@@ -28,10 +28,15 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
-
 	// Points stack to main kernel stack.
 	mov $stack_top, %esp
 	
+	// Pushes %ebx to pass address of the Multiboot memory map as a
+	// parameter to boot_main
+    push %ebx
+
+	// Calls C boot procedure to do additional setup before the kernel is
+	// called.
 	call boot_main
 
 	// Loops infinitely in case an error causes boot_main to return.
