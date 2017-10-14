@@ -25,15 +25,32 @@ stack_top:
 
 // Declare entry function.
 .section .text
-.global _start
-.type _start, @function
 _start:
     // Points stack to main kernel stack.
     mov $stack_top, %esp
+    
+    // TODO: Detect whether long-mode is supported and abort if not.
 	
+	///////////////
     // TODO: Change to 64-bit before calling boot_main, as all C code will
     // be compiled as 64-bit and we will trigger an exception if we try to
     // call any C code first.
+    ///////////////
+    
+    // Initialize GDT, IDT, and page tables.
+    
+    // Disable paging (clear CR4.PG).
+    xorl
+    
+    // Set CR4.PAE.
+    
+    // Load CR3 with physical address of the PML4.
+    
+    // Enable long mode by setting the EFER.LME flag in MSR 0xC0000080.
+    
+    // Enable paging.
+    
+    ///////////////
 
     // Pushes %ebx to pass address of the Multiboot memory map as a
     // parameter to boot_main
