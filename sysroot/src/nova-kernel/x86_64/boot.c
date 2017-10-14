@@ -1,13 +1,17 @@
+// Authors: Seth McBee
+// Created: 2017-10-14
+// Description: x86_64 initial C boot environment.
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include <boot/cpu.h>
-#include <boot/memory_map.h>
-#include <boot/multiboot.h>
-#include <boot/drivers/graphics/vga_color_text_mode.h>
-#include <boot/kernel/kernel.h>
-#include <boot/ui/terminal.h>
+#include <drivers/graphics/vga_color_text_mode.h>
+#include <kernel.h>
+#include <ui/terminal.h>
+#include <x86_64/cpu.h>
+#include <x86_64/memory_map.h>
+#include <x86_64/multiboot.h>
 
 void boot_main(multiboot_info_t* mbd, unsigned int magic)
 {
