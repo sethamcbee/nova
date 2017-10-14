@@ -32,14 +32,13 @@ _start:
 	// Points stack to main kernel stack.
 	mov $stack_top, %esp
 	
-	call kernel_main
+	call boot_main
 
-	// Loops infinitely in case an error causes kernel_main to return.
+	// Loops infinitely in case an error causes boot_main to return.
 	cli
 1:	hlt
 	jmp 1b
 
 // Set the size of the _start symbol to the current location '.' minus its start.
 // This is useful when debugging or when you implement call tracing.
-*/
 .size _start, . - _start
