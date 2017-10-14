@@ -31,6 +31,10 @@ _start:
 	// Points stack to main kernel stack.
 	mov $stack_top, %esp
 	
+	// TODO: Change to 64-bit before calling boot_main, as all C code will
+	// be compiled as 64-bit and we will trigger an exception if we try to
+	// call any C code first.
+	
 	// Pushes %ebx to pass address of the Multiboot memory map as a
 	// parameter to boot_main
     push %ebx
