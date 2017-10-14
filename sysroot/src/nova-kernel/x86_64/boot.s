@@ -28,25 +28,25 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
-	// Points stack to main kernel stack.
-	mov $stack_top, %esp
+    // Points stack to main kernel stack.
+    mov $stack_top, %esp
 	
-	// TODO: Change to 64-bit before calling boot_main, as all C code will
-	// be compiled as 64-bit and we will trigger an exception if we try to
-	// call any C code first.
-	
-	// Pushes %ebx to pass address of the Multiboot memory map as a
-	// parameter to boot_main
+    // TODO: Change to 64-bit before calling boot_main, as all C code will
+    // be compiled as 64-bit and we will trigger an exception if we try to
+    // call any C code first.
+
+    // Pushes %ebx to pass address of the Multiboot memory map as a
+    // parameter to boot_main
     push %ebx
 
-	// Calls C boot procedure to do additional setup before the kernel is
-	// called.
-	call boot_main
+    // Calls C boot procedure to do additional setup before the kernel is
+    // called.
+    call boot_main
 
-	// Loops infinitely in case an error causes boot_main to return.
-	cli
+    // Loops infinitely in case an error causes boot_main to return.
+    cli
 1:	hlt
-	jmp 1b
+    jmp 1b
 
 // Set the size of the _start symbol to the current location '.' minus its start.
 // This is useful when debugging or when you implement call tracing.
