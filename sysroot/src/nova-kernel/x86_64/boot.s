@@ -1,69 +1,85 @@
-// Authors: Seth McBee, with code from OSDev Wiki
-// Created: 2017-10-11
-// Description: Initial boot file; first code ran by the bootloader.
+# Authors: Seth McBee, with code from OSDev Wiki
+# Created: 2017-10-11
+# Description: Initial boot file: first code ran by the bootloader.
 
-// Declare constants for the Multiboot header.
-.set ALIGN,    1<<0             // align loaded modules on page boundaries
-.set MEMINFO,  1<<1             // provide memory map
-.set FLAGS,    ALIGN | MEMINFO  // this is the Multiboot 'flag' field
-.set MAGIC,    0x1BADB002       // 'magic number' lets bootloader find the header
-.set CHECKSUM, -(MAGIC + FLAGS) // checksum of above, to prove we are multiboot
+# Declare constants for the Multiboot header.
+.set ALIGN, (1 << 0)             # align loaded modules on page boundaries
+.set MEMINFO, (1 << 1)             # provide memory map
+.set FLAGS, (ALIGN | MEMINFO)  # this is the Multiboot 'flag' field
+.set MAGIC, 0x1BADB002       # 'magic number' lets bootloader find the header
+.set CHECKSUM, -(MAGIC + FLAGS) # checksum of above
 
-// Declare Multiboot header.
+# Declare constants for transition to long mode.
+.set CR0_PG_MASK, (1 << 31)
+.set CR4_PAE_MASK, (1 << 5)
+
+# Define Multiboot header.
 .section .multiboot
 .align 4
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
 
-// Declare main kernel stack.
+# Define main kernel stack.
 .section .bss
 .align 16
 stack_bottom:
-.skip 16384 // 16 KiB
+.skip 16384 # 16kb
 stack_top:
 
-// Declare entry function.
+# Define entry function.
 .section .text
+.code32
 _start:
-    // Points stack to main kernel stack.
-    mov $stack_top, %esp
-    
-    // TODO: Detect whether long-mode is supported and abort if not.
+	# Note: At this point, %ebx contains the address of the Multiboot
+	# memory map. This will need to be passed to boot_main.
 	
-	///////////////
-    // TODO: Change to 64-bit before calling boot_main, as all C code will
-    // be compiled as 64-bit and we will trigger an exception if we try to
-    // call any C code first.
-    ///////////////
+    # Points stack to main kernel stack.
+    movl $stack_top, %esp
     
-    // Initialize GDT, IDT, and page tables.
-    
-    // Disable paging (clear CR4.PG).
-    xorl
-    
-    // Set CR4.PAE.
-    
-    // Load CR3 with physical address of the PML4.
-    
-    // Enable long mode by setting the EFER.LME flag in MSR 0xC0000080.
-    
-    // Enable paging.
-    
-    ///////////////
+    # TODO: Detect whether long-mode is supported and abort if not.
 
-    // Pushes %ebx to pass address of the Multiboot memory map as a
-    // parameter to boot_main
-    push %ebx
+	############
+    # TODO: Change to 64-bit before calling boot_main, as all C code will
+    # be compiled as 64-bit and we will trigger an exception if we try to
+    # call any C code first.
+    ############
+    
+    # Initialize GDT, IDT, and page tables.
+    
+    # Disable paging (clear CR0.PG).
+    movl %cr0, %eax
+    andl -CR0_PG_MASK, %eax
+    movl %eax, %cr0
+    
+    # Set CR4.PAE.
+    movl %cr4, %eax
+    orl CR4_PAE_MASK, %eax
+    movl %eax, %cr4
+    
+    # Load CR3 with physical address of the PML4.
+    
+    # Enable long mode by setting the EFER.LME flag in MSR 0xC0000080.
+    
+    # Enable paging.
+    
+    ###########
 
-    // Calls C boot procedure to do additional setup before the kernel is
-    // called.
+# 64-bit mode from here on out.
+.code64
+
+    # Pushes %ebx to pass address of the Multiboot memory map as a
+    # parameter to boot_main
+    pushq %rbx
+
+    # Calls C boot procedure to do additional setup before the kernel is
+    # called.
     call boot_main
 
-    // Loops infinitely in case an error causes boot_main to return.
-    cli
+	# Loops infinitely in case an error causes boot_main to return.
+	cli
 1:	hlt
-    jmp 1b
+	jmp 1b
 
 // Set the size of the _start symbol to the current location '.' minus its start.
 // This is useful when debugging or when you implement call tracing.
