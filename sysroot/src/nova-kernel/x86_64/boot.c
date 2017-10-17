@@ -6,35 +6,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <drivers/graphics/vga_color_text_mode.h>
 #include <kernel.h>
-#include <ui/terminal.h>
-#include <x86_64/cpu.h>
-#include <x86_64/memory_map.h>
-#include <x86_64/multiboot.h>
+#include <x86_64/multiboot2.h>
 
-void boot_main(multiboot_info_t* mbd, unsigned int magic)
+void boot_main(multiboot_tag* multiboot_tag, unsigned int magic)
 {
-    /* Makes sure interrupts are disabled, since the interrupt handler hasn't
-     * been enabled yet. */
-    cpu_disable_interrupts();
+	// TODO: Setup permanent GDT, IDT, paging, etc.
+	
+    // TODO: Safely copy all needed Multiboot2 structures.
 
-    /* Make permanent copy of memory map. This is done first to preserve
-     * the integrity of the structure, preventing the memory manager from
-     * allocating it's memory. */
-    multiboot_get_multiboot_info(mbd);
+    // TODO: Initialize memory manager.
 
-    /* Initialize memory manager. */
-    memory_initialize();
-
-    /* Set terminal driver. */
-    terminal_driver_set(vga_color_text_mode_get_driver());
-
-    /* Initialize terminal. */
-    terminal_initialize();
-
-    terminal_write_string("Booted.\n");
-
-    /* Call kernel. */
+    // TODO: Initialize terminal.
+    
+    // Call kernel.
     kernel_main();
 }
