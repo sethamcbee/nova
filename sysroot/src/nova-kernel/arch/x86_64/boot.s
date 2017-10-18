@@ -26,11 +26,31 @@ multiboot_start:
 Lend_tag_start:
 	.word 0 # Type
 	.word 0 # Flags
-	.long 8 # Size - special code for last tag
+	.long Lend_tag_end - Lend_tag_start # Size
 Lend_tag_end:
 multiboot_end:
 
-# Define temporary paging structure.
+# Storage for Multiboot2 MAGIC and info struct pointer.
+.section .bss
+Lmb_info:
+	.long
+Lmb_magic:
+	.long
+
+# Define temporary paging structure. This will only be a stub, so
+# real paging can be handled in C by kernel_main.
+.section .data
+.align (0x1000) # align to page boundary
+Lpaging_struct_start:
+Lpml4:
+	.skip 0x1000
+Lpdp:
+	.skip 0x1000
+Lpd:
+	.skip 0x1000
+Lpt:
+	.skip 0x1000
+Lpaging_struct_end:
 
 # Define main kernel stack.
 .section .bss
@@ -44,37 +64,56 @@ kernel_stack_top:
 .code32
 .global _start
 _start:
-	# Points stack to main kernel stack.
+# TODO: Detect whether long-mode is supported and hang if not.
+
+# Points stack to main kernel stack.
     movl $kernel_stack_top, %esp
 
-	# Note: At this point, %eax should contain MB_MAGIC_TEST and %ebx should
-	# contain the address of the Multiboot memory map. These will need to
-	# be passed to boot_main. Because %eax is used for writing to MSRs,
-	# move %eax to %ebp to preserve its value.
-	movl %eax, %ebp
-    
-    # TODO: Detect whether long-mode is supported and hang if not.
+# Note: At this point, %eax should contain MB_MAGIC_TEST and %ebx should
+# contain the address of the Multiboot memory map. These will need to
+# be passed to boot_main.
+	movl %eax, Lmb_magic
+	movl %ebx, Lmb_info
        
-    # Setup temporary page table.
+# Setup temporary page table. Some code from OSDev.org wiki.
+	movl $0x1000, %edi # set first location to iterate from
+	movl %edi, %cr3
+	xorl %eax, %eax
+	movl $0x1000, %ecx # set number of iterations to 4KiB
+	rep stosl # clear all (sets each long to value of %eax)
+	movl %cr3, %edi # set %edi to beginning again
+	movl $0x2003, (%edi)
+	addl $0x1000, %edi
+	movl $0x3003, (%edi)
+	addl $0x1000, %edi
+	movl $0x4003, (%edi)
+	addl $0x1000, %edi
+	
+	movl $00000003, %ebx # set pages to PRESENT, and RW
+	movl $512, %ecx # loop 512 times
+.Lset_entry:
+	movl %ebx, (%edi)
+	addl $0x1000, %ebx
+	addl $8, %edi # iterate eight bytes
+	loop .Lset_entry
     
-    # Set CR4.PAE.
+# Set CR4.PAE.
     movl %cr4, %eax
     orl $CR4_PAE_MASK, %eax
     movl %eax, %cr4
     
-    # Load CR3 with physical address of the PML4.
-    
-    # Set long mode bit by setting the EFER.LME flag in MSR 0xC0000080.
+# Set long mode bit by setting the EFER.LME flag in MSR 0xC0000080.
     movl $LONG_MODE_MSR, %ecx
     rdmsr
     orl $LONG_MODE_MASK, %eax
     wrmsr
     
-    # Enable paging and thereby enter compatibility mode.
+# Enable paging and thereby enter compatibility mode.
     movl %cr0, %eax
     orl $CR0_PG_MASK, %eax
+    movl %eax, %cr0
     
-    # Setup GDT and jump to long mode.
+# Setup GDT and jump to long mode.
 Lgdt_load:
     movl $gdt_pointer, %eax # Load pointer to GDT to %eax
     lgdt (%eax) # Tell CPU to load descriptor
@@ -88,25 +127,20 @@ Lgdt_load:
     pushl $Lgdt_load_cs
 	retf # We far jump to load the selector.
 Lgdt_load_cs:
-
-	# Long mode from here on out.
 .code64
-
-    # Moves the address of the Mulitboot info structure to %rdi
-    # so it can be the first argument to boot_main.
-    movl %ebx, %ebx
-    movq %rbx, %rdi
+# Moves the address of the Multiboot info structure to %rdi
+# so it can be the first argument to boot_main.
+    movl Lmb_info, %edi
     
-    # Moves the value of MB_MAGIC_TEST to %rsi, so it can be the
-    # second argument to boot_main.
-    movl %ebp, %ebp
-    movq %rbp, %rsi
+# Moves the value of MB_MAGIC_TEST to %rsi, so it can be the
+# second argument to boot_main.
+    movl Lmb_magic, %esi
 
-    # Calls C boot procedure to do additional setup before the kernel is
-    # called.
+# Calls C boot procedure to do additional setup before the kernel is
+# called.
     call boot_main
 
-	# Loops infinitely in case an error causes boot_main to return.
+# Loops infinitely in case an error causes boot_main to return.
 	cli
 1:	hlt
 	jmp 1b
