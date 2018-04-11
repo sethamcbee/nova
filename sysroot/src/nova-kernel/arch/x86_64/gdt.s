@@ -7,7 +7,7 @@
 .set GDT_SIZE, (Lgdt_end - Lgdt_start - 1) # Size of table minus 1.
 
 # Define GDT pointer.
-.section .data
+.data
 .global gdt_pointer
 .align 16
 gdt_pointer:
@@ -15,8 +15,7 @@ gdt_pointer:
     .quad Lgdt_start # Address of GDT
 
 # Define GDT.
-.section .data
-.align
+.align 16
 Lgdt_start:
 Lgdt_null: # Null descriptor.
     .long 0

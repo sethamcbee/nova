@@ -71,7 +71,7 @@ DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
 GCC_PREFIX=x86_64-elf-
-OPTIMIZE=-Og
+OPTIMIZE=-O0
 AS=$(GCC_DIR)/$(GCC_PREFIX)as
 ASFLAGS=\
 	$(INCLUDE_SCRIPT)
@@ -138,6 +138,8 @@ QEMU_FLAGS=\
 	-boot d \
 	-display sdl \
 	-monitor stdio \
+	-no-reboot \
+	-no-shutdown \
 	-m $(QEMU_MEMORY) \
 	-cpu $(QEMU_CPU) \
 	-smp $(QEMU_SMP) \
@@ -187,6 +189,11 @@ $(ISO): $(BIN)
 qemu: $(ISO)
 	$(TERMINAL) -e "$(QEMU) $(QEMU_FLAGS)" &
 	$(GDB) -tui --quiet $(BIN) -ex "set confirm off" -ex "target remote localhost:1234"
+
+.PHONY: bochs
+bochs: $(ISO)
+	bochs
+
 # target to export assembled source files
 .PHONY: asm
 asm: $(ASM)

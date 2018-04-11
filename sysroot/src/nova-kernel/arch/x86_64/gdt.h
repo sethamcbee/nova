@@ -5,6 +5,10 @@
 #ifndef GDT_H
 #define GDT_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 // If any entries are modifed, assembly files may need to be updated
 // manually.
 #define GDT_KERNEL_CODE 0x08

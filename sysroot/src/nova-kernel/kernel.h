@@ -13,9 +13,12 @@
 void kernel_main(void);
 
 // Kernel panic. Prints panic message and then halts infinitely.
-void kernel_panic(char *str, size_t len);
+void kernel_panic(char *str);
 
 // Function pointer to the environment-specific terminal write().
 int (*kernel_write)(const void *, size_t);
+
+// Finds the length of the string and then calls kernel_write.
+int kernel_print(const char *s);
 
 #endif // KERNEL_H

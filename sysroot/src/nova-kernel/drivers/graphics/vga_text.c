@@ -29,6 +29,11 @@ int vga_text_write(const void *str, size_t len)
     {
         switch (p[i])
         {
+        case '\n':
+            vga_cur_x = 0;
+            vga_cur_y++;
+            break;
+
         // Just write the character.
         default:
             vga_text_put_char(p[i], vga_cur_x, vga_cur_y, vga_color);

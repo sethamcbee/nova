@@ -7,18 +7,21 @@
 #include <stdint.h>
 
 #include <kernel.h>
+#include <arch/x86_64/idt.h>
 #include <arch/x86_64/multiboot2.h>
 
 void boot_main(struct multiboot_header_tag* multiboot_tag, unsigned int magic)
 {
-	// TODO: Setup permanent GDT, IDT, paging, etc.
-	
+    // TODO: Set up IDT.
+    idt_initialize();
+
+    // TODO: Remap and set up IRQs.
+
+    // TODO: Set up paging.
+
     // TODO: Parse Multiboot2 structure.
 
     // TODO: Initialize memory manager.
 
-    // TODO: Initialize terminal.
-    
-    // Call kernel.
     kernel_main();
 }
