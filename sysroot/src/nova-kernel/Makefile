@@ -63,7 +63,7 @@ DEFINES=\
 
 # special defines
 ifeq ($(ARCH), x86_64)
-	DEFINES+=_ARCH_X86_64_
+	DEFINES+=ARCH_X86_64
 endif
 
 # add prefix to defines
