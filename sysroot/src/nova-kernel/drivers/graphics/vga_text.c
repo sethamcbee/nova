@@ -8,7 +8,7 @@
 
 #include <drivers/graphics/vga_text.h>
 
-static uint16_t *vga_buffer;
+static volatile uint16_t *vga_buffer;
 static uint16_t vga_cur_x;
 static uint16_t vga_cur_y;
 static uint16_t vga_color;

@@ -2,8 +2,8 @@
 // Created: 2017-10-14
 // Description: Main kernel.
 
-#ifndef _KERNEL_H_
-#define _KERNEL_H_
+#ifndef KERNEL_H
+#define KERNEL_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -18,4 +18,4 @@ void kernel_panic(char *str, size_t len);
 // Function pointer to the environment-specific terminal write().
 int (*kernel_write)(const void *, size_t);
 
-#endif // _KERNEL_H_
+#endif // KERNEL_H

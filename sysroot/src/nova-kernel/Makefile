@@ -26,8 +26,8 @@ DEBUG_DIR=$(BUILD_DIR)/debug
 QEMU_DIR=$(BUILD_DIR)/qemu
 
 # find all source files except architecture-specific files
-SRC=$(shell find $(SRC_DIR) -type f -name "*.c" -not -path "./arch/*")
-SRC+=$(shell find $(SRC_DIR) -type f -name "*.s" -not -path "./arch/*")
+SRC=$(shell find $(SRC_DIR) -type f -name "*.c" -not -path "./arch/*" -not -path "./build/*")
+SRC+=$(shell find $(SRC_DIR) -type f -name "*.s" -not -path "./arch/*" -not -path "./build/*")
 
 # add appropriate architecture-specific files
 ifeq ($(ARCH), x86_64)
@@ -71,7 +71,7 @@ DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
 GCC_PREFIX=x86_64-elf-
-OPTIMIZE=-O2
+OPTIMIZE=-Og
 AS=$(GCC_DIR)/$(GCC_PREFIX)as
 ASFLAGS=\
 	$(INCLUDE_SCRIPT)
@@ -108,9 +108,9 @@ GDB=~/opt/gdb-8.1/bin/gdb
 
 # adds additional compiler flags if debugging
 ifeq ($(DEBUG),true)
-ASFLAGS+= -gdwarf-2
-CCFLAGS+= -gdwarf-2
-CPPFLAGS+= -gdwarf-2
+	ASFLAGS+= -gdwarf-2
+	CCFLAGS+= -gdwarf-2
+	CPPFLAGS+= -gdwarf-2
 endif
 
 # Grub2 settings

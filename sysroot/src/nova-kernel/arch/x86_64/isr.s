@@ -2,8 +2,8 @@
 # Created: 2017-10-17
 # Description: Interrupt Service Routines.
 
-.text
 .code64
+.text
 .global isr_0
 isr_0:
 	iretq

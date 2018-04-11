@@ -2,8 +2,8 @@
 // Created: 2018-10-14
 // Description: VGA color text mode driver.
 
-#ifndef _VGA_TEXT_H_
-#define _VGA_TEXT_H_
+#ifndef VGA_TEXT_H
+#define VGA_TEXT_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -49,4 +49,4 @@ void vga_text_put_char(uint8_t c, uint8_t x, uint8_t y, uint16_t color);
 // Formats a color scheme.
 uint8_t vga_text_make_color(Vga_Text_Color fg, Vga_Text_Color bg);
 
-#endif // _VGA_TEXT_H_
+#endif // VGA_TEXT_H
