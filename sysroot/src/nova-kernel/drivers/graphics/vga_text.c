@@ -9,9 +9,9 @@
 #include <drivers/graphics/vga_text.h>
 
 static volatile uint16_t *vga_buffer;
-static uint16_t vga_cur_x;
-static uint16_t vga_cur_y;
-static uint16_t vga_color;
+static uint8_t vga_cur_x;
+static uint8_t vga_cur_y;
+static uint8_t vga_color;
 
 int vga_text_write(const void *str, size_t len)
 {
@@ -79,8 +79,10 @@ void vga_text_initialize(void)
     vga_text_initialized = true;
 
     // Clear the buffer.
+    uint16_t entry = ' ' | (vga_color << 8);
     for (size_t i = 0; i < (VGA_TEXT_HEIGHT * VGA_TEXT_WIDTH); i++)
     {
+        vga_buffer[i] = entry;
     }
 }
 
@@ -90,7 +92,7 @@ uint8_t vga_text_make_color(Vga_Text_Color fg, Vga_Text_Color bg)
     return (color);
 }
 
-void vga_text_put_char(uint8_t c, uint8_t x, uint8_t y, uint16_t color)
+void vga_text_put_char(uint8_t c, uint8_t x, uint8_t y, uint8_t color)
 {
     // Find position in the buffer.
     size_t pos = x + (y * VGA_TEXT_WIDTH);

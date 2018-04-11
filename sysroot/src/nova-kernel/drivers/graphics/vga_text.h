@@ -44,7 +44,7 @@ int vga_text_write(const void *str, size_t len);
 void vga_text_initialize(void);
 
 // Writes a single character at the given (x,y) with a certain color scheme.
-void vga_text_put_char(uint8_t c, uint8_t x, uint8_t y, uint16_t color);
+void vga_text_put_char(uint8_t c, uint8_t x, uint8_t y, uint8_t color);
 
 // Formats a color scheme.
 uint8_t vga_text_make_color(Vga_Text_Color fg, Vga_Text_Color bg);
