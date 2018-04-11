@@ -5,9 +5,8 @@ VERSION=nova
 DEBUG=true
 
 # Output file names
-BIN=$(BIN_DIR)/$(VERSION).bin
+BIN=$(BIN_DIR)/$(VERSION).elf
 ISO=$(ISO_DIR)/$(VERSION).iso
-SYM=$(DEBUG_DIR)/debug.sym
 
 # build root directory
 BUILD_DIR=./build
@@ -57,7 +56,7 @@ LIBRARY_PATH=
 TERMINAL=xfce4-terminal
 
 # directory containing gcc
-GCC_DIR=/home/sethamcbee/opt/gcc-7.2.0/bin
+GCC_DIR=/home/sethamcbee/opt/gcc-7.3.0-x86_64-elf/bin
 
 # config defines
 DEFINES=\
@@ -71,11 +70,12 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
+GCC_PREFIX=x86_64-elf-
 OPTIMIZE=-O2
-AS=$(GCC_DIR)/as
+AS=$(GCC_DIR)/$(GCC_PREFIX)as
 ASFLAGS=\
 	$(INCLUDE_SCRIPT)
-CC=$(GCC_DIR)/gcc
+CC=$(GCC_DIR)/$(GCC_PREFIX)gcc
 CCFLAGS=\
 	$(INCLUDE_SCRIPT) \
 	$(OPTIMIZE) \
@@ -83,9 +83,8 @@ CCFLAGS=\
 	-std=gnu11 \
 	-ffreestanding \
 	-Wall \
-	-Wextra \
 	-mno-red-zone
-CPP=$(GCC_DIR)/g++
+CPP=$(GCC_DIR)/$(GCC_PREFIX)g++
 CPPFLAGS=\
 	$(INCLUDE_SCRIPT) \
 	$(OPTIMIZE) \
@@ -93,7 +92,6 @@ CPPFLAGS=\
 	-std=gnu++11 \
 	-ffreestanding \
 	-Wall \
-	-Wextra \
 	-fno-exceptions \
 	-fno-rtti \
 	-mno-red-zone
@@ -105,12 +103,14 @@ LDFLAGS=\
 	-ffreestanding \
 	-nostdlib \
 	-lgcc
+GDB=~/opt/gdb-8.1/bin/gdb
+#GDB=gdb
 
 # adds additional compiler flags if debugging
-ifeq ($(DEBUG), true)
-ASFLAGS+=-gdwarf-2
-CCFLAGS+=-gdwarf-2
-CPPFLAGS+=-gdwarf-2
+ifeq ($(DEBUG),true)
+ASFLAGS+= -gdwarf-2
+CCFLAGS+= -gdwarf-2
+CPPFLAGS+= -gdwarf-2
 endif
 
 # Grub2 settings
@@ -166,8 +166,6 @@ $(BIN): $(OBJ)
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(DEBUG_DIR)
 	$(LD) -T $(LD_SCRIPT) -o $(BIN) $(LDFLAGS) $(OBJ)
-	objcopy --only-keep-debug $(BIN) $(SYM)
-	objcopy --strip-debug $(BIN)
 
 # target to build output binary
 .PHONY: bin
@@ -188,8 +186,7 @@ $(ISO): $(BIN)
 .PHONY: qemu
 qemu: $(ISO)
 	$(TERMINAL) -e "$(QEMU) $(QEMU_FLAGS)" &
-	gdb --tui --quiet -ex "set confirm off" -ex "target remote localhost:1234" -ex "symbol-file $(SYM)"
-
+	$(GDB) -tui --quiet $(BIN) -ex "set confirm off" -ex "target remote localhost:1234"
 # target to export assembled source files
 .PHONY: asm
 asm: $(ASM)
@@ -197,17 +194,17 @@ asm: $(ASM)
 # assemble assembly files, generic
 $(OBJ_DIR)/%.s.o: %.s
 	mkdir -p $(@D)
-	$(AS) $< -o $@ $(ASFLAGS)
+	$(AS) $(ASFLAGS) $< -o $@
 
 # compile C files, generic
 $(OBJ_DIR)/%.c.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CCFLAGS)
+	$(CC) $(CCFLAGS) -c $< -o $@
 
 # compile C++ files, generic
 $(OBJ_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(@D)
-	$(CPP) -c $< -o $@ $(CPPFLAGS)
+	$(CPP) $(CPPFLAGS) -c $< -o $@
 
 # copy assembly files, generic
 $(ASM_DIR)/%.s.s: %.s
@@ -217,9 +214,9 @@ $(ASM_DIR)/%.s.s: %.s
 # assemble C files, generic
 $(ASM_DIR)/%.c.s: %.c
 	mkdir -p $(@D)
-	$(CC) -S $< -o $@ $(CCFLAGS)
+	$(CC) $(CCFLAGS) -S $< -o $@
 
 # assemble C++ files, generic
 $(ASM_DIR)/%.cpp.s: %.cpp
 	mkdir -p $(@D)
-	$(CPP) -S $< -o $@ $(CPPFLAGS)
+	$(CPP) $(CPPFLAGS) -S $< -o $@

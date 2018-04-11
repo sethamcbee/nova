@@ -7,9 +7,14 @@
 #include <stdint.h>
 
 #include <kernel.h>
+#include <drivers/graphics/vga_text.h>
 
 void kernel_main(void)
 {
+    // Set up terminal based on arch. Stub, only for kernel testing.
+    kernel_write = vga_text_write;
+
+    kernel_write("fuck", 4);
 }
 
 void kernel_panic(char* str, size_t len)
@@ -18,4 +23,5 @@ void kernel_panic(char* str, size_t len)
     str[len] = '\0';
 
     // TODO: Print panic message and then halt.
+    kernel_write(str, len);
 }

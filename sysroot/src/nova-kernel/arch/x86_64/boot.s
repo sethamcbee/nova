@@ -74,7 +74,7 @@ _start:
 # be passed to boot_main.
 	movl %eax, Lmb_magic
 	movl %ebx, Lmb_info
-       
+
 # Setup temporary page table. Some code from OSDev.org wiki.
 	movl $0x1000, %edi # set first location to iterate from
 	movl %edi, %cr3
@@ -88,7 +88,7 @@ _start:
 	addl $0x1000, %edi
 	movl $0x4003, (%edi)
 	addl $0x1000, %edi
-	
+
 	movl $00000003, %ebx # set pages to PRESENT, and RW
 	movl $512, %ecx # loop 512 times
 .Lset_entry:
@@ -96,23 +96,23 @@ _start:
 	addl $0x1000, %ebx
 	addl $8, %edi # iterate eight bytes
 	loop .Lset_entry
-    
+
 # Set CR4.PAE.
     movl %cr4, %eax
     orl $CR4_PAE_MASK, %eax
     movl %eax, %cr4
-    
+
 # Set long mode bit by setting the EFER.LME flag in MSR 0xC0000080.
     movl $LONG_MODE_MSR, %ecx
     rdmsr
     orl $LONG_MODE_MASK, %eax
     wrmsr
-    
+
 # Enable paging and thereby enter compatibility mode.
     movl %cr0, %eax
     orl $CR0_PG_MASK, %eax
     movl %eax, %cr0
-    
+
 # Setup GDT and jump to long mode.
 Lgdt_load:
     movl $gdt_pointer, %eax # Load pointer to GDT to %eax
@@ -124,14 +124,14 @@ Lgdt_load:
     movw %ax, %gs
     movw %ax, %ss
     pushl $0x08 # Load code entry from GDT
-    pushl $Lgdt_load_cs
+    pushl $enter_64
 	retf # We far jump to load the selector.
-Lgdt_load_cs:
+enter_64:
 .code64
 # Moves the address of the Multiboot info structure to %rdi
 # so it can be the first argument to boot_main.
     movl Lmb_info, %edi
-    
+
 # Moves the value of MB_MAGIC_TEST to %rsi, so it can be the
 # second argument to boot_main.
     movl Lmb_magic, %esi
