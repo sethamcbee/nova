@@ -44,7 +44,8 @@ ASM=$(addprefix $(ASM_DIR)/, $(addsuffix .s, $(SRC)))
 
 # additional include paths
 INCLUDE_PATH=\
-$(SRC_DIR)
+$(SRC_DIR) \
+$(SRC_DIR)/libc
 
 # script for adding specified include paths
 INCLUDE_SCRIPT=$(addprefix -I, $(INCLUDE_PATH))
@@ -71,7 +72,7 @@ DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
 GCC_PREFIX=x86_64-elf-
-OPTIMIZE=-O0
+OPTIMIZE=-Og
 AS=$(GCC_DIR)/$(GCC_PREFIX)as
 ASFLAGS=\
 	$(INCLUDE_SCRIPT)

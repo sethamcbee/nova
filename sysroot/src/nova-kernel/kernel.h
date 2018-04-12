@@ -21,4 +21,7 @@ int (*kernel_write)(const void *, size_t);
 // Finds the length of the string and then calls kernel_write.
 int kernel_print(const char *s);
 
+// Safely stops all operation.
+void kernel_halt(void);
+
 #endif // KERNEL_H

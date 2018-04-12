@@ -7,16 +7,14 @@
 #include <stdint.h>
 
 #include <kernel.h>
+#include <arch/x86_64/cpu.h>
 #include <drivers/graphics/vga_text.h>
 
 void kernel_main(void)
 {
-    // Set up terminal based on arch. Stub, only for kernel testing.
-    kernel_write = vga_text_write;
-
-    asm ("   \n");
-
-    kernel_print("Help\n  me");
+    // The kernel is not intended to return; halt.
+    kernel_print("\nEnd of kernel code. Halt.");
+    kernel_halt();
 }
 
 void kernel_panic(char* str)
@@ -26,27 +24,38 @@ void kernel_panic(char* str)
     kernel_print(str);
 
     // Infinite loop.
-    volatile int loop = 1;
-    while (loop == 1)
-    {
-        // Do nothing.
-    }
+    kernel_halt();
 }
 
 int kernel_print(const char *s)
 {
     size_t len;
-    size_t timeout = 100000000;
+    size_t timeout = 100000;
 
     // Find the length of the string.
-    for (len = 0; len < timeout; len++)
+    for (len = 0; len <= timeout; len++)
     {
         if (s[len] == '\0')
         {
             break;
         }
+
+        if (len == timeout)
+        {
+            kernel_print("!!kernel_print timeout!!");
+            return (-1);
+        }
     }
 
     int ret = kernel_write(s, len);
     return (ret);
+}
+
+void kernel_halt(void)
+{
+    volatile int loop = 1;
+    while (loop == 1)
+    {
+        // Do nothing.
+    }
 }

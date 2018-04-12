@@ -8,6 +8,10 @@
 
 #include <drivers/graphics/vga_text.h>
 
+#ifdef ARCH_X86_64
+    #include <arch/x86_64/cpu.h>
+#endif
+
 static volatile uint16_t *vga_buffer;
 static uint8_t vga_cur_x;
 static uint8_t vga_cur_y;
@@ -37,11 +41,9 @@ int vga_text_write(const void *str, size_t len)
         // Just write the character.
         default:
             vga_text_put_char(p[i], vga_cur_x, vga_cur_y, vga_color);
+            vga_cur_x++;
             break;
         }
-
-        // Move cursor to next position.
-        vga_cur_x++;
 
         if (vga_cur_x == VGA_TEXT_WIDTH)
         {
@@ -84,6 +86,12 @@ void vga_text_initialize(void)
     {
         vga_buffer[i] = entry;
     }
+
+    // Disable the cursor.
+    #ifdef ARCH_X86_64
+        cpu_outb(0xD4, 0x0A); // Magic.
+        cpu_outb(0xD5, 0x20);
+    #endif
 }
 
 uint8_t vga_text_make_color(Vga_Text_Color fg, Vga_Text_Color bg)

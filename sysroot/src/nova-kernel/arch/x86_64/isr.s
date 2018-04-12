@@ -13,6 +13,7 @@
 	push %r9
 	push %r10
 	push %r11
+	cld
 .endm
 
 # Pops registers.
