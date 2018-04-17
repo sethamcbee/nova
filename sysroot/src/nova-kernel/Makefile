@@ -12,7 +12,7 @@ ISO=$(ISO_DIR)/$(VERSION).iso
 BUILD_DIR=./build
 SRC_DIR:=.
 
-# Architecture. Options are: x86_64
+# Architecture. Options are: x86_64, x86
 ARCH=x86_64
 
 # Whether to enable the __stack_chk_guard.
@@ -37,6 +37,11 @@ ifeq ($(ARCH), x86_64)
 	LD_SCRIPT=x86_64.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.c")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.s")
+endif
+ifeq ($(ARCH), x86)
+	LD_SCRIPT=x86.ld
+	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.c")
+	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.s")
 endif
 
 # objects list made from generic sources list
@@ -74,6 +79,9 @@ DEFINES=\
 # special defines
 ifeq ($(ARCH), x86_64)
 	DEFINES+=ARCH_X86_64
+endif
+ifeq ($(ARCH), x86)
+	DEFINES+=ARCH_X86
 endif
 ifeq ($(STACK_GUARD), true)
 	DEFINES+=STACK_GUARD

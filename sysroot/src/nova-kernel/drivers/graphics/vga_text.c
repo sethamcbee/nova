@@ -12,6 +12,10 @@
     #include <arch/x86_64/cpu.h>
 #endif
 
+#ifdef ARCH_X86
+    #include <arch/x86/cpu.h>
+#endif
+
 static volatile uint16_t *vga_buffer;
 static uint8_t vga_cur_x;
 static uint8_t vga_cur_y;

@@ -9,8 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-uint8_t ps2_keyboard_queue;
-
 // PS/2 keyboard responses.
 #define PS2_KB_ACK        0xFA
 #define PS2_KB_ECHO       0xEE
@@ -50,6 +48,11 @@ void ps2_keyboard_initialize(void);
 void ps2_keyboard_main(void);
 
 void ps2_keyboard_handle(uint8_t code);
+
+// Keyboard handler queue.
+#define PS2_KB_QUEUE_MAX 32
+uint8_t ps2_keyboard_queue[PS2_KB_QUEUE_MAX];
+uint8_t ps2_keyboard_queue_count;
 
 // Stores keyboard mapping.
 char ps2_keyboard_table[256];

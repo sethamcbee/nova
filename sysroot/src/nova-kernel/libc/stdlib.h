@@ -122,6 +122,8 @@ int rand(void);
  */
 void srand(unsigned int seed);
 
+int rand_max(unsigned int max);
+
 /**
  * @brief Searches array for an item that matches the key specified using a
  * specified function.

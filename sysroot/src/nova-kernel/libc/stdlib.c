@@ -428,3 +428,14 @@ char* sitoa(size_t val, char* str, int base)
 
 	return (str);
 }
+
+static unsigned long int rand_seed = 1;
+int rand_max(unsigned int max) // RAND_MAX assumed to be 32767
+{
+    rand_seed = rand_seed * 1103515245 + 12345;
+    return (unsigned int)(rand_seed / 65536) % (max + 1);
+}
+void srand( unsigned int seed )
+{
+    rand_seed = seed;
+}

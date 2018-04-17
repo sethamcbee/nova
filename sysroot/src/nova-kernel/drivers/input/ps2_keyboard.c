@@ -13,17 +13,23 @@
 #include <kernel.h>
 #include <drivers/input/ps2_keyboard.h>
 
-//#ifdef ARCH_X86_64
+#ifdef ARCH_X86_64
     #include <arch/x86_64/cpu.h>
     #include <arch/x86_64/pic.h>
     #include <arch/x86_64/ps2.h>
-//#endif
+#endif
+
+#ifdef ARCH_X86
+    #include <arch/x86/cpu.h>
+    #include <arch/x86/pic.h>
+    #include <arch/x86/ps2.h>
+#endif
 
 static void ps2_kb_flush(void);
 
 void ps2_keyboard_initialize(void)
 {
-    ps2_keyboard_queue = 0;
+    ps2_keyboard_queue_count = 0;
     volatile uint8_t response = 0;
 
     // Disable 2nd PS/2 channel.
@@ -56,19 +62,19 @@ void ps2_keyboard_initialize(void)
         response = ps2_receive(PS2_DATA);
     }
     while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
+
+    // Flush again.
+    ps2_kb_flush();
 }
 
 void ps2_keyboard_main(void)
 {
-    // Get all awaiting input.
-    while (ps2_keyboard_queue > 0)
+    // Handle all awaiting input.
+    for (size_t i = 0; i < ps2_keyboard_queue_count; i++)
     {
-        uint8_t c = ps2_receive(PS2_DATA);
-
-        ps2_keyboard_handle(c);
-
-        ps2_keyboard_queue--;
+        ps2_keyboard_handle(ps2_keyboard_queue[i]);
     }
+    ps2_keyboard_queue_count = 0;
 }
 
 void ps2_keyboard_handle(uint8_t code)
