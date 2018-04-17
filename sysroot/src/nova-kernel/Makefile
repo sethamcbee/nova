@@ -15,6 +15,9 @@ SRC_DIR:=.
 # Architecture. Options are: x86_64
 ARCH=x86_64
 
+# Whether to enable the __stack_chk_guard.
+STACK_GUARD=true
+
 # directories to export objects, binaries, ISOs, etc.
 OBJ_DIR=$(BUILD_DIR)/obj
 ASM_DIR=$(BUILD_DIR)/asm
@@ -42,6 +45,12 @@ OBJ=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SRC)))
 # assembly list made from generic sources list
 ASM=$(addprefix $(ASM_DIR)/, $(addsuffix .s, $(SRC)))
 
+# Headers to be included into all other (C) files.
+HEADERS=stack_guard.h
+
+# Script for adding headers.
+HEADERS_SCRIPT=$(addprefix -include , $(HEADERS))
+
 # additional include paths
 INCLUDE_PATH=\
 $(SRC_DIR) \
@@ -66,19 +75,23 @@ DEFINES=\
 ifeq ($(ARCH), x86_64)
 	DEFINES+=ARCH_X86_64
 endif
+ifeq ($(STACK_GUARD), true)
+	DEFINES+=STACK_GUARD
+endif
 
 # add prefix to defines
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
 GCC_PREFIX=x86_64-elf-
-OPTIMIZE=-Og
+OPTIMIZE=-Og -mno-sse
 AS=$(GCC_DIR)/$(GCC_PREFIX)as
 ASFLAGS=\
 	$(INCLUDE_SCRIPT)
 CC=$(GCC_DIR)/$(GCC_PREFIX)gcc
 CCFLAGS=\
 	$(INCLUDE_SCRIPT) \
+	$(HEADERS_SCRIPT) \
 	$(OPTIMIZE) \
 	$(DEFINES) \
 	-std=gnu11 \
@@ -88,6 +101,7 @@ CCFLAGS=\
 CPP=$(GCC_DIR)/$(GCC_PREFIX)g++
 CPPFLAGS=\
 	$(INCLUDE_SCRIPT) \
+	$(HEADERS_SCRIPT) \
 	$(OPTIMIZE) \
 	$(DEFINES) \
 	-std=gnu++11 \
@@ -112,6 +126,12 @@ ifeq ($(DEBUG),true)
 	ASFLAGS+= -gdwarf-2
 	CCFLAGS+= -gdwarf-2
 	CPPFLAGS+= -gdwarf-2
+endif
+
+# Add additional flags if the stack_chk_guard is desired.
+ifeq ($(STACK_GUARD), true)
+	CCFLAGS += -fstack-protector-all
+	CPPFLAGS += -fstack-protector-all
 endif
 
 # Grub2 settings
@@ -146,6 +166,10 @@ QEMU_FLAGS=\
 	-smp $(QEMU_SMP) \
 	-vga std \
 	-soundhw pcspk,sb16
+
+# Bochs application settings.
+#BOCHS=$(HOME)/opt/bochs/bin/bochs
+BOCHS=bochs
 
 # build objects, binary, and disk image
 .PHONY: default
@@ -193,7 +217,8 @@ qemu: $(ISO)
 
 .PHONY: bochs
 bochs: $(ISO)
-	bochs
+	$(TERMINAL) -e "$(BOCHS)" &
+	#$(GDB) -tui --quiet $(BIN) -ex "set confirm off" -ex "target remote localhost:1234"
 
 # target to export assembled source files
 .PHONY: asm

@@ -8,15 +8,26 @@
 
 #include <kernel.h>
 #include <arch/x86_64/cpu.h>
+#include <arch/x86_64/pic.h>
 #include <drivers/graphics/vga_text.h>
+#include <drivers/input/ps2_keyboard.h>
 
 void kernel_main(void)
 {
+    asm volatile ("sti \n"); // We can safely enable interrupts now.
+
+    // Kernel loop.
+    while (1)
+    {
+        ps2_keyboard_main();
+    }
+
     // The kernel is not intended to return; halt.
     kernel_print("\nEnd of kernel code. Halt.");
     kernel_halt();
 }
 
+__attribute__((noreturn))
 void kernel_panic(char* str)
 {
     // Just pass the string to print for now.
@@ -51,10 +62,24 @@ int kernel_print(const char *s)
     return (ret);
 }
 
+int kernel_log(const char *s)
+{
+    // Later on, this might be stored elsewhere, but for now
+    // we'll just print it if debugging.
+    int ret = 0;
+    //ret = kernel_print(s);
+    return (ret);
+}
+
+__attribute__((noreturn))
 void kernel_halt(void)
 {
-    volatile int loop = 1;
-    while (loop == 1)
+    #ifdef ARCH_X86_64
+        // Disable interrupts.
+        asm volatile ("sti \n");
+    #endif
+
+    while (1)
     {
         // Do nothing.
     }

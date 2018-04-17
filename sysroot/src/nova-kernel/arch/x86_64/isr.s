@@ -5,6 +5,7 @@
 # Pushes registers.
 .macro isr_push
 	push %rax
+	push %rbx
 	push %rcx
 	push %rdx
 	push %rsi
@@ -26,6 +27,7 @@
 	pop %rsi
 	pop %rdx
 	pop %rcx
+	pop %rbx
 	pop %rax
 .endm
 
@@ -95,6 +97,38 @@ panic_30:
 	.string "EXCEPTION: SECURITY EXCEPTION"
 panic_31:
 	.string "EXCEPTION: RESERVED EXCEPTION 31"
+panic_32:
+	.string "\n\tIRQ: PIT\n"
+panic_33:
+	.string "\n\tIRQ: Keyboard\n"
+panic_34:
+	.string "\n\tIRQ: Cascade\n"
+panic_35:
+	.string "\n\tIRQ: COM2\n"
+panic_36:
+	.string "\n\tIRQ: COM1\n"
+panic_37:
+	.string "\n\tIRQ: LPT2\n"
+panic_38:
+	.string "\n\tIRQ: Floppy\n"
+panic_39:
+	.string "\n\tIRQ: LPT1\n"
+panic_40:
+	.string "\n\tIRQ: CMOS\n"
+panic_41:
+	.string "\n\tIRQ: #9\n"
+panic_42:
+	.string "\n\tIRQ: #10\n"
+panic_43:
+	.string "\n\tIRQ: #11\n"
+panic_44:
+	.string "\n\tIRQ: Mouse\n"
+panic_45:
+	.string "\n\tIRQ: FPU\n"
+panic_46:
+	.string "\n\tIRQ: ATA1\n"
+panic_47:
+	.string "\n\tIRQ: ATA2\n"
 
 .code64
 .text
@@ -416,6 +450,170 @@ isr_31:
 
 	movq $panic_31, %rdi
 	call kernel_panic
+
+	isr_pop
+	iretq
+
+.global isr_32
+isr_32:
+	isr_push
+
+	call isr_32_ext
+
+	isr_pop
+	iretq
+
+.global isr_33
+isr_33:
+	isr_push
+
+	#movq $panic_33, %rdi
+	#call kernel_log
+
+	call isr_33_ext
+
+	isr_pop
+	iretq
+
+.global isr_34
+isr_34:
+	isr_push
+
+	movq $panic_34, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_35
+isr_35:
+	isr_push
+
+	movq $panic_35, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_36
+isr_36:
+	isr_push
+
+	movq $panic_36, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_37
+isr_37:
+	isr_push
+
+	movq $panic_37, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_38
+isr_38:
+	isr_push
+
+	movq $panic_38, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_39
+isr_39:
+	isr_push
+
+	# Check for spurious IRQ.
+	call isr_39_ext
+
+	movq $panic_39, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_40
+isr_40:
+	isr_push
+
+	movq $panic_40, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_41
+isr_41:
+	isr_push
+
+	movq $panic_41, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_42
+isr_42:
+	isr_push
+
+	movq $panic_42, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_43
+isr_43:
+	isr_push
+
+	movq $panic_43, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_44
+isr_44:
+	isr_push
+
+	movq $panic_44, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_45
+isr_45:
+	isr_push
+
+	movq $panic_45, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_46
+isr_46:
+	isr_push
+
+	movq $panic_46, %rdi
+	call kernel_log
+
+	isr_pop
+	iretq
+
+.global isr_47
+isr_47:
+	isr_push
+
+	movq $panic_47, %rdi
+	call kernel_log
 
 	isr_pop
 	iretq

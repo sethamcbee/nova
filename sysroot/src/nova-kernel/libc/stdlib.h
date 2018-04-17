@@ -33,7 +33,7 @@
  *
  * @return String s converted to type double.
  */
-double atof(const char* s);
+//double atof(const char* s);
 
 /**
  * @brief Converts string to int.
@@ -65,7 +65,7 @@ long atol(const char* s);
  * HUGE_VAL is returned with the proper sign; if the answer would underflow,
  * zero is returned. In either error case, errno is set to ERANGE.
  */
-double strtod(const char* s, char** endp);
+//double strtod(const char* s, char** endp);
 
 /**
  * @brief Converts the prefix a string to long, ignoring leading white space;

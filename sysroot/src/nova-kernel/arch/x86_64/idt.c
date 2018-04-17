@@ -263,6 +263,118 @@ void idt_initialize(void)
 
     //// IRQs. ////
 
+    // PIT.
+    entry.offset = (uint64_t) isr_32;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[32 * 2], entry);
+
+    // Keyboard IRQ.
+    entry.offset = (uint64_t) isr_33;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[33 * 2], entry);
+
+    // Cascade.
+    entry.offset = (uint64_t) isr_34;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[34 * 2], entry);
+
+    // COM2.
+    entry.offset = (uint64_t) isr_35;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[35 * 2], entry);
+
+    // COM1.
+    entry.offset = (uint64_t) isr_36;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[36 * 2], entry);
+
+    // LPT2.
+    entry.offset = (uint64_t) isr_37;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[37 * 2], entry);
+
+    // Floppy.
+    entry.offset = (uint64_t) isr_38;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[38 * 2], entry);
+
+    // LPT1.
+    entry.offset = (uint64_t) isr_39;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[39 * 2], entry);
+
+    // CMOS.
+    entry.offset = (uint64_t) isr_40;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[40 * 2], entry);
+
+    // IRQ 9.
+    entry.offset = (uint64_t) isr_41;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[41 * 2], entry);
+
+    // IRQ 10.
+    entry.offset = (uint64_t) isr_42;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[42 * 2], entry);
+
+    // IRQ 11.
+    entry.offset = (uint64_t) isr_43;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[43 * 2], entry);
+
+    // PS2 Mouse.
+    entry.offset = (uint64_t) isr_44;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[44 * 2], entry);
+
+    // FPU.
+    entry.offset = (uint64_t) isr_45;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[45 * 2], entry);
+
+    // ATA1.
+    entry.offset = (uint64_t) isr_46;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[46 * 2], entry);
+
+    // ATA2.
+    entry.offset = (uint64_t) isr_47;
+    entry.selector = GDT_KERNEL_CODE;
+    entry.type = IDT_INTERRUPT_GATE;
+    entry.dpl = 0;
+    idt_encode_entry(&idt[47 * 2], entry);
+
     //// Other. ////
 
     // Syscall.

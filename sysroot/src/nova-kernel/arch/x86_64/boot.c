@@ -11,8 +11,10 @@
 #include <kernel.h>
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/idt.h>
+#include <arch/x86_64/pic.h>
 #include <arch/x86_64/multiboot2.h>
 #include <drivers/graphics/vga_text.h>
+#include <drivers/input/ps2_keyboard.h>
 
 void boot_main(struct multiboot_header_tag* multiboot_tag, unsigned int magic)
 {
@@ -26,7 +28,16 @@ void boot_main(struct multiboot_header_tag* multiboot_tag, unsigned int magic)
     idt_initialize();
     kernel_print("IDT initialized.\n");
 
-    // TODO: Remap and set up IRQs.
+    // Initialize PIC (disables all IRQs).
+    pic_initialize();
+    kernel_print("PIC initialized.\n");
+
+    ps2_keyboard_initialize();
+    kernel_print("Keyboard initialized.\n");
+
+    // Enable supported IRQs.
+    pic_irq_enable(IRQ_PIT);
+    pic_irq_enable(IRQ_KEYBOARD);
 
     // TODO: Set up timer.
 

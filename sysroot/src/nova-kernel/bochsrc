@@ -34,3 +34,4 @@ keyboard: type=mf, serial_delay=250, paste_delay=100000, keymap=
 mouse: enabled=0, type=ps2, toggle=ctrl+mbutton
 
 boot: cdrom
+#gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0

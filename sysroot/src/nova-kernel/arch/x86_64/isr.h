@@ -41,6 +41,26 @@ void isr_28(void);
 void isr_29(void);
 void isr_30(void);
 void isr_31(void);
+void isr_32(void);
+void isr_33(void);
+void isr_34(void);
+void isr_35(void);
+void isr_36(void);
+void isr_37(void);
+void isr_38(void);
+void isr_39(void);
+void isr_40(void);
+void isr_41(void);
+void isr_42(void);
+void isr_43(void);
+void isr_44(void);
+void isr_45(void);
+void isr_46(void);
+void isr_47(void);
 void isr_80(void);
+
+void isr_32_ext(void);
+void isr_33_ext(void);
+void isr_39_ext(void);
 
 #endif // ISR_H

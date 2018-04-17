@@ -41,64 +41,66 @@ int abs(int n)
     }
 }
 
-double atof(const char* s)
-{
-    volatile double val = 0;
-    size_t i = 0;
-
-    /* Ignores any whitespace at beginning of string. */
-    while (isspace(s[i]) != 0)
+#if 0
+    double atof(const char* s)
     {
-        ++i;
+	volatile double val = 0;
+	size_t i = 0;
+
+	/* Ignores any whitespace at beginning of string. */
+	while (isspace(s[i]) != 0)
+	{
+	    ++i;
+	}
+
+	/* If sign is 1, integer is positive. If sign is -1, integer is
+	 * negative. Default is positive. */
+	double val_sign = 1;
+
+	/* Checks for negative sign. */
+	if (s[i] == '-')
+	{
+	    val_sign = -1;
+	    ++i;
+	}
+	/* Checks for positive sign. */
+	else
+	{
+	    if (s[i] == '+')
+	    {
+		++i;
+	    }
+	}
+
+	/* Converts ASCII digits to double. */
+	while (isdigit(s[i]) != 0)
+	{
+	    val *= 10;
+	    val += s[i] - '0';
+	    ++i;
+	}
+
+	/* Checks for decimal point. */
+	if (s[i] == '.')
+	{
+	    ++i;
+	}
+
+	double decimal = 10; /* Value to multiply fractional part by. */
+	size_t decimal_place = 1;
+
+	/* Converts ASCII digits to fractional part of double. */
+	while ((isdigit(s[i]) != 0) && (decimal_place <= DBL_DIG))
+	{
+	    val += (s[i] - '0') / decimal;
+	    decimal *= 10;
+	    ++decimal_place;
+	    ++i;
+	}
+
+	    return (val_sign * val);
     }
-
-    /* If sign is 1, integer is positive. If sign is -1, integer is
-     * negative. Default is positive. */
-    double val_sign = 1;
-
-    /* Checks for negative sign. */
-    if (s[i] == '-')
-    {
-        val_sign = -1;
-        ++i;
-    }
-    /* Checks for positive sign. */
-    else
-    {
-        if (s[i] == '+')
-        {
-            ++i;
-        }
-    }
-
-    /* Converts ASCII digits to double. */
-    while (isdigit(s[i]) != 0)
-    {
-        val *= 10;
-        val += s[i] - '0';
-        ++i;
-    }
-
-    /* Checks for decimal point. */
-    if (s[i] == '.')
-    {
-        ++i;
-    }
-
-    double decimal = 10; /* Value to multiply fractional part by. */
-    size_t decimal_place = 1;
-
-    /* Converts ASCII digits to fractional part of double. */
-    while ((isdigit(s[i]) != 0) && (decimal_place <= DBL_DIG))
-    {
-        val += (s[i] - '0') / decimal;
-        decimal *= 10;
-        ++decimal_place;
-        ++i;
-    }
-
-	return (val_sign * val);
-}
+#endif
 
 int atoi(const char* s)
 {

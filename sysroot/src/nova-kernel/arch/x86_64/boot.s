@@ -55,8 +55,10 @@ Lpaging_struct_end:
 # Define main kernel stack.
 .section .bss
 .align 16
+.global kernel_stack_bottom
 kernel_stack_bottom:
 .skip (1024 * 16) # 16 KiB
+.global kernel_stack_top
 kernel_stack_top:
 
 # Define entry function.

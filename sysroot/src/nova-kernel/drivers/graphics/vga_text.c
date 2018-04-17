@@ -33,6 +33,10 @@ int vga_text_write(const void *str, size_t len)
     {
         switch (p[i])
         {
+        case '\t':
+            vga_text_write("    ", 4);
+            break;
+
         case '\n':
             vga_cur_x = 0;
             vga_cur_y++;
@@ -45,12 +49,12 @@ int vga_text_write(const void *str, size_t len)
             break;
         }
 
-        if (vga_cur_x == VGA_TEXT_WIDTH)
+        if (vga_cur_x >= VGA_TEXT_WIDTH)
         {
             vga_cur_x = 0;
             vga_cur_y++;
         }
-        if (vga_cur_y == VGA_TEXT_HEIGHT)
+        if (vga_cur_y >= VGA_TEXT_HEIGHT)
         {
             // Copy all entries up a row.
             for (size_t k = 0; k < VGA_TEXT_WIDTH*(VGA_TEXT_HEIGHT - 1); k++)
@@ -89,8 +93,8 @@ void vga_text_initialize(void)
 
     // Disable the cursor.
     #ifdef ARCH_X86_64
-        cpu_outb(0xD4, 0x0A); // Magic.
-        cpu_outb(0xD5, 0x20);
+        cpu_outb(0x0A, 0x3D4); //Magic.
+        cpu_outb(0x20, 0x3D5);
     #endif
 }
 
