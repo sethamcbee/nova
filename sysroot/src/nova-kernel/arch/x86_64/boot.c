@@ -45,5 +45,7 @@ void boot_main(struct multiboot_header_tag* multiboot_tag, unsigned int magic)
 
     // TODO: Initialize memory manager.
 
+    asm volatile ("sti \n"); // We can safely enable interrupts now.
+
     kernel_main();
 }

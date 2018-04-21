@@ -40,7 +40,7 @@ void idt_initialize(void)
     // Divide-by-zero Error.
     entry.offset = (uint64_t) isr_0;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[0], entry);
 
@@ -54,7 +54,7 @@ void idt_initialize(void)
     // NMI.
     entry.offset = (uint64_t) isr_2;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[2 * 2], entry);
 
@@ -75,189 +75,189 @@ void idt_initialize(void)
     // Bound range exceeded.
     entry.offset = (uint64_t) isr_5;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[5 * 2], entry);
 
     // Invalid opcode.
     entry.offset = (uint64_t) isr_6;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[6 * 2], entry);
 
     // Device not available.
     entry.offset = (uint64_t) isr_7;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[7 * 2], entry);
 
     // Double fault.
     entry.offset = (uint64_t) isr_8;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[8 * 2], entry);
 
     // Coprocessor segment overrun.
     entry.offset = (uint64_t) isr_9;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[9 * 2], entry);
 
     // Invalid TSS.
     entry.offset = (uint64_t) isr_10;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[10 * 2], entry);
 
     // Segment not present.
     entry.offset = (uint64_t) isr_11;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[11 * 2], entry);
 
     // Stack-segment fault.
     entry.offset = (uint64_t) isr_12;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[12 * 2], entry);
 
     // GPF.
     entry.offset = (uint64_t) isr_13;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[13 * 2], entry);
 
     // Page fault.
     entry.offset = (uint64_t) isr_14;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[14 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_15;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[15 * 2], entry);
 
     // x86 floating-point exception.
     entry.offset = (uint64_t) isr_16;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[16 * 2], entry);
 
     // Alignment check.
     entry.offset = (uint64_t) isr_17;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[17 * 2], entry);
 
     // Machine check.
     entry.offset = (uint64_t) isr_18;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[18 * 2], entry);
 
     // SIMD floating-point exception.
     entry.offset = (uint64_t) isr_19;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[19 * 2], entry);
 
     // Virtualization exception.
     entry.offset = (uint64_t) isr_20;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[20 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_21;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[21 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_22;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[22 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_23;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[23 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_24;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[24 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_25;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[25 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_26;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[26 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_27;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[27 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_28;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[28 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_29;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[29 * 2], entry);
 
     // Security exception.
     entry.offset = (uint64_t) isr_30;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[30 * 2], entry);
 
     // Reserved.
     entry.offset = (uint64_t) isr_31;
     entry.selector = GDT_KERNEL_CODE;
-    entry.type = IDT_INTERRUPT_GATE;
+    entry.type = IDT_TRAP_GATE;
     entry.dpl = 0;
     idt_encode_entry(&idt[31 * 2], entry);
 

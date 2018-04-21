@@ -38,7 +38,7 @@ panic_0:
 panic_1:
 	.string "EXCEPTION: DEBUG"
 panic_2:
-	.string "EXCEPTION: NON-MASKABLE_INTERRUPT"
+	.string "EXCEPTION: NON-MASKABLE INTERRUPT"
 panic_3:
 	.string "EXCEPTION: BREAKPOINT"
 panic_4:

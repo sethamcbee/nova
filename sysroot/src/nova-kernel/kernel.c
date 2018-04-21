@@ -12,8 +12,6 @@
 
 void kernel_main(void)
 {
-    asm volatile ("sti \n"); // We can safely enable interrupts now.
-
     // Kernel loop.
     while (1)
     {
@@ -74,11 +72,11 @@ void kernel_halt(void)
 {
     #ifdef ARCH_X86_64
         // Disable interrupts.
-        asm volatile ("sti \n");
+        asm volatile ("cli \n");
     #endif
 
     #ifdef ARCH_X86
-        asm volatile ("sti \n");
+        asm volatile ("cli \n");
     #endif
 
     while (1)

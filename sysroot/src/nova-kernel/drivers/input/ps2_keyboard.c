@@ -83,9 +83,43 @@ void ps2_keyboard_handle(uint8_t code)
 
     switch (code)
     {
+//// Ordinary keystrokes. ////
+
+//// Special cases. ////
+
+    // Detection or buffer overrun error.
+    case 0x00:
+        kernel_log("PS/2 Keyboard: Received 0x00. Key detection or buffer overrun error.");
+        break;
+
+    // Test passed.
+    case 0xAA:
+        break;
+
+    // Echo.
+    case 0xEE:
+        break;
+
+    // ACK.
+    case 0xFA:
+        break;
+
+    // Test failed.
+    case 0xFC:
+    case 0xFD:
+        break;
+
+    // Resend.
+    case 0xFE:
+        break;
+
+    // Detection or buffer overrun error.
+    case 0xFF:
+        break;
+
     default:
         itoa(code, s, 16);
-        //strcat(s, "\n");
+        strcat(s, "\n");
         kernel_print(s);
         break;
     }
