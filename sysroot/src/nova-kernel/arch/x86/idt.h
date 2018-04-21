@@ -17,14 +17,14 @@
 // 64-bit IDT entry.
 typedef struct Idt_Entry
 {
-    uint64_t offset;
+    uint32_t offset;
     uint16_t selector;
     uint8_t type;
     uint8_t dpl;
 } Idt_Entry;
 
 // Stores the IDT.
-uint64_t idt[256 * 2];
+uint32_t idt[256 * 2];
 
 // Encodes an IDT entry.
 void idt_encode_entry(void *pos, Idt_Entry entry);

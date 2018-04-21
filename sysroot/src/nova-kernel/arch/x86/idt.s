@@ -10,7 +10,7 @@
 .align 16
 idt_pointer:
     .word IDT_SIZE
-    .quad idt
+    .long idt
 
 .text
 .global idt_load

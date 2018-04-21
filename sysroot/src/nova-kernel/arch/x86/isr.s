@@ -4,31 +4,23 @@
 
 # Pushes registers.
 .macro isr_push
-	push %rax
-	push %rbx
-	push %rcx
-	push %rdx
-	push %rsi
-	push %rdi
-	push %r8
-	push %r9
-	push %r10
-	push %r11
+	push %eax
+	push %ebx
+	push %ecx
+	push %edx
+	push %esi
+	push %edi
 	cld
 .endm
 
 # Pops registers.
 .macro isr_pop
-	pop %r11
-	pop %r10
-	pop %r9
-	pop %r8
-	pop %rdi
-	pop %rsi
-	pop %rdx
-	pop %rcx
-	pop %rbx
-	pop %rax
+	pop %edi
+	pop %esi
+	pop %edx
+	pop %ecx
+	pop %ebx
+	pop %eax
 .endm
 
 # Error strings.
@@ -130,7 +122,6 @@ panic_46:
 panic_47:
 	.string "\n\tIRQ: ATA2\n"
 
-.code64
 .text
 
 #
@@ -138,321 +129,353 @@ panic_47:
 isr_0:
 	isr_push
 
-	movq $panic_0, %rdi
+	movl $panic_0, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_1
 isr_1:
 	isr_push
 
-	movq $panic_1, %rdi
+	movl $panic_1, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_2
 isr_2:
 	isr_push
 
-	movq $panic_2, %rdi
+	movl $panic_2, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_3
 isr_3:
 	isr_push
 
-	movq $panic_3, %rdi
+	movl $panic_3, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_4
 isr_4:
 	isr_push
 
-	movq $panic_4, %rdi
+	movl $panic_4, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_5
 isr_5:
 	isr_push
 
-	movq $panic_5, %rdi
+	movl $panic_5, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_6
 isr_6:
 	isr_push
 
-	movq $panic_6, %rdi
+	movl $panic_6, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_7
 isr_7:
 	isr_push
 
-	movq $panic_7, %rdi
+	movl $panic_7, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_8
 isr_8:
 	isr_push
 
-	movq $panic_8, %rdi
+	movl $panic_8, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_9
 isr_9:
 	isr_push
 
-	movq $panic_9, %rdi
+	movl $panic_9, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_10
 isr_10:
 	isr_push
 
-	movq $panic_10, %rdi
+	movl $panic_10, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_11
 isr_11:
 	isr_push
 
-	movq $panic_11, %rdi
+	movl $panic_11, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_12
 isr_12:
 	isr_push
 
-	movq $panic_12, %rdi
+	movl $panic_12, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_13
 isr_13:
 	isr_push
 
-	movq $panic_13, %rdi
+	movl $panic_13, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_14
 isr_14:
 	isr_push
 
-	movq $panic_14, %rdi
+	movl $panic_14, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_15
 isr_15:
 	isr_push
 
-	movq $panic_15, %rdi
+	movl $panic_15, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_16
 isr_16:
 	isr_push
 
-	movq $panic_16, %rdi
+	movl $panic_16, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_17
 isr_17:
 	isr_push
 
-	movq $panic_17, %rdi
+	movl $panic_17, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_18
 isr_18:
 	isr_push
 
-	movq $panic_18, %rdi
+	movl $panic_18, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_19
 isr_19:
 	isr_push
 
-	movq $panic_19, %rdi
+	movl $panic_19, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_20
 isr_20:
 	isr_push
 
-	movq $panic_20, %rdi
+	movl $panic_20, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_21
 isr_21:
 	isr_push
 
-	movq $panic_21, %rdi
+	movl $panic_21, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_22
 isr_22:
 	isr_push
 
-	movq $panic_22, %rdi
+	movl $panic_22, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_23
 isr_23:
 	isr_push
 
-	movq $panic_23, %rdi
+	movl $panic_23, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_24
 isr_24:
 	isr_push
 
-	movq $panic_24, %rdi
+	movl $panic_24, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_25
 isr_25:
 	isr_push
 
-	movq $panic_25, %rdi
+	movl $panic_25, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_26
 isr_26:
 	isr_push
 
-	movq $panic_26, %rdi
+	movl $panic_26, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_27
 isr_27:
 	isr_push
 
-	movq $panic_27, %rdi
+	movl $panic_27, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_28
 isr_28:
 	isr_push
 
-	movq $panic_28, %rdi
+	movl $panic_28, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_29
 isr_29:
 	isr_push
 
-	movq $panic_29, %rdi
+	movl $panic_29, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_30
 isr_30:
 	isr_push
 
-	movq $panic_30, %rdi
+	movl $panic_30, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_31
 isr_31:
 	isr_push
 
-	movq $panic_31, %rdi
+	movl $panic_31, %eax
+	push %eax
 	call kernel_panic
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_32
 isr_32:
@@ -461,69 +484,71 @@ isr_32:
 	call isr_32_ext
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_33
 isr_33:
 	isr_push
 
-	#movq $panic_33, %rdi
-	#call kernel_log
-
 	call isr_33_ext
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_34
 isr_34:
 	isr_push
 
-	movq $panic_34, %rdi
+	movl $panic_34, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_35
 isr_35:
 	isr_push
 
-	movq $panic_35, %rdi
+	movl $panic_35, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_36
 isr_36:
 	isr_push
 
-	movq $panic_36, %rdi
+	movl $panic_36, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_37
 isr_37:
 	isr_push
 
-	movq $panic_37, %rdi
+	movl $panic_37, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_38
 isr_38:
 	isr_push
 
-	movq $panic_38, %rdi
+	movl $panic_38, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_39
 isr_39:
@@ -532,95 +557,104 @@ isr_39:
 	# Check for spurious IRQ.
 	call isr_39_ext
 
-	movq $panic_39, %rdi
+	movl $panic_39, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_40
 isr_40:
 	isr_push
 
-	movq $panic_40, %rdi
+	movl $panic_40, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_41
 isr_41:
 	isr_push
 
-	movq $panic_41, %rdi
+	movl $panic_41, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_42
 isr_42:
 	isr_push
 
-	movq $panic_42, %rdi
+	movl $panic_42, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_43
 isr_43:
 	isr_push
 
-	movq $panic_43, %rdi
+	movl $panic_43, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_44
 isr_44:
 	isr_push
 
-	movq $panic_44, %rdi
+	movl $panic_44, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_45
 isr_45:
 	isr_push
 
-	movq $panic_45, %rdi
+	movl $panic_45, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_46
 isr_46:
 	isr_push
 
-	movq $panic_46, %rdi
+	movl $panic_46, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_47
 isr_47:
 	isr_push
 
-	movq $panic_47, %rdi
+	movl $panic_47, %eax
+	push %eax
 	call kernel_log
 
 	isr_pop
-	iretq
+	iret
 
 .global isr_80
 isr_80:
 	isr_push
 
 	isr_pop
-	iretq
+	iret

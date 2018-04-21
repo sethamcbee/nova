@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/pic.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/pic.h>
 
 void pic_initialize(void)
 {

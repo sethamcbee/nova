@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 // Some arbitrary value.
-#define STACK_CHK_GUARD 0x901249712
+#define STACK_CHK_GUARD 0x9012
 
 uintptr_t __stack_chk_guard;
 

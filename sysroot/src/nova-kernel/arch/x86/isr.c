@@ -10,10 +10,10 @@
 #include <stdlib.h>
 
 #include <kernel.h>
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/isr.h>
-#include <arch/x86_64/pic.h>
-#include <arch/x86_64/ps2.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/isr.h>
+#include <arch/x86/pic.h>
+#include <arch/x86/ps2.h>
 #include <drivers/input/ps2_keyboard.h>
 
 uint64_t irq_spurious_count = 0;

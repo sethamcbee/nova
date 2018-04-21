@@ -85,7 +85,7 @@ void ps2_keyboard_handle(uint8_t code)
     {
     default:
         itoa(code, s, 16);
-        strcat(s, "\n");
+        //strcat(s, "\n");
         kernel_print(s);
         break;
     }

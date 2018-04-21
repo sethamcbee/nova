@@ -18,8 +18,6 @@
 
 void boot_main(struct multiboot_header_tag* multiboot_tag, unsigned int magic)
 {
-    uint64_t time = cpu_rdtsc();
-
     // Initialize terminal.
     kernel_write = vga_text_write;
     vga_text_initialize();
@@ -46,13 +44,6 @@ void boot_main(struct multiboot_header_tag* multiboot_tag, unsigned int magic)
     // TODO: Parse Multiboot2 structure.
 
     // TODO: Initialize memory manager.
-
-    time = cpu_rdtsc() - time;
-    char str[20];
-    litoa(time, str, 10);
-    kernel_print("\nTicks diff: ");
-    kernel_print(str);
-    kernel_print("\n");
 
     kernel_main();
 }

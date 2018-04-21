@@ -7,8 +7,6 @@
 #include <stdint.h>
 
 #include <kernel.h>
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/pic.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
 
@@ -76,6 +74,10 @@ void kernel_halt(void)
 {
     #ifdef ARCH_X86_64
         // Disable interrupts.
+        asm volatile ("sti \n");
+    #endif
+
+    #ifdef ARCH_X86
         asm volatile ("sti \n");
     #endif
 

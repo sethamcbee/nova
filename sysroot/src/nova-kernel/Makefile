@@ -71,7 +71,12 @@ LIBRARY_PATH=
 TERMINAL=xfce4-terminal
 
 # directory containing gcc
-GCC_DIR=/home/sethamcbee/opt/gcc-7.3.0-x86_64-elf/bin
+ifeq ($(ARCH), x86_64)
+	GCC_DIR=/home/sethamcbee/opt/gcc-7.3.0-x86_64-elf/bin
+endif
+ifeq ($(ARCH), x86)
+	GCC_DIR=/home/sethamcbee/opt/gcc-7.3.0-i686-elf/bin
+endif
 
 # config defines
 DEFINES=\
@@ -91,45 +96,83 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
-GCC_PREFIX=x86_64-elf-
 OPTIMIZE=-Og -mno-sse
-AS=$(GCC_DIR)/$(GCC_PREFIX)as
-ASFLAGS=\
-	$(INCLUDE_SCRIPT)
-CC=$(GCC_DIR)/$(GCC_PREFIX)gcc
-CCFLAGS=\
-	$(INCLUDE_SCRIPT) \
-	$(HEADERS_SCRIPT) \
-	$(OPTIMIZE) \
-	$(DEFINES) \
-	-std=gnu11 \
-	-ffreestanding \
-	-Wall \
-	-mno-red-zone
-CPP=$(GCC_DIR)/$(GCC_PREFIX)g++
-CPPFLAGS=\
-	$(INCLUDE_SCRIPT) \
-	$(HEADERS_SCRIPT) \
-	$(OPTIMIZE) \
-	$(DEFINES) \
-	-std=gnu++11 \
-	-ffreestanding \
-	-Wall \
-	-fno-exceptions \
-	-fno-rtti \
-	-mno-red-zone
-LD=$(CC)
-LDFLAGS=\
-	$(OPTIMIZE) \
-	$(DEFINES) \
-	-z max-page-size=4096 \
-	-ffreestanding \
-	-nostdlib \
-	-lgcc
+ifeq ($(ARCH), x86_64)
+	GCC_PREFIX=x86_64-elf-
+	AS=$(GCC_DIR)/$(GCC_PREFIX)as
+	ASFLAGS=\
+		$(INCLUDE_SCRIPT)
+	CC=$(GCC_DIR)/$(GCC_PREFIX)gcc
+	CCFLAGS=\
+		$(INCLUDE_SCRIPT) \
+		$(HEADERS_SCRIPT) \
+		$(OPTIMIZE) \
+		$(DEFINES) \
+		-std=gnu11 \
+		-ffreestanding \
+		-Wall \
+		-mno-red-zone
+	CPP=$(GCC_DIR)/$(GCC_PREFIX)g++
+	CPPFLAGS=\
+		$(INCLUDE_SCRIPT) \
+		$(HEADERS_SCRIPT) \
+		$(OPTIMIZE) \
+		$(DEFINES) \
+		-std=gnu++11 \
+		-ffreestanding \
+		-Wall \
+		-fno-exceptions \
+		-fno-rtti \
+		-mno-red-zone
+	LD=$(CC)
+	LDFLAGS=\
+		$(OPTIMIZE) \
+		$(DEFINES) \
+		-z max-page-size=4096 \
+		-ffreestanding \
+		-nostdlib \
+		-lgcc
+endif
+ifeq ($(ARCH), x86)
+	GCC_PREFIX=i686-elf-
+	AS=$(GCC_DIR)/$(GCC_PREFIX)as
+	ASFLAGS=\
+		$(INCLUDE_SCRIPT)
+	CC=$(GCC_DIR)/$(GCC_PREFIX)gcc
+	CCFLAGS=\
+		$(INCLUDE_SCRIPT) \
+		$(HEADERS_SCRIPT) \
+		$(OPTIMIZE) \
+		$(DEFINES) \
+		-std=gnu11 \
+		-ffreestanding \
+		-Wall
+	CPP=$(GCC_DIR)/$(GCC_PREFIX)g++
+	CPPFLAGS=\
+		$(INCLUDE_SCRIPT) \
+		$(HEADERS_SCRIPT) \
+		$(OPTIMIZE) \
+		$(DEFINES) \
+		-std=gnu++11 \
+		-ffreestanding \
+		-Wall \
+		-fno-exceptions \
+		-fno-rtti
+	LD=$(CC)
+	LDFLAGS=\
+		$(OPTIMIZE) \
+		$(DEFINES) \
+		-z max-page-size=4096 \
+		-ffreestanding \
+		-nostdlib \
+		-lgcc
+endif
+
+# GDB settings.
 GDB=~/opt/gdb-8.1/bin/gdb
 #GDB=gdb
 
-# adds additional compiler flags if debugging
+# Adds additional compiler flags if debugging.
 ifeq ($(DEBUG),true)
 	ASFLAGS+= -gdwarf-2
 	CCFLAGS+= -gdwarf-2
@@ -147,7 +190,12 @@ GRUB=grub-mkrescue
 GRUB_FLAGS=--directory=/usr/lib/grub/i386-pc
 
 # QEMU application settings
-QEMU=qemu-system-x86_64
+ifeq ($(ARCH), x86_64)
+	QEMU=qemu-system-x86_64
+endif
+ifeq ($(ARCH), x86)
+	QEMU=qemu-system-i386
+endif
 
 # QEMU disk settings
 QEMU_DISK_FORMAT=qcow2
@@ -155,9 +203,16 @@ QEMU_DISK=disk.img
 QEMU_DISK_SIZE=30M
 
 #QEMU flags settings
-QEMU_MEMORY=800M
-QEMU_CPU=qemu64
-QEMU_SMP=1
+ifeq ($(ARCH), x86_64)
+	QEMU_MEMORY=800M
+	QEMU_CPU=qemu64
+	QEMU_SMP=1
+endif
+ifeq ($(ARCH), x86)
+	QEMU_MEMORY=800M
+	QEMU_CPU=qemu32
+	QEMU_SMP=1
+endif
 
 #QEMU flags
 QEMU_FLAGS=\
