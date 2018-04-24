@@ -64,7 +64,15 @@ void ps2_keyboard_initialize(void)
     while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
 
     // Flush again.
+    #if defined(ARCH_X86_64) || defined(ARCH_X86)
+        for (int i = 0; i < 10; i++)
+            cpu_io_wait();
+        asm volatile ("sti \n");
+    #endif
     ps2_kb_flush();
+    #if defined(ARCH_X86_64) || defined(ARCH_X86)
+        asm volatile ("cli \n");
+    #endif
 }
 
 void ps2_keyboard_main(void)

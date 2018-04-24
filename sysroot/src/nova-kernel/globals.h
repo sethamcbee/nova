@@ -32,7 +32,7 @@
  *
  * @note Does not affect original variable.
  */
-#define BIT_SET(x,bit) (x | (1 << bit))
+#define BIT_SET(x,bit) ((x) | (1 << (bit)))
 
 /**
  * @brief Clears a bit, giving it a value of 1.
@@ -44,7 +44,7 @@
  *
  * @note Does not affect original variable.
  */
-#define BIT_CLEAR(x,bit) (x & ~(1 << bit))
+#define BIT_CLEAR(x,bit) ((x) & ~(1 << (bit)))
 
 /**
  * @brief Toggles a bit, inversing it's value.
@@ -56,7 +56,7 @@
  *
  * @note Does not affect original variable.
  */
-#define BIT_TOGGLE(x,bit) (x ^ (1 << bit))
+#define BIT_TOGGLE(x,bit) ((x) ^ (1 << (bit)))
 
 /**
  * @brief Checks a bit, returning it's value.
@@ -66,7 +66,7 @@
  *
  * @return Value of given bit.
  */
-#define BIT_CHECK(x,bit) ((x & (1 << bit)) ? 1 : 0)
+#define BIT_CHECK(x,bit) (((x) & (1 << (bit))) ? 1 : 0)
 
 /**
  * @brief Hints to the compiler that an expression is expected to return

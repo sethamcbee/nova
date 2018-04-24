@@ -1,6 +1,6 @@
 // Authors: Seth McBee
 // Created: 2018-4-13
-// Description: GCC stack guard implementation.
+// Description: GCC stack guard support.
 
 #include <stdbool.h>
 #include <stddef.h>

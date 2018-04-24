@@ -14,7 +14,7 @@
 #define IDT_TASK_GATE       0b0101
 #define IDT_TRAP_GATE       0b1111
 
-// 64-bit IDT entry.
+// 32-bit IDT entry.
 typedef struct Idt_Entry
 {
     uint32_t offset;

@@ -1,30 +1,28 @@
 # Authors: Seth McBee
 # Created: 2017-10-17
-# Description: Interrupt Service Routines.
+# Description: x86 Interrupt Service Routines.
 
 # Pushes registers.
 .macro isr_push
-	push %eax
-	push %ebx
-	push %ecx
-	push %edx
-	push %esi
-	push %edi
+	pushal
 	cld
 .endm
 
 # Pops registers.
 .macro isr_pop
-	pop %edi
-	pop %esi
-	pop %edx
-	pop %ecx
-	pop %ebx
-	pop %eax
+	popal
 .endm
 
-# Error strings.
+
+.bss
+selector_error_code:
+	.skip 4
+
+
 .data
+
+# Error strings.
+
 panic_0:
 	.string "EXCEPTION: DIVIDE-BY-ZERO ERROR"
 panic_1:
@@ -90,41 +88,42 @@ panic_30:
 panic_31:
 	.string "EXCEPTION: RESERVED EXCEPTION 31"
 panic_32:
-	.string "\n\tIRQ: PIT\n"
+	.string "\n\tIRQ 0: PIT\n"
 panic_33:
-	.string "\n\tIRQ: Keyboard\n"
+	.string "\n\tIRQ 1: Keyboard\n"
 panic_34:
-	.string "\n\tIRQ: Cascade\n"
+	.string "\n\tIRQ 2: Cascade\n"
 panic_35:
-	.string "\n\tIRQ: COM2\n"
+	.string "\n\tIRQ 3: COM2\n"
 panic_36:
-	.string "\n\tIRQ: COM1\n"
+	.string "\n\tIRQ 4: COM1\n"
 panic_37:
-	.string "\n\tIRQ: LPT2\n"
+	.string "\n\tIRQ 5: LPT2\n"
 panic_38:
-	.string "\n\tIRQ: Floppy\n"
+	.string "\n\tIRQ 6: Floppy\n"
 panic_39:
-	.string "\n\tIRQ: LPT1\n"
+	.string "\n\tIRQ 7: LPT1\n"
 panic_40:
-	.string "\n\tIRQ: CMOS\n"
+	.string "\n\tIRQ 8: CMOS\n"
 panic_41:
-	.string "\n\tIRQ: #9\n"
+	.string "\n\tIRQ 9\n"
 panic_42:
-	.string "\n\tIRQ: #10\n"
+	.string "\n\tIRQ 10\n"
 panic_43:
-	.string "\n\tIRQ: #11\n"
+	.string "\n\tIRQ 11\n"
 panic_44:
-	.string "\n\tIRQ: Mouse\n"
+	.string "\n\tIRQ 12: Mouse\n"
 panic_45:
-	.string "\n\tIRQ: FPU\n"
+	.string "\n\tIRQ 13: FPU\n"
 panic_46:
-	.string "\n\tIRQ: ATA1\n"
+	.string "\n\tIRQ 14: ATA1\n"
 panic_47:
-	.string "\n\tIRQ: ATA2\n"
+	.string "\n\tIRQ 15: ATA2\n"
+
 
 .text
 
-#
+# Interrupt Service Routines.
 .global isr_0
 isr_0:
 	isr_push
@@ -270,13 +269,28 @@ isr_12:
 
 .global isr_13
 isr_13:
+	# Get error code.
+	push %eax
+	movl 4(%esp), %eax
+	movl %eax, selector_error_code
+
 	isr_push
+
+	# Handle error code.
+	movl selector_error_code, %eax
+	push %eax
+	call isr_13_ext
 
 	movl $panic_13, %eax
 	push %eax
 	call kernel_panic
 
 	isr_pop
+
+	# Remove error code from stack.
+	pop %eax
+	add $4, %esp
+
 	iret
 
 .global isr_14
@@ -552,16 +566,16 @@ isr_38:
 
 .global isr_39
 isr_39:
-	isr_push
+	#isr_push
 
 	# Check for spurious IRQ.
-	call isr_39_ext
+	#call isr_39_ext
 
-	movl $panic_39, %eax
-	push %eax
-	call kernel_log
+	#movl $panic_39, %eax
+	#push %eax
+	#call kernel_log
 
-	isr_pop
+	#isr_pop
 	iret
 
 .global isr_40

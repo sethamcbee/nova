@@ -1,6 +1,6 @@
 // Authors: Seth McBee
 // Created: 2018-4-11
-// Description: ISR functions.
+// Description: x86 ISR functions.
 
 #ifndef ISR_H
 #define ISR_H
@@ -9,6 +9,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// Selector error codes.
+#define ISR_ERROR_EXTERNAL_BIT      0
+#define ISR_ERROR_EXTERNAL_MASK     1
+#define ISR_ERROR_TABLE_BIT         1
+#define ISR_ERROR_TABLE_MASK        3
+#define ISR_ERROR_TABLE_GDT         0
+#define ISR_ERROR_TABLE_IDT1        1
+#define ISR_ERROR_TABLE_LDT         2
+#define ISR_ERROR_TABLE_IDT2        3
+#define ISR_ERROR_INDEX_BIT         3
+#define ISR_ERROR_INDEX_MASK        0b1111111111111
+
+// ISR entry points.
 void isr_0(void);
 void isr_1(void);
 void isr_2(void);
@@ -59,6 +72,8 @@ void isr_46(void);
 void isr_47(void);
 void isr_80(void);
 
+// ISR C extensions.
+void isr_13_ext(uint32_t error_code);
 void isr_32_ext(void);
 void isr_33_ext(void);
 void isr_39_ext(void);

@@ -37,17 +37,17 @@ void kernel_panic(char* str)
 int kernel_print(const char *s)
 {
     size_t len;
-    size_t timeout = 100000;
+    size_t max_len = 100000;
 
     // Find the length of the string.
-    for (len = 0; len <= timeout; len++)
+    for (len = 0; len < max_len; len++)
     {
         if (s[len] == '\0')
         {
             break;
         }
 
-        if (len == timeout)
+        if (len == max_len)
         {
             kernel_print("!!kernel_print timeout!!");
             return (-1);
@@ -63,19 +63,15 @@ int kernel_log(const char *s)
     // Later on, this might be stored elsewhere, but for now
     // we'll just print it if debugging.
     int ret = 0;
-    //ret = kernel_print(s);
+    ret = kernel_print(s);
     return (ret);
 }
 
 __attribute__((noreturn))
 void kernel_halt(void)
 {
-    #ifdef ARCH_X86_64
+    #if defined(ARCH_X86_64) || defined(ARCH_X86)
         // Disable interrupts.
-        asm volatile ("cli \n");
-    #endif
-
-    #ifdef ARCH_X86
         asm volatile ("cli \n");
     #endif
 

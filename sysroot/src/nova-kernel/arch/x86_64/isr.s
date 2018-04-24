@@ -1,6 +1,6 @@
 # Authors: Seth McBee
 # Created: 2017-10-17
-# Description: Interrupt Service Routines.
+# Description: x86-64 Interrupt Service Routines.
 
 # Pushes registers.
 .macro isr_push
@@ -133,7 +133,7 @@ panic_47:
 .code64
 .text
 
-#
+# Interrupt Service Routines.
 .global isr_0
 isr_0:
 	isr_push
@@ -266,12 +266,23 @@ isr_12:
 
 .global isr_13
 isr_13:
+	# Get error code.
+	movq (%rsp), %r12
+
 	isr_push
+
+	# Handle error code.
+	movq %r12, %rdi
+	call isr_13_ext
 
 	movq $panic_13, %rdi
 	call kernel_panic
 
 	isr_pop
+
+	# Remove error code from stack.
+	add $4, %rsp
+
 	iretq
 
 .global isr_14

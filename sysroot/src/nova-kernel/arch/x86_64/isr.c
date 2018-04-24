@@ -1,6 +1,6 @@
 // Authors: Seth McBee
 // Created: 2018-4-12
-// Description: Interrupt Service Routines - extended.
+// Description: x86-64 Interrupt Service Routines - extended.
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -18,6 +18,41 @@
 
 uint64_t irq_spurious_count = 0;
 uint64_t irq_pit_count = 0;
+
+void isr_13_ext(uint32_t error_code)
+{
+    // Check whether the exception was triggered externally.
+    if (BIT_CHECK(error_code, ISR_ERROR_EXTERNAL_BIT))
+    {
+        kernel_log("\n\tGPF: Exception triggered externally.\n");
+    }
+
+    // Check which table the exception originated from.
+    uint8_t table = (error_code >> ISR_ERROR_TABLE_BIT) & ISR_ERROR_TABLE_MASK;
+
+    if (table == ISR_ERROR_TABLE_GDT)
+    {
+        kernel_log("\n\tGPF: Error occurred in the GDT.");
+    }
+
+    if (table == ISR_ERROR_TABLE_LDT)
+    {
+        kernel_log("\n\tGPF: Error occurred in the LDT.");
+    }
+
+    if (table == ISR_ERROR_TABLE_IDT1 || table == ISR_ERROR_TABLE_IDT2)
+    {
+        kernel_log("\n\tGPF: Error occurred in the IDT.");
+    }
+
+    // Check which selector the exception originated from.
+    uint16_t selector = (error_code >> ISR_ERROR_INDEX_BIT) & ISR_ERROR_INDEX_MASK;
+    char str[10];
+    itoa(selector, str, 10);
+    kernel_log("\n\tGPF: Selector index - ");
+    kernel_log(str);
+    kernel_log("\n");
+}
 
 void isr_32_ext(void)
 {

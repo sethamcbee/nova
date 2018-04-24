@@ -96,7 +96,7 @@ void vga_text_initialize(void)
     }
 
     // Disable the cursor.
-    #ifdef ARCH_X86_64
+    #if defined(ARCH_X86_64) || defined(ARCH_X86)
         cpu_outb(0x0A, 0x3D4); //Magic.
         cpu_outb(0x20, 0x3D5);
     #endif
