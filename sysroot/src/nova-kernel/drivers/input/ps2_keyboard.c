@@ -29,49 +29,43 @@ static void ps2_kb_flush(void);
 
 void ps2_keyboard_initialize(void)
 {
-    ps2_keyboard_queue_count = 0;
-    volatile uint8_t response = 0;
-
-    // Disable 2nd PS/2 channel.
-    ps2_send(0xA7, PS2_CMD);
-
-    // Flush output buffer.
-    ps2_kb_flush();
-
-    // Disable port translation.
-    do
-    {
-        ps2_send(PS2_CFG_R, PS2_CMD);
-        response = ps2_receive(PS2_DATA);
-    }
-    while (response == PS2_KB_REDO);
-    response = BIT_CLEAR(response, 6);
-    ps2_send(PS2_CFG_W, PS2_CMD);
-    ps2_send(response, PS2_DATA);
-
-    // Set scan mode 2.
-    do
-    {
-        ps2_send(PS2_KB_SCAN, PS2_DATA);
-        response = ps2_receive(PS2_DATA);
-    }
-    while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
-    do
-    {
-        ps2_send(PS2_KB_SCAN2, PS2_DATA);
-        response = ps2_receive(PS2_DATA);
-    }
-    while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
-
-    // Flush again.
     #if defined(ARCH_X86_64) || defined(ARCH_X86)
-        for (int i = 0; i < 10; i++)
-            cpu_io_wait();
-        asm volatile ("sti \n");
-    #endif
-    ps2_kb_flush();
-    #if defined(ARCH_X86_64) || defined(ARCH_X86)
-        asm volatile ("cli \n");
+        ps2_keyboard_queue_count = 0;
+        volatile uint8_t response = 0;
+
+        // Disable 2nd PS/2 channel.
+        ps2_send(0xA7, PS2_CMD);
+
+        // Flush output buffer.
+        ps2_kb_flush();
+
+        // Disable port translation.
+        do
+        {
+            ps2_send(PS2_CFG_R, PS2_CMD);
+            response = ps2_receive(PS2_DATA);
+        }
+        while (response == PS2_KB_REDO);
+        response = BIT_CLEAR(response, 6);
+        ps2_send(PS2_CFG_W, PS2_CMD);
+        ps2_send(response, PS2_DATA);
+
+        // Set scan mode 2.
+        do
+        {
+            ps2_send(PS2_KB_SCAN, PS2_DATA);
+            response = ps2_receive(PS2_DATA);
+        }
+        while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
+        do
+        {
+            ps2_send(PS2_KB_SCAN2, PS2_DATA);
+            response = ps2_receive(PS2_DATA);
+        }
+        while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
+
+        // Flush again.
+        ps2_kb_flush();
     #endif
 }
 
@@ -128,7 +122,7 @@ void ps2_keyboard_handle(uint8_t code)
     default:
         itoa(code, s, 16);
         strcat(s, "\n");
-        kernel_print(s);
+        //kernel_print(s);
         break;
     }
 }

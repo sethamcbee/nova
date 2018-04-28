@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
@@ -14,6 +15,9 @@
 
 void kernel_main(void)
 {
+    // Initialize STDIO.
+    stdio_init();
+
     // Kernel loop.
     while (1)
     {
