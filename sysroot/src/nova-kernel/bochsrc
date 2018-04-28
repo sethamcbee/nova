@@ -35,3 +35,4 @@ mouse: enabled=0, type=ps2, toggle=ctrl+mbutton
 
 boot: cdrom
 #gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
+#com1: enabled, mode=file, dev=bochs_serial.txt

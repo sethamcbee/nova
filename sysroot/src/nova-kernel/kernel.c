@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <stdlib.h>
+
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>

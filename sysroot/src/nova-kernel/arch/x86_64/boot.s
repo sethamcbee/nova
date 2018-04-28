@@ -1,9 +1,8 @@
 # Authors: Seth McBee
 # Created: 2017-10-11
-# Description: Initial boot file: first code ran by the bootloader.
+# Description: x86-64 initial boot file: first code ran by the bootloader.
 
 # Declare constants for the Multiboot2 header.
-.set MB_MAGIC_TEST, 0x36d76289 # %eax should equal this upon entry of _start
 .set MB_MAGIC, 0xE85250D6 # Must be present for bootloader to find header
 .set MB_ARCH, 0 # constant for x86 family
 .set MB_LENGTH, (multiboot_end - multiboot_start) # equals length of Mulitboot2 header (bytes)
@@ -32,14 +31,14 @@ multiboot_end:
 
 # Storage for Multiboot2 MAGIC and info struct pointer.
 .section .bss
-Lmb_info:
-	.long
-Lmb_magic:
-	.long
+mb_info:
+	.skip 4
+mb_magic:
+	.skip 4
 
 # Define temporary paging structure. This will only be a stub, so
 # real paging can be handled in C by kernel_main.
-.section .data
+.section .tmp_paging
 .align (0x1000) # align to page boundary
 Lpaging_struct_start:
 Lpml4:
@@ -74,8 +73,8 @@ _start:
 # Note: At this point, %eax should contain MB_MAGIC_TEST and %ebx should
 # contain the address of the Multiboot memory map. These will need to
 # be passed to boot_main.
-	movl %eax, Lmb_magic
-	movl %ebx, Lmb_info
+	movl %eax, mb_magic
+	movl %ebx, mb_info
 
 # Setup temporary page table. Some code from OSDev.org wiki.
 	movl $0x1000, %edi # set first location to iterate from
@@ -132,11 +131,13 @@ enter_64:
 .code64
 # Moves the address of the Multiboot info structure to %rdi
 # so it can be the first argument to boot_main.
-    movl Lmb_info, %edi
+    xorq %rdi, %rdi
+    movl mb_info, %edi
 
 # Moves the value of MB_MAGIC_TEST to %rsi, so it can be the
 # second argument to boot_main.
-    movl Lmb_magic, %esi
+    xorq %rsi, %rsi
+    movl mb_magic, %esi
 
 # Calls C boot procedure to do additional setup before the kernel is
 # called.

@@ -1,9 +1,8 @@
 # Authors: Seth McBee
 # Created: 2017-10-11
-# Description: Initial boot file: first code ran by the bootloader.
+# Description: x86 initial boot file: first code ran by the bootloader.
 
 # Declare constants for the Multiboot2 header.
-.set MB_MAGIC_TEST, 0x36d76289 # %eax should equal this upon entry of _start
 .set MB_MAGIC, 0xE85250D6 # Must be present for bootloader to find header
 .set MB_ARCH, 0 # constant for x86 family
 .set MB_LENGTH, (multiboot_end - multiboot_start) # equals length of Mulitboot2 header (bytes)
@@ -17,34 +16,19 @@ multiboot_start:
 	.long MB_ARCH
 	.long MB_LENGTH
 	.long MB_CHECKSUM
-Lend_tag_start:
+end_tag_start:
 	.word 0 # Type
 	.word 0 # Flags
-	.long Lend_tag_end - Lend_tag_start # Size
-Lend_tag_end:
+	.long end_tag_end - end_tag_start # Size
+end_tag_end:
 multiboot_end:
 
 # Storage for Multiboot2 MAGIC and info struct pointer.
 .section .bss
-Lmb_info:
-	.long
-Lmb_magic:
-	.long
-
-# Define temporary paging structure. This will only be a stub, so
-# real paging can be handled in C by kernel_main.
-.section .data
-.align (0x1000) # align to page boundary
-Lpaging_struct_start:
-Lpml4:
-	.skip 0x1000
-Lpdp:
-	.skip 0x1000
-Lpd:
-	.skip 0x1000
-Lpt:
-	.skip 0x1000
-Lpaging_struct_end:
+mb_info:
+	.skip 4
+mb_magic:
+	.skip 4
 
 # Define main kernel stack.
 .section .bss
@@ -67,11 +51,11 @@ _start:
 # Note: At this point, %eax should contain MB_MAGIC_TEST and %ebx should
 # contain the address of the Multiboot memory map. These will need to
 # be passed to boot_main.
-	movl %eax, Lmb_magic
-	movl %ebx, Lmb_info
+	movl %eax, mb_magic
+	movl %ebx, mb_info
 
 # Setup GDT and jump to long mode.
-Lgdt_load:
+gdt_load:
     movl $gdt_pointer, %eax # Load pointer to GDT to %eax
     lgdt (%eax) # Tell CPU to load descriptor
     movw $0x10, %ax # Load data entry from GDT
@@ -86,11 +70,11 @@ Lgdt_load:
 1:
 
 # Pushes the Magic value onto the stack.
-    movl Lmb_magic, %eax
+    movl mb_magic, %eax
     push %eax
 
 # Pushes the address of the Multiboot stucture onto the stack.
-    movl Lmb_info, %eax
+    movl mb_info, %eax
     push %eax
 
 # Calls C boot procedure to do additional setup before the kernel is

@@ -20,24 +20,36 @@ SECTIONS
 		*(.multiboot)
 		*(.text)
 	}
+	_section_text_end = .;
 
+	_section_rodata_start = .;
 	.rodata BLOCK(4K) : ALIGN(4K)
 	{
 		*(.rodata)
 	}
+	_section_rodata_end = .;
 
+	_section_data_start = .;
 	.data BLOCK(4K) : ALIGN(4K)
 	{
 		*(.data)
 	}
 	_section_data_end = .;
 
+	_section_bss_start = .;
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
 		*(COMMON)
 		*(.bss)
 	}
 	_section_bss_end = .;
+
+	_section_tmp_paging_start = .;
+	.tmp_paging BLOCK(4K) : ALIGN(4K)
+	{
+		*(.tmp_paging)
+	}
+	_section_tmp_paging_end = .;
 
 	_sections_end = .;
 }

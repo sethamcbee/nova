@@ -96,7 +96,7 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
-OPTIMIZE=-Og -mno-sse
+OPTIMIZE=-O0 -mno-sse
 ifeq ($(ARCH), x86_64)
 	GCC_PREFIX=x86_64-elf-
 	AS=$(GCC_DIR)/$(GCC_PREFIX)as
@@ -228,7 +228,8 @@ QEMU_FLAGS=\
 	-cpu $(QEMU_CPU) \
 	-smp $(QEMU_SMP) \
 	-vga std \
-	-soundhw pcspk,sb16
+	-soundhw pcspk,sb16 \
+	-enable-kvm
 
 # Bochs application settings.
 #BOCHS=$(HOME)/opt/bochs/bin/bochs
@@ -280,8 +281,7 @@ qemu: $(ISO)
 
 .PHONY: bochs
 bochs: $(ISO)
-	$(TERMINAL) -e "$(BOCHS)" &
-	#$(GDB) -tui --quiet $(BIN) -ex "set confirm off" -ex "target remote localhost:1234"
+	$(TERMINAL) -e "$(BOCHS)"
 
 # target to export assembled source files
 .PHONY: asm
