@@ -16,11 +16,12 @@ static char stdin_buf[1000 + 2];
 static FILE stdin_file;
 static char stdout_buf[10000 + 2];
 static FILE stdout_file;
+static char stderr_buf[1000 + 2];
+static FILE stderr_file;
 
 void stdio_init(void)
 {
     // Set up stdin.
-    stdin_buf[0] = '\0';
     stdin_buf[1001] = '\0';
     stdin_file.buf = stdin_buf;
     stdin_file.pos = 0;
@@ -30,14 +31,22 @@ void stdio_init(void)
     stdin = &stdin_file;
 
     // Set up stdout.
-    stdout_buf[0] = '\0';
     stdout_buf[10001] = '\0';
     stdout_file.buf = stdout_buf;
     stdout_file.pos = 0;
     stdout_file.len = 0;
     stdout_file.max_len = 10000;
-    stdout_file.mode = _IONBF;
+    stdout_file.mode = _IOLBF;
     stdout = &stdout_file;
+
+    // Set up stderr.
+    stderr_buf[1001] = '\0';
+    stderr_file.buf = stderr_buf;
+    stderr_file.pos = 0;
+    stderr_file.len = 0;
+    stderr_file.max_len = 1000;
+    stderr_file.mode = _IONBF;
+    stderr = &stderr_file;
 }
 
 int fflush(FILE *stream)
@@ -47,8 +56,14 @@ int fflush(FILE *stream)
     size_t len = stream->len;
     size_t max_len = stream->max_len;
 
-    // Print stdout while flushing.
-    if (stream == stdout)
+    // No need to flush an empty stream.
+    if (len == 0)
+    {
+        return (0);
+    }
+
+    // Print stdout/stderr while flushing.
+    if (stream == stdout || stream == stderr)
     {
         // Check if the buffer wraps around.
         if (pos + len >= max_len)
@@ -103,15 +118,15 @@ int fputc(int c, FILE *stream)
     // Check if the buffer should be flushed.
     if (mode == _IONBF)
     {
-        return (true);
+        fflush(stream);
     }
     else if (mode == _IOLBF && (c == '\n' || len == max_len))
     {
-        return (true);
+        fflush(stream);
     }
     else if (mode == _IOFBF && len == max_len)
     {
-        return (true);
+        fflush(stream);
     }
 
     return (0);
@@ -152,7 +167,11 @@ int puts(const char *s)
 
 int fgetc(FILE *stream)
 {
-
+    // Flush output buffer if receiving user-input.
+    if (stream == stdin)
+    {
+        fflush(stdout);
+    }
 }
 
 int getc(FILE *stream)

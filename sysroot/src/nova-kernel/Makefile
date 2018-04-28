@@ -229,7 +229,7 @@ QEMU_FLAGS=\
 	-smp $(QEMU_SMP) \
 	-vga std \
 	-soundhw pcspk,sb16 \
-	-enable-kvm
+#	-enable-kvm
 
 # Bochs application settings.
 #BOCHS=$(HOME)/opt/bochs/bin/bochs
