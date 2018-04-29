@@ -69,7 +69,7 @@ int kernel_log(const char *s)
     // Later on, this might be stored elsewhere, but for now
     // we'll just print it if debugging.
     int ret = 0;
-    ret = kernel_print(s);
+    //ret = kernel_print(s);
     return (ret);
 }
 

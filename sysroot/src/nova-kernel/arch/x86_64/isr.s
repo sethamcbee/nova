@@ -31,8 +31,9 @@
 	pop %rax
 .endm
 
+.section .rodata
+
 # Error strings.
-.data
 panic_0:
 	.string "EXCEPTION: DIVIDE-BY-ZERO ERROR"
 panic_1:
@@ -130,7 +131,6 @@ panic_46:
 panic_47:
 	.string "\n\tIRQ: ATA2\n"
 
-.code64
 .text
 
 # Interrupt Service Routines.

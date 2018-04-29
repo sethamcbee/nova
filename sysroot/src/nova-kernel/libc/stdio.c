@@ -167,11 +167,7 @@ int puts(const char *s)
 
 int fgetc(FILE *stream)
 {
-    // Flush output buffer if receiving user-input.
-    if (stream == stdin)
-    {
-        fflush(stdout);
-    }
+
 }
 
 int getc(FILE *stream)

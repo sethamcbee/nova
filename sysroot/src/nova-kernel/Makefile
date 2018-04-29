@@ -2,7 +2,7 @@
 VERSION=nova
 
 # Whether or not the build will be setup for debugging.
-DEBUG=true
+DEBUG=false
 
 # Output file names
 BIN=$(BIN_DIR)/$(VERSION).elf
@@ -16,7 +16,7 @@ SRC_DIR:=.
 ARCH=x86_64
 
 # Whether to enable the __stack_chk_guard.
-STACK_GUARD=true
+STACK_GUARD=false
 
 # directories to export objects, binaries, ISOs, etc.
 OBJ_DIR=$(BUILD_DIR)/obj
@@ -34,12 +34,12 @@ SRC+=$(shell find $(SRC_DIR) -type f -name "*.s" -not -path "./arch/*" -not -pat
 
 # add appropriate architecture-specific files
 ifeq ($(ARCH), x86_64)
-	LD_SCRIPT=x86_64.ld
+	LD_SCRIPT=arch/x86_64/x86_64.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.c")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.s")
 endif
 ifeq ($(ARCH), x86)
-	LD_SCRIPT=x86.ld
+	LD_SCRIPT=arch/x86/x86.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.c")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.s")
 endif
@@ -96,7 +96,7 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
-OPTIMIZE=-O0 -mno-sse
+OPTIMIZE=-O2 -mno-sse
 ifeq ($(ARCH), x86_64)
 	GCC_PREFIX=x86_64-elf-
 	AS=$(GCC_DIR)/$(GCC_PREFIX)as
@@ -310,9 +310,9 @@ $(ASM_DIR)/%.s.s: %.s
 # assemble C files, generic
 $(ASM_DIR)/%.c.s: %.c
 	mkdir -p $(@D)
-	$(CC) $(CCFLAGS) -S $< -o $@
+	$(CC) $(CCFLAGS) -fno-asynchronous-unwind-tables -fverbose-asm -S $< -o $@
 
 # assemble C++ files, generic
 $(ASM_DIR)/%.cpp.s: %.cpp
 	mkdir -p $(@D)
-	$(CPP) $(CPPFLAGS) -S $< -o $@
+	$(CPP) $(CPPFLAGS) -fno-asynchronous-unwind-tables -fverbose-asm -S $< -o $@
