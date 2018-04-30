@@ -28,6 +28,7 @@ void stdio_init(void)
     stdin_file.len = 0;
     stdin_file.max_len = 1000;
     stdin_file.mode = _IOLBF;
+    stdin_file.io = _IOI;
     stdin = &stdin_file;
 
     // Set up stdout.
@@ -37,6 +38,7 @@ void stdio_init(void)
     stdout_file.len = 0;
     stdout_file.max_len = 10000;
     stdout_file.mode = _IOLBF;
+    stdout_file.io = _IOO;
     stdout = &stdout_file;
 
     // Set up stderr.
@@ -46,6 +48,7 @@ void stdio_init(void)
     stderr_file.len = 0;
     stderr_file.max_len = 1000;
     stderr_file.mode = _IONBF;
+    stderr_file.io = _IOO;
     stderr = &stderr_file;
 }
 
@@ -71,14 +74,11 @@ int fflush(FILE *stream)
             size_t tmp_len = max_len - pos;
 
             kernel_write(&p[pos], tmp_len);
-            pos = 0;
             len -= tmp_len;
         }
 
         kernel_write(&p[pos], len);
         len = 0;
-
-        stream->pos = pos;
         stream->len = len;
     }
 
@@ -104,16 +104,16 @@ int fputc(int c, FILE *stream)
     {
         size_t tmp_len = len + pos - max_len;
 
-        p[tmp_len] = c;
-        p[tmp_len] = '\0';
+        p[pos + tmp_len] = c;
+        p[pos + tmp_len + 1] = '\0';
     }
     else
     {
-        p[len] = c;
-        p[len + 1] = '\0';
+        p[pos + len] = c;
+        p[pos + len + 1] = '\0';
     }
 
-    stream->len += 1;
+    stream->len++;
 
     // Check if the buffer should be flushed.
     if (mode == _IONBF)
@@ -167,7 +167,20 @@ int puts(const char *s)
 
 int fgetc(FILE *stream)
 {
+    int ret;
 
+    // Check if buffer is empty.
+    while (stream->len == 0)
+    {
+    }
+
+    ret = stream->buf[stream->pos];
+    stream->len--;
+    stream->pos++;
+    if (stream->pos == stream->max_len)
+        stream->pos = 0;
+
+    return (ret);
 }
 
 int getc(FILE *stream)
@@ -182,7 +195,21 @@ int getchar(void)
 
 char* gets(char *s)
 {
+    char c;
 
+    c = fgetc(stdin);
+    if (c == 0)
+        return (0);
+    for (size_t i = 0; c != 0; i++)
+    {
+        s[i] = c;
+        c = fgetc(stdin);
+    }
+
+    return (s);
 }
 
-char* fgets(char *s, int n, FILE *stream);
+char* fgets(char *s, int n, FILE *stream)
+{
+
+}

@@ -73,30 +73,30 @@ _start:
 # Note: At this point, %eax should contain MB_MAGIC_TEST and %ebx should
 # contain the address of the Multiboot memory map. These will need to
 # be passed to boot_main.
-	movl %eax, mb_magic
-	movl %ebx, mb_info
+    movl %eax, mb_magic
+    movl %ebx, mb_info
 
 # Setup temporary page table. Some code from OSDev.org wiki.
-	movl $0x1000, %edi # set first location to iterate from
-	movl %edi, %cr3
-	xorl %eax, %eax
-	movl $0x1000, %ecx # set number of iterations to 4KiB
-	rep stosl # clear all (sets each long to value of %eax)
-	movl %cr3, %edi # set %edi to beginning again
-	movl $0x2003, (%edi)
-	addl $0x1000, %edi
-	movl $0x3003, (%edi)
-	addl $0x1000, %edi
-	movl $0x4003, (%edi)
-	addl $0x1000, %edi
+    movl $0x1000, %edi # set first location to iterate from
+    movl %edi, %cr3
+    xorl %eax, %eax
+    movl $0x1000, %ecx # set number of iterations to 4KiB
+    rep stosl # clear all (sets each long to value of %eax)
+    movl %cr3, %edi # set %edi to beginning again
+    movl $0x2003, (%edi)
+    addl $0x1000, %edi
+    movl $0x3003, (%edi)
+    addl $0x1000, %edi
+    movl $0x4003, (%edi)
+    addl $0x1000, %edi
 
-	movl $00000003, %ebx # set pages to PRESENT, and RW
-	movl $512, %ecx # loop 512 times
+    movl $00000003, %ebx # set pages to PRESENT, and RW
+    movl $512, %ecx # loop 512 times
 .Lset_entry:
-	movl %ebx, (%edi)
-	addl $0x1000, %ebx
-	addl $8, %edi # iterate eight bytes
-	loop .Lset_entry
+    movl %ebx, (%edi)
+    addl $0x1000, %ebx
+    addl $8, %edi # iterate eight bytes
+    loop .Lset_entry
 
 # Set CR4.PAE.
     movl %cr4, %eax
@@ -126,7 +126,7 @@ Lgdt_load:
     movw %ax, %ss
     pushl $0x08 # Load code entry from GDT
     pushl $enter_64
-	retf # We far jump to load the selector.
+    retf # We far jump to load the selector.
 enter_64:
 .code64
 # Moves the address of the Multiboot info structure to %rdi

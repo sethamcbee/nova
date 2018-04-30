@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
@@ -21,7 +22,10 @@ void kernel_main(void)
     // Kernel loop.
     while (1)
     {
-        ps2_keyboard_main();
+        char c = getchar();
+        if (c != 0)
+            putchar(c);
+        fflush(stdout);
     }
 
     // The kernel is not intended to return; halt.

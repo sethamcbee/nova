@@ -72,6 +72,8 @@ void isr_33_ext(void)
         ps2_receive(PS2_DATA);
     }
     pic_eoi(IRQ_KEYBOARD);
+
+    ps2_keyboard_main();
 }
 
 void isr_39_ext(void)

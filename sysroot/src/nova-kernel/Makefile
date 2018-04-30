@@ -2,7 +2,7 @@
 VERSION=nova
 
 # Whether or not the build will be setup for debugging.
-DEBUG=false
+DEBUG=true
 
 # Output file names
 BIN=$(BIN_DIR)/$(VERSION).elf
@@ -16,7 +16,7 @@ SRC_DIR:=.
 ARCH=x86_64
 
 # Whether to enable the __stack_chk_guard.
-STACK_GUARD=false
+STACK_GUARD=true
 
 # directories to export objects, binaries, ISOs, etc.
 OBJ_DIR=$(BUILD_DIR)/obj
@@ -96,7 +96,7 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
-OPTIMIZE=-O2 -mno-sse
+OPTIMIZE=-Og -mno-sse
 ifeq ($(ARCH), x86_64)
 	GCC_PREFIX=x86_64-elf-
 	AS=$(GCC_DIR)/$(GCC_PREFIX)as

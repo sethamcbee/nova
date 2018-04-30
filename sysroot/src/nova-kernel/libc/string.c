@@ -84,7 +84,7 @@ void* memmove(void* s, const void* ct, size_t n)
     {
         for (size_t i = 0; i < n; ++i)
         {
-            ((uint8_t*) s)[n - 1 - i] = ((uint8_t*) s)[n - 1 - i];
+            ((uint8_t*) s)[n - 1 - i] = ((uint8_t*) ct)[n - 1 - i];
         }
         return (s);
     }

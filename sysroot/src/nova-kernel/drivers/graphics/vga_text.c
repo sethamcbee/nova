@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <string.h>
+
 #include <drivers/graphics/vga_text.h>
 
 #ifdef ARCH_X86_64

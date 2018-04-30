@@ -9,12 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <globals.h>
-#include <kernel.h>
-
 
 
 #endif // KEYBOARD_H

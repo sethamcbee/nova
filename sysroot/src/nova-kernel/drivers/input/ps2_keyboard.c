@@ -6,11 +6,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <globals.h>
 #include <kernel.h>
+#include <hal/keyboard.h>
 #include <drivers/input/ps2_keyboard.h>
 
 #ifdef ARCH_X86_64
@@ -26,6 +28,13 @@
 #endif
 
 static void ps2_kb_flush(void);
+
+static bool control;
+static bool shift;
+static bool alt;
+static uint8_t code_last;
+static bool ignore_next;
+static bool release_code;
 
 void ps2_keyboard_initialize(void)
 {
@@ -67,6 +76,12 @@ void ps2_keyboard_initialize(void)
         // Flush again.
         ps2_kb_flush();
     #endif
+
+    shift = false;
+    control = false;
+    alt = false;
+    code_last = 0;
+    ignore_next = false;
 }
 
 void ps2_keyboard_main(void)
@@ -81,13 +96,214 @@ void ps2_keyboard_main(void)
 
 void ps2_keyboard_handle(uint8_t code)
 {
-    char s[10];
+    if (ignore_next == true)
+    {
+        ignore_next = false;
+        return;
+    }
 
     switch (code)
     {
 //// Ordinary keystrokes. ////
 
+    case 0x1C:
+        if (shift)
+            fputc('A', stdin);
+        else
+            fputc('a', stdin);
+        break;
+
+    case 0x32:
+        if (shift)
+            fputc('B', stdin);
+        else
+            fputc('b', stdin);
+        break;
+
+    case 0x21:
+        if (shift)
+            fputc('C', stdin);
+        else
+            fputc('c', stdin);
+        break;
+
+    case 0x23:
+        if (shift)
+            fputc('D', stdin);
+        else
+            fputc('d', stdin);
+        break;
+
+    case 0x24:
+        if (shift)
+            fputc('E', stdin);
+        else
+            fputc('e', stdin);
+        break;
+
+    case 0x2B:
+        if (shift)
+            fputc('F', stdin);
+        else
+            fputc('f', stdin);
+        break;
+
+    case 0x34:
+        if (shift)
+            fputc('G', stdin);
+        else
+            fputc('g', stdin);
+        break;
+
+    case 0x33:
+        if (shift)
+            fputc('H', stdin);
+        else
+            fputc('h', stdin);
+        break;
+
+    case 0x43:
+        if (shift)
+            fputc('I', stdin);
+        else
+            fputc('i', stdin);
+        break;
+
+    case 0x3B:
+        if (shift)
+            fputc('J', stdin);
+        else
+            fputc('j', stdin);
+        break;
+
+    case 0x42:
+        if (shift)
+            fputc('K', stdin);
+        else
+            fputc('k', stdin);
+        break;
+
+    case 0x4B:
+        if (shift)
+            fputc('L', stdin);
+        else
+            fputc('l', stdin);
+        break;
+
+    case 0x3A:
+        if (shift)
+            fputc('M', stdin);
+        else
+            fputc('m', stdin);
+        break;
+
+    case 0x31:
+        if (shift)
+            fputc('N', stdin);
+        else
+            fputc('n', stdin);
+        break;
+
+    case 0x44:
+        if (shift)
+            fputc('O', stdin);
+        else
+            fputc('o', stdin);
+        break;
+
+    case 0x4D:
+        if (shift)
+            fputc('P', stdin);
+        else
+            fputc('p', stdin);
+        break;
+
+    case 0x15:
+        if (shift)
+            fputc('Q', stdin);
+        else
+            fputc('q', stdin);
+        break;
+
+    case 0x2D:
+        if (shift)
+            fputc('R', stdin);
+        else
+            fputc('r', stdin);
+        break;
+
+    case 0x1B:
+        if (shift)
+            fputc('S', stdin);
+        else
+            fputc('s', stdin);
+        break;
+
+    case 0x2C:
+        if (shift)
+            fputc('T', stdin);
+        else
+            fputc('t', stdin);
+        break;
+
+    case 0x3C:
+        if (shift)
+            fputc('U', stdin);
+        else
+            fputc('u', stdin);
+        break;
+
+    case 0x2A:
+        if (shift)
+            fputc('V', stdin);
+        else
+            fputc('v', stdin);
+        break;
+
+    case 0x1D:
+        if (shift)
+            fputc('W', stdin);
+        else
+            fputc('w', stdin);
+        break;
+
+    case 0x22:
+        if (shift)
+            fputc('X', stdin);
+        else
+            fputc('x', stdin);
+        break;
+
+    case 0x35:
+        if (shift)
+            fputc('Y', stdin);
+        else
+            fputc('y', stdin);
+        break;
+
+    case 0x1A:
+        if (shift)
+            fputc('Z', stdin);
+        else
+            fputc('z', stdin);
+        break;
+
+    case 0x29:
+        fputc(' ', stdin);
+        break;
+
+    case 0x5A:
+        fputc('\n', stdin);
+        break;
+
 //// Special cases. ////
+
+    // Key released.
+    case 0xF0:
+        ignore_next = true;
+        break;
+
+//// Command codes. ////
 
     // Detection or buffer overrun error.
     case 0x00:
@@ -120,9 +336,6 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     default:
-        itoa(code, s, 16);
-        strcat(s, "\n");
-        //kernel_print(s);
         break;
     }
 }

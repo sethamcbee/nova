@@ -17,6 +17,10 @@
 #define _IOLBF 1    // Line-buffer.
 #define _IOFBF 2    // Full-buffer.
 
+// IO modes.
+#define _IOI 0      // Input only.
+#define _IOO 1      // Output only.
+
 // C file abstraction.
 typedef struct FILE
 {
@@ -25,6 +29,7 @@ typedef struct FILE
     size_t len;
     size_t max_len;
     int mode;
+    int io;
 } FILE;
 
 FILE *stdin;
