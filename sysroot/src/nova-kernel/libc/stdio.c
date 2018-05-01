@@ -210,15 +210,18 @@ int getchar(void)
 char* fgets(char *s, int n, FILE *stream)
 {
     char c;
+    size_t i;
 
     c = fgetc(stream);
     if (c == EOF)
         return ((char*)EOF);
-    for (size_t i = 0; i < n && c != 0; i++)
+    for (i = 0; i < n && c != 0; i++)
     {
         s[i] = c;
         c = fgetc(stream);
     }
+
+    s[i] = '\0';
 
     return (s);
 }
@@ -226,17 +229,21 @@ char* fgets(char *s, int n, FILE *stream)
 char* gets(char *s)
 {
     char c;
+    size_t i;
 
     c = fgetc(stdin);
     if (c == EOF)
         return ((char*)EOF);
-    for (size_t i = 0; c != 0 && c != '\n'; i++)
+    for (i = 0; c != 0 && c != '\n'; i++)
     {
         putchar(c);
         fflush(stdout);
         s[i] = c;
         c = fgetc(stdin);
     }
+
+    putchar('\n');
+    s[i] = '\0';
 
     return (s);
 }

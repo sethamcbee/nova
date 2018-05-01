@@ -19,9 +19,14 @@ void kernel_main(void)
     // Initialize STDIO.
     stdio_init();
 
+    char s[10000];
+
     // Kernel loop.
     while (1)
     {
+        puts("> ");
+        fflush(stdout);
+        gets(s);
     }
 
     // The kernel is not intended to return; halt.

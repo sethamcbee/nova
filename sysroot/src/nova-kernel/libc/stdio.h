@@ -63,7 +63,7 @@ int getc(FILE *stream);
 // Gets a single character from stdin.
 int getchar(void);
 
-// Gets a string from stdin.
+// Gets a string from stdin, not including the final newline.
 char* gets(char *s);
 
 // Gets a a line from a stream, up to n-1 characters.

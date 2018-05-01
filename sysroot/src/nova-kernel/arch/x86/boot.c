@@ -24,7 +24,7 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     // Initialize terminal.
     kernel_write = vga_text_write;
     vga_text_initialize();
-    kernel_print("Terminal initialized.\n");
+    kernel_log("Terminal initialized.\n");
 
     // Verify that the Multiboot2 magic word was passed correctly.
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC)
@@ -33,14 +33,14 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     }
 
     idt_initialize();
-    kernel_print("IDT initialized.\n");
+    kernel_log("IDT initialized.\n");
 
     // Initialize PIC (disables all IRQs).
     pic_initialize();
-    kernel_print("PIC initialized.\n");
+    kernel_log("PIC initialized.\n");
 
     ps2_keyboard_initialize();
-    kernel_print("Keyboard initialized.\n");
+    kernel_log("Keyboard initialized.\n");
 
     // Enable supported IRQs.
     pic_irq_enable(IRQ_PIT);
