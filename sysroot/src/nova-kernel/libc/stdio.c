@@ -325,7 +325,7 @@ char* gets(char *s)
 
 int printf(const char *format, ...)
 {
-    size_t len = 0;
+    ssize_t len = 0;
     int written = 0;
 
     // Tags.
@@ -350,7 +350,7 @@ int printf(const char *format, ...)
             fputn(format, len, stdout);
             written += len;
             format += len + 1;
-            len = 0;
+            len = -1;
 
             // Get tags.
             bool done = false;

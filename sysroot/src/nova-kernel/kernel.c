@@ -20,11 +20,13 @@ void kernel_main(void)
     stdio_init();
 
     char s[10000];
+    const char user[] = "sethamcbee@nova:";
+    const char dir[] = "/";
 
     // Kernel loop.
     while (1)
     {
-        printf("> ");
+        printf("%s%s$", user, dir);
         fflush(stdout);
         gets(s);
     }
