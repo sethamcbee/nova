@@ -215,75 +215,80 @@ char* btoa(uint8_t val, char* str, size_t bits)
 	return (str);
 }
 
-char* itoa(int val, char* str, int base)
+char* itoa(int val, char* str)
 {
-	const char digit[] = "0123456789ABCDEF";
-	size_t str_i = 0;
+    return ( _itoa(val, str, 10) );
+}
 
-	if (val < 0)
-	{
-		str[str_i] = '-';
-		++str_i;
-		val *= -1;
-	}
+char* _itoa(int val, char* str, int base)
+{
+    const char digit[] = "0123456789ABCDEF";
+    size_t str_i = 0;
 
-	switch (base)
-	{
-	case (2):
-		str[str_i] = '0';
-		++str_i;
-		str[str_i] = 'b';
-		++str_i;
-		break;
+    if (val < 0)
+    {
+        str[str_i] = '-';
+        ++str_i;
+        val *= -1;
+    }
 
-	case (8):
-		str[str_i] = '0';
-		++str_i;
-		break;
+    switch (base)
+    {
+    case (2):
+        str[str_i] = '0';
+        ++str_i;
+        str[str_i] = 'b';
+        ++str_i;
+        break;
 
-	case (10):
-		break;
+    case (8):
+        str[str_i] = '0';
+        ++str_i;
+        break;
 
-	case (16):
-		str[str_i] = '0';
-		++str_i;
-		str[str_i] = 'x';
-		++str_i;
-		break;
+    case (10):
+        break;
 
-	default:
-		str = "ERROR: BASE NOT SUPPORTED";
-		return (str);
-	}
+    case (16):
+        str[str_i] = '0';
+        ++str_i;
+        str[str_i] = 'x';
+        ++str_i;
+        break;
 
-	if (val == 0)
-	{
-		str[str_i] = digit[0];
-        str[str_i + 1] = '\0';
-		return (str);
-	}
+    default:
+        str = "ERROR: BASE NOT SUPPORTED";
+        return (str);
+    }
 
-	size_t place = 0;
-	int place_val = val;
+    if (val == 0)
+    {
+        str[str_i] = digit[0];
+    str[str_i + 1] = '\0';
+        return (str);
+    }
 
-	while (place_val > 0)
-	{
-		++place;
-		place_val /= base;
-	}
+    size_t place = 0;
+    int place_val = val;
 
-	str_i += place;
+    while (place_val > 0)
+    {
+        ++place;
+        place_val /= base;
+    }
 
-	str[str_i] = '\0';
+    str_i += place;
 
-	while (val > 0)
-	{
-		--str_i;
-		str[str_i] = digit[val%base];
-		val /= base;
-	}
+    str[str_i] = '\0';
 
-	return (str);
+    while (val > 0)
+    {
+        --str_i;
+        str[str_i] = digit[val%base];
+        val /= base;
+    }
+
+    return (str);
 }
 
 long labs(long n)
@@ -298,7 +303,12 @@ long labs(long n)
     }
 }
 
-char* litoa(long val, char* str, int base)
+char* litoa(long val, char* str)
+{
+	return ( _litoa(val, str, 10) );
+}
+
+char* _litoa(long val, char* str, int base)
 {
 	const char digit[] = "0123456789ABCDEF";
 	size_t str_i = 0;
@@ -367,7 +377,12 @@ char* litoa(long val, char* str, int base)
 	return (str);
 }
 
-char* sitoa(size_t val, char* str, int base)
+char* sitoa(size_t val, char* str)
+{
+    return ( _sitoa(val, str, 10) );
+}
+
+char* _sitoa(size_t val, char* str, int base)
 {
 	const char digit[] = "0123456789ABCDEF";
 	size_t str_i = 0;

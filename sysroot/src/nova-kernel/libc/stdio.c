@@ -302,10 +302,17 @@ char* gets(char *s)
         {
             if (i > 0)
             {
+                // If the character was a tab, then backspace
+                // 4 places.
+                if (s[i - 1] == '\t')
+                {
+                    puts("\b\b\b\b    \b\b\b\b");
+                }
+                else
+                {
+                    puts("\b \b");
+                }
                 i -= 2;
-                putchar('\b');
-                putchar(' ');
-                putchar('\b');
                 fflush(stdout);
             }
             else
@@ -503,7 +510,7 @@ int vfprintf(FILE *stream, const char *format, va_list arg)
                         tmp[0] = '-';
                     else
                         tmp[0] = '+';
-                    litoa(labs(n), tmp+1, 10);
+                    litoa(labs(n), tmp+1);
                 }
                 else if (force_space == true)
                 {
@@ -511,11 +518,11 @@ int vfprintf(FILE *stream, const char *format, va_list arg)
                         tmp[0] = '-';
                     else
                         tmp[0] = ' ';
-                    litoa(labs(n), tmp+1, 10);
+                    litoa(labs(n), tmp+1);
                 }
                 else
                 {
-                    litoa(n, tmp, 10);
+                    litoa(n, tmp);
                 }
 
                 fputs(tmp, stream);

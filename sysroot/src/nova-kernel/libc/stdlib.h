@@ -256,7 +256,8 @@ ldiv_t ldiv(long num, long denom);
  * @note Base should be between 2 and 36, where 10 means decimal base, 16
  * means hexadecimal base, 8 means octal base, and 2 means binary base.
  */
-char* itoa(int val, char* str, int base);
+char* itoa(int val, char* str);
+char* _itoa(int val, char* str, int base);
 
 /**
  * @brief Converts value to string.
@@ -278,7 +279,8 @@ char* itoa(int val, char* str, int base);
  * @note Base should be between 2 and 36, where 10 means decimal base, 16
  * means hexadecimal base, 8 means octal base, and 2 means binary base.
  */
-char* litoa(long val, char* str, int base);
+char* litoa(long val, char* str);
+char* _litoa(long val, char* str, int base);
 
 /**
  * @brief Converts value to string.
@@ -300,7 +302,8 @@ char* litoa(long val, char* str, int base);
  * @note Base should be between 2 and 36, where 10 means decimal base, 16
  * means hexadecimal base, 8 means octal base, and 2 means binary base.
  */
-char* sitoa(size_t val, char* str, int base);
+char* sitoa(size_t val, char* str);
+char* _sitoa(size_t val, char* str, int base);
 
 /**
  * @brief Converts raw byte to string.
