@@ -22,10 +22,6 @@ void kernel_main(void)
     // Kernel loop.
     while (1)
     {
-        char c = getchar();
-        if (c != 0)
-            putchar(c);
-        fflush(stdout);
     }
 
     // The kernel is not intended to return; halt.

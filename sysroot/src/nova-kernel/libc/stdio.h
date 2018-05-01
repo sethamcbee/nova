@@ -24,12 +24,12 @@
 // C file abstraction.
 typedef struct FILE
 {
-    char* buf;
-    size_t pos;
-    size_t len;
-    size_t max_len;
-    int buf_mode;
-    int io_mode;
+    volatile char* buf;
+    volatile size_t pos;
+    volatile size_t len;
+    volatile size_t max_len;
+    volatile int buf_mode;
+    volatile int io_mode;
 } FILE;
 
 FILE *stdin;

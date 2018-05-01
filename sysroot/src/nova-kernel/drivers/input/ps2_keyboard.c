@@ -337,61 +337,91 @@ void ps2_keyboard_handle(uint8_t code)
     case 0x16:
         if (code_last == 0xF0)
             break;
-        fputc('1', stdin);
+        if (shift)
+            fputc('!', stdin);
+        else
+            fputc('1', stdin);
         break;
 
     case 0x1E:
         if (code_last == 0xF0)
             break;
-        fputc('2', stdin);
+        if (shift)
+            fputc('@', stdin);
+        else
+            fputc('2', stdin);
         break;
 
     case 0x26:
         if (code_last == 0xF0)
             break;
-        fputc('3', stdin);
+        if (shift)
+            fputc('#', stdin);
+        else
+            fputc('3', stdin);
         break;
 
     case 0x25:
         if (code_last == 0xF0)
             break;
-        fputc('4', stdin);
+        if (shift)
+            fputc('$', stdin);
+        else
+            fputc('4', stdin);
         break;
 
     case 0x2E:
         if (code_last == 0xF0)
             break;
-        fputc('5', stdin);
+        if (shift)
+            fputc('%', stdin);
+        else
+            fputc('5', stdin);
         break;
 
     case 0x36:
         if (code_last == 0xF0)
             break;
-        fputc('6', stdin);
+        if (shift)
+            fputc('^', stdin);
+        else
+            fputc('6', stdin);
         break;
 
     case 0x3D:
         if (code_last == 0xF0)
             break;
-        fputc('7', stdin);
+        if (shift)
+            fputc('&', stdin);
+        else
+            fputc('7', stdin);
         break;
 
     case 0x3E:
         if (code_last == 0xF0)
             break;
-        fputc('8', stdin);
+        if (shift)
+            fputc('*', stdin);
+        else
+            fputc('8', stdin);
         break;
 
     case 0x46:
         if (code_last == 0xF0)
             break;
-        fputc('9', stdin);
+        if (shift)
+            fputc('(', stdin);
+        else
+            fputc('9', stdin);
         break;
 
     case 0x45:
         if (code_last == 0xF0)
             break;
-        fputc('0', stdin);
+        if (shift)
+            fputc(')', stdin);
+        else
+            fputc('0', stdin);
         break;
 
 // Whitespace.
@@ -409,6 +439,113 @@ void ps2_keyboard_handle(uint8_t code)
             break;
         fputc('\n', stdin);
         break;
+
+    // Tab.
+    case 0x0D:
+        if (code_last == 0xF0)
+            break;
+        fputc('\t', stdin);
+        break;
+
+// Punctuation and special characters.
+
+    case 0x0E:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('~', stdin);
+        else
+            fputc('`', stdin);
+        break;
+
+    case 0x4E:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('_', stdin);
+        else
+            fputc('-', stdin);
+        break;
+
+    case 0x55:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('+', stdin);
+        else
+            fputc('=', stdin);
+        break;
+
+    case 0x54:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('{', stdin);
+        else
+            fputc('[', stdin);
+        break;
+
+    case 0x5B:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('}', stdin);
+        else
+            fputc(']', stdin);
+        break;
+
+    case 0x5D:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('|', stdin);
+        else
+            fputc('\\', stdin);
+        break;
+
+    case 0x4C:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc(':', stdin);
+        else
+            fputc(';', stdin);
+        break;
+
+    case 0x52:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('"', stdin);
+        else
+            fputc('\'', stdin);
+        break;
+
+    case 0x41:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('<', stdin);
+        else
+            fputc(',', stdin);
+        break;
+
+    case 0x49:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('>', stdin);
+        else
+            fputc('.', stdin);
+        break;
+
+    case 0x4A:
+        if (code_last == 0xF0)
+            break;
+        if (shift)
+            fputc('?', stdin);
+        else
+            fputc('/', stdin);
 
 // Modifiers.
 

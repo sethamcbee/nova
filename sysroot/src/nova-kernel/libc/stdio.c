@@ -54,7 +54,7 @@ void stdio_init(void)
 
 int fflush(FILE *stream)
 {
-    char* p = stream->buf;
+    char* p = (char*) stream->buf;
     size_t pos = stream->pos;
     size_t len = stream->len;
     size_t max_len = stream->max_len;
@@ -87,7 +87,7 @@ int fflush(FILE *stream)
 
 int fputc(int c, FILE *stream)
 {
-    char* p = stream->buf;
+    char* p = (char*) stream->buf;
     size_t pos = stream->pos;
     size_t len = stream->len;
     size_t max_len = stream->max_len;
@@ -153,7 +153,7 @@ int fputs(const char *s, FILE *stream)
 
         if (err == EOF)
         {
-            return (err);
+            return (EOF);
         }
     }
 
@@ -169,11 +169,22 @@ int fgetc(FILE *stream)
 {
     int ret;
 
-    // Check if buffer is empty.
-    while (stream->len == 0)
+    // Wait until stdin buffer is non-empty.
+    if (stream == stdin)
     {
+        while (stream->len == 0)
+        {
+            // Wait.
+        }
     }
 
+    // Check if stream is empty.
+    if (stream->len == 0)
+    {
+        return (EOF);
+    }
+
+    // Get character.
     ret = stream->buf[stream->pos];
     stream->len--;
     stream->pos++;
@@ -190,7 +201,26 @@ int getc(FILE *stream)
 
 int getchar(void)
 {
-    return ( fgetc(stdin) );
+    int c = fgetc(stdin);
+    putchar(c);
+    fflush(stdout);
+    return (c);
+}
+
+char* fgets(char *s, int n, FILE *stream)
+{
+    char c;
+
+    c = fgetc(stream);
+    if (c == EOF)
+        return ((char*)EOF);
+    for (size_t i = 0; i < n && c != 0; i++)
+    {
+        s[i] = c;
+        c = fgetc(stream);
+    }
+
+    return (s);
 }
 
 char* gets(char *s)
@@ -198,10 +228,12 @@ char* gets(char *s)
     char c;
 
     c = fgetc(stdin);
-    if (c == 0)
-        return (0);
-    for (size_t i = 0; c != 0; i++)
+    if (c == EOF)
+        return ((char*)EOF);
+    for (size_t i = 0; c != 0 && c != '\n'; i++)
     {
+        putchar(c);
+        fflush(stdout);
         s[i] = c;
         c = fgetc(stdin);
     }
@@ -209,7 +241,3 @@ char* gets(char *s)
     return (s);
 }
 
-char* fgets(char *s, int n, FILE *stream)
-{
-
-}
