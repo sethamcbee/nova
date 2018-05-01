@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include <globals.h>
 #include <drivers/graphics/vga_text.h>
 
 #ifdef ARCH_X86_64
@@ -23,7 +24,7 @@ static uint8_t vga_cur_x;
 static uint8_t vga_cur_y;
 static uint8_t vga_color;
 
-int vga_text_write(const void *str, size_t len)
+ssize_t vga_text_write(const void *str, size_t len)
 {
     // Initialize terminal if it hasn't already been initialized.
     if (vga_text_initialized == false)

@@ -29,6 +29,7 @@ void stdio_init(void)
     stdin_file.max_len = 1000;
     stdin_file.buf_mode = _IOLBF;
     stdin_file.io_mode = _IOI;
+    stdin_file.write = &write_null;
     stdin = &stdin_file;
 
     // Set up stdout.
@@ -39,6 +40,7 @@ void stdio_init(void)
     stdout_file.max_len = 10000;
     stdout_file.buf_mode = _IOLBF;
     stdout_file.io_mode = _IOO;
+    stdout_file.write = kernel_write;
     stdout = &stdout_file;
 
     // Set up stderr.
@@ -49,6 +51,7 @@ void stdio_init(void)
     stderr_file.max_len = 1000;
     stderr_file.buf_mode = _IONBF;
     stderr_file.io_mode = _IOO;
+    stderr_file.write = kernel_write;
     stderr = &stderr_file;
 }
 
@@ -65,22 +68,24 @@ int fflush(FILE *stream)
         return (0);
     }
 
-    // Print stdout/stderr while flushing.
-    if (stream == stdout || stream == stderr)
+    // Check for input-only stream.
+    if (stream->io_mode == _IOI)
     {
-        // Check if the buffer wraps around.
-        if (pos + len >= max_len)
-        {
-            size_t tmp_len = max_len - pos;
-
-            kernel_write(&p[pos], tmp_len);
-            len -= tmp_len;
-        }
-
-        kernel_write(&p[pos], len);
-        len = 0;
-        stream->len = len;
+        return (EOF);
     }
+
+    // Check if the buffer wraps around.
+    if (pos + len >= max_len)
+    {
+        size_t tmp_len = max_len - pos;
+
+        stream->write(&p[pos], tmp_len);
+        len -= tmp_len;
+    }
+
+    stream->write(&p[pos], len);
+    len = 0;
+    stream->len = len;
 
     return (0);
 }
@@ -248,3 +253,8 @@ char* gets(char *s)
     return (s);
 }
 
+ssize_t write_null(const void *s, size_t n)
+{
+    // Do nothing.
+    return (0);
+}

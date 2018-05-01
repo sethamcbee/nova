@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <globals.h>
+
 #define VGA_TEXT_BUFFER 0xB8000
 #define VGA_TEXT_WIDTH 80
 #define VGA_TEXT_HEIGHT 25
@@ -38,7 +40,7 @@ typedef enum Vga_Text_Color
 bool vga_text_initialized;
 
 // Writes a string to the terminal, possibly returning an error code.
-int vga_text_write(const void *str, size_t len);
+ssize_t vga_text_write(const void *str, size_t len);
 
 // Initializes the driver before use.
 void vga_text_initialize(void);

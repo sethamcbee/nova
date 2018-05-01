@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <globals.h>
+
 // Error codes.
 #define EOF -1
 
@@ -30,6 +32,7 @@ typedef struct FILE
     volatile size_t max_len;
     volatile int buf_mode;
     volatile int io_mode;
+    ssize_t (*write)(const void *s, size_t n);
 } FILE;
 
 FILE *stdin;
@@ -68,5 +71,8 @@ char* gets(char *s);
 
 // Gets a a line from a stream, up to n-1 characters.
 char* fgets(char *s, int n, FILE *stream);
+
+// Null write interface.
+ssize_t write_null(const void *s, size_t n);
 
 #endif // STDIO_H

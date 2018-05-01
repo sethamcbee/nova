@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <globals.h>
+
 // Main kernel. Should only be called once.
 void kernel_main(void);
 
@@ -17,7 +19,7 @@ __attribute__((noreturn))
 void kernel_panic(char *str);
 
 // Function pointer to the environment-specific terminal write().
-int (*kernel_write)(const void *, size_t);
+ssize_t (*kernel_write)(const void *, size_t);
 
 // Finds the length of the string and then calls kernel_write.
 int kernel_print(const char *s);
