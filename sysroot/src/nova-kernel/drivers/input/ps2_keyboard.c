@@ -549,6 +549,13 @@ void ps2_keyboard_handle(uint8_t code)
 
 // Modifiers.
 
+    // Backspace.
+    case 0x66:
+        if (code_last == 0xF0)
+            break;
+        fputc('\b', stdin);
+        break;
+
     // Left shift.
     case 0x12:
         if (code_last == 0xF0)

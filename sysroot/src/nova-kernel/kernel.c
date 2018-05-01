@@ -27,6 +27,10 @@ void kernel_main(void)
         puts("> ");
         fflush(stdout);
         gets(s);
+        if (strcmp(s, "help") == 0)
+        {
+            puts("I cannot help you.\n");
+        }
     }
 
     // The kernel is not intended to return; halt.

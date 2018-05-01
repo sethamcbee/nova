@@ -110,7 +110,6 @@ int fputc(int c, FILE *stream)
         size_t tmp_len = len + pos - max_len;
 
         p[pos + tmp_len] = c;
-        p[pos + tmp_len + 1] = '\0';
     }
     else
     {
@@ -215,15 +214,50 @@ int getchar(void)
 char* fgets(char *s, int n, FILE *stream)
 {
     char c;
-    size_t i;
+    ssize_t i;
 
     c = fgetc(stream);
     if (c == EOF)
         return ((char*)EOF);
     for (i = 0; i < n && c != 0; i++)
     {
-        s[i] = c;
+        // If this is not an interactive stream.
+        if (stream != stdin)
+        {
+            s[i] = c;
+        }
+        else  // This is an interactive stream.
+        {
+            // Check for backspace.
+            if (c == '\b')
+            {
+                if (i > 0)
+                {
+                    i -= 2;
+                    putchar('\b');
+                    putchar(' ');
+                    putchar('\b');
+                    fflush(stdout);
+                }
+                else
+                {
+                    i = -1;
+                }
+            }
+            else
+            {
+                s[i] = c;
+                putchar(c);
+                fflush(stdout);
+            }
+        }
+
         c = fgetc(stream);
+    }
+
+    if (stream == stdin)
+    {
+        putchar('\n');
     }
 
     s[i] = '\0';
@@ -234,16 +268,36 @@ char* fgets(char *s, int n, FILE *stream)
 char* gets(char *s)
 {
     char c;
-    size_t i;
+    ssize_t i;
 
     c = fgetc(stdin);
     if (c == EOF)
         return ((char*)EOF);
     for (i = 0; c != 0 && c != '\n'; i++)
     {
-        putchar(c);
-        fflush(stdout);
-        s[i] = c;
+        // Check for backspace.
+        if (c == '\b')
+        {
+            if (i > 0)
+            {
+                i -= 2;
+                putchar('\b');
+                putchar(' ');
+                putchar('\b');
+                fflush(stdout);
+            }
+            else
+            {
+                i = -1;
+            }
+        }
+        else
+        {
+            s[i] = c;
+            putchar(c);
+            fflush(stdout);
+        }
+
         c = fgetc(stdin);
     }
 
@@ -256,5 +310,5 @@ char* gets(char *s)
 ssize_t write_null(const void *s, size_t n)
 {
     // Do nothing.
-    return (0);
+    return (n);
 }

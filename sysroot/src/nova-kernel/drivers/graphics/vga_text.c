@@ -40,6 +40,18 @@ ssize_t vga_text_write(const void *str, size_t len)
     {
         switch (p[i])
         {
+        case '\b':
+            if (vga_cur_x > 0)
+            {
+                vga_cur_x--;
+            }
+            else if (vga_cur_y > 0)
+            {
+                vga_cur_y--;
+                vga_cur_x = VGA_TEXT_WIDTH - 1;
+            }
+            break;
+
         case '\t':
             vga_text_write("    ", 4);
             break;
