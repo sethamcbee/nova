@@ -14,7 +14,7 @@
 
 #include <kernel.h>
 
-// printf specifiers.
+// printf() specifiers.
 #define WIDTH_ARG           -2
 #define PRECISION_ARG       -2
 #define LENGTH_SHORT        -1
@@ -76,6 +76,12 @@ int fflush(FILE *stream)
 
     // No need to flush an empty stream.
     if (len == 0)
+    {
+        return (0);
+    }
+
+    // Do nothing with virtual string stream.
+    if (stream->io_mode == _IOS)
     {
         return (0);
     }
@@ -560,6 +566,32 @@ int printf(const char *format, ...)
 int vprintf(const char *format, va_list arg)
 {
     return ( vfprintf(stdout, format, arg) );
+}
+
+int vsprintf(char *s, const char *format, va_list arg)
+{
+    int ret;
+    FILE tmp;
+    FILE *stream = &tmp;
+    tmp.buf = s;
+    tmp.pos = 0;
+    tmp.len = 0;
+    tmp.max_len = SIZE_MAX;
+    tmp.buf_mode = _IONBF;
+    tmp.io_mode = _IOS;
+    tmp.write = &write_null;
+
+    ret = vfprintf(stream, format, arg);
+    return (ret);
+}
+
+int sprintf(char *s, const char *format, ...)
+{
+    int ret;
+    va_list arg;
+    va_start(arg, format);
+    ret = vsprintf(s, format, arg);
+    return (ret);
 }
 
 ssize_t write_null(const void *s, size_t n)

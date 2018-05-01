@@ -20,6 +20,7 @@ void kernel_main(void)
     stdio_init();
 
     char s[10000];
+    char t[100];
     const char user[] = "sethamcbee@nova:";
     const char dir[] = "/";
 
@@ -29,6 +30,10 @@ void kernel_main(void)
         printf("%s%s$ ", user, dir);
         fflush(stdout);
         gets(s);
+
+        // Echo user input.
+        sprintf(t, "%s\n", s);
+        printf("%s", t);
     }
 
     // The kernel is not intended to return; halt.

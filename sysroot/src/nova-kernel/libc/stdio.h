@@ -23,6 +23,7 @@
 // IO modes.
 #define _IOI 0      // Input only.
 #define _IOO 1      // Output only.
+#define _IOS 2      // String virtual mode.
 
 // C file abstraction.
 typedef struct FILE
@@ -87,6 +88,10 @@ int printf(const char *format, ...);
 
 // Outputs a formatted string to stdout using an argument list.
 int vprintf(const char *format, va_list arg);
+
+// Write a formatted string to a string.
+int vsprintf(char *s, const char *format, va_list arg);
+int sprintf(char *s, const char *format, ...);
 
 // Null write interface.
 ssize_t write_null(const void *s, size_t n);
