@@ -26,7 +26,7 @@ void kernel_main(void)
     // Kernel loop.
     while (1)
     {
-        printf("%s%s$", user, dir);
+        printf("%s%s$ ", user, dir);
         fflush(stdout);
         gets(s);
     }

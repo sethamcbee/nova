@@ -104,7 +104,7 @@ int fflush(FILE *stream)
 
 int fputn(const char *s, size_t n, FILE *stream)
 {
-    int ret;
+    int ret = EOF;
 
     for (size_t i = 0; i < n; i++)
     {
@@ -323,7 +323,7 @@ char* gets(char *s)
     return (s);
 }
 
-int printf(const char *format, ...)
+int vfprintf(FILE *stream, const char *format, va_list arg)
 {
     ssize_t len = 0;
     int written = 0;
@@ -339,15 +339,12 @@ int printf(const char *format, ...)
     int precision = -1;
     int length = LENGTH_DEFAULT;
 
-    va_list arg;
-    va_start(arg, format);
-
     while (format[len] != '\0')
     {
         if (format[len] == '%')
         {
             // Print string so far.
-            fputn(format, len, stdout);
+            fputn(format, len, stream);
             written += len;
             format += len + 1;
             len = -1;
@@ -446,7 +443,7 @@ int printf(const char *format, ...)
                 if (length != LENGTH_WIDE)
                 {
                     char c = (char) va_arg(arg, int);
-                    fputc(c, stdout);
+                    fputc(c, stream);
                     written++;
                 }
                 continue;
@@ -464,12 +461,12 @@ int printf(const char *format, ...)
 
                 if (precision > 0)
                 {
-                    fputn(s, precision, stdout);
+                    fputn(s, precision, stream);
                     written += precision;
                 }
                 else
                 {
-                    puts(s);
+                    fputs(s, stream);
                     written += strlen(s);
                 }
             }
@@ -488,10 +485,10 @@ int printf(const char *format, ...)
                 // Get integer.
                 if (length == LENGTH_SHORT)
                     n = (short) va_arg(arg, int);
-                if (length == LENGTH_DEFAULT)
-                    n = (int) va_arg(arg, int);
-                if (length == LENGTH_LONG)
+                else if (length == LENGTH_LONG)
                     n = (long) va_arg(arg, long);
+                else
+                    n = (int) va_arg(arg, int);
 
                 // Format string.
                 if (force_sign == true)
@@ -515,7 +512,7 @@ int printf(const char *format, ...)
                     litoa(n, tmp, 10);
                 }
 
-                fputs(tmp, stdout);
+                fputs(tmp, stream);
                 written += strlen(tmp);
             }
 
@@ -534,9 +531,35 @@ int printf(const char *format, ...)
     }
 
     // Print anything left.
-    fputs(format, stdout);
+    fputs(format, stream);
+
+    va_end(arg);
 
     return (written);
+}
+
+int fprintf(FILE *stream, const char *format, ...)
+{
+    int ret;
+    va_list arg;
+    va_start(arg, format);
+    ret = vfprintf(stream, format, arg);
+    va_end(arg);
+    return (ret);
+}
+
+int printf(const char *format, ...)
+{
+    int ret;
+    va_list arg;
+    va_start(arg, format);
+    ret = vfprintf(stdout, format, arg);
+    return (ret);
+}
+
+int vprintf(const char *format, va_list arg)
+{
+    return ( vfprintf(stdout, format, arg) );
 }
 
 ssize_t write_null(const void *s, size_t n)

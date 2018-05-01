@@ -5,6 +5,7 @@
 #ifndef STDIO_H
 #define STDIO_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -75,8 +76,17 @@ char* gets(char *s);
 // Gets a a line from a stream, up to n-1 characters.
 char* fgets(char *s, int n, FILE *stream);
 
+// Outputs a formatted string using an argument list.
+int vfprintf(FILE *stream, const char *format, va_list arg);
+
+// Outputs a formatted string to a stream.
+int fprintf(FILE *stream, const char *format, ...);
+
 // Outputs a formatted string to stdout.
 int printf(const char *format, ...);
+
+// Outputs a formatted string to stdout using an argument list.
+int vprintf(const char *format, va_list arg);
 
 // Null write interface.
 ssize_t write_null(const void *s, size_t n);
