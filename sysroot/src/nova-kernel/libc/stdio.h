@@ -46,6 +46,9 @@ void stdio_init(void);
 // Flushes output stream.
 int fflush(FILE *stream);
 
+// Writes a given number of characters to a stream.
+int fputn(const char *s, size_t n, FILE *stream);
+
 // Writes a single character to a stream.
 int fputc(int c, FILE *stream);
 int putc(int c, FILE *stream);
@@ -71,6 +74,9 @@ char* gets(char *s);
 
 // Gets a a line from a stream, up to n-1 characters.
 char* fgets(char *s, int n, FILE *stream);
+
+// Outputs a formatted string to stdout.
+int printf(const char *format, ...);
 
 // Null write interface.
 ssize_t write_null(const void *s, size_t n);

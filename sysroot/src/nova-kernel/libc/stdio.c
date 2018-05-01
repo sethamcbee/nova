@@ -2,14 +2,26 @@
 // Created: 2018-4-27
 // Description: STDIO.
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <kernel.h>
+
+// printf specifiers.
+#define WIDTH_ARG           -2
+#define PRECISION_ARG       -2
+#define LENGTH_SHORT        -1
+#define LENGTH_DEFAULT      0
+#define LENGTH_LONG         1
+#define LENGTH_WIDE         1
+#define LENGTH_DOUBLE       2
 
 // STUB. Eventually these should be implemented using the VFS.
 static char stdin_buf[1000 + 2];
@@ -90,6 +102,21 @@ int fflush(FILE *stream)
     return (0);
 }
 
+int fputn(const char *s, size_t n, FILE *stream)
+{
+    int ret;
+
+    for (size_t i = 0; i < n; i++)
+    {
+        ret = fputc(s[i], stream);
+
+        if (ret == EOF)
+            return (EOF);
+    }
+
+    return (ret);
+}
+
 int fputc(int c, FILE *stream)
 {
     char* p = (char*) stream->buf;
@@ -148,20 +175,9 @@ int putchar(int c)
 
 int fputs(const char *s, FILE *stream)
 {
-    int err;
     size_t len = strlen(s);
 
-    for (size_t i = 0; i < len; i++)
-    {
-        err = fputc(s[i], stream);
-
-        if (err == EOF)
-        {
-            return (EOF);
-        }
-    }
-
-    return (0);
+    return (fputn(s, len, stream));
 };
 
 int puts(const char *s)
@@ -305,6 +321,222 @@ char* gets(char *s)
     s[i] = '\0';
 
     return (s);
+}
+
+int printf(const char *format, ...)
+{
+    size_t len = 0;
+    int written = 0;
+
+    // Tags.
+    char spec;
+    bool left_justify = false;
+    bool force_sign = false;
+    bool force_space = false;
+    bool force_spec = false;
+    bool zero_pad = false;
+    int width = -1;
+    int precision = -1;
+    int length = LENGTH_DEFAULT;
+
+    va_list arg;
+    va_start(arg, format);
+
+    while (format[len] != '\0')
+    {
+        if (format[len] == '%')
+        {
+            // Print string so far.
+            fputn(format, len, stdout);
+            written += len;
+            format += len + 1;
+            len = 0;
+
+            // Get tags.
+            bool done = false;
+            bool dot = false;
+            while (!done)
+            {
+                switch (*format)
+                {
+                case '-':
+                    left_justify = true;
+                    break;
+
+                case '+':
+                    force_sign = true;
+                    break;
+
+                case ' ':
+                    force_space = true;
+                    break;
+
+                case '#':
+                    force_spec = true;
+                    break;
+
+                case '0':
+                    zero_pad = true;
+                    break;
+
+                case '.':
+                    dot = true;
+                    break;
+
+                case '*':
+                    if (dot == true)
+                    {
+                        dot = false;
+                        precision = PRECISION_ARG;
+                    }
+                    else
+                        width = WIDTH_ARG;
+                    break;
+
+                case 'h':
+                    length = LENGTH_SHORT;
+                    break;
+
+                case 'l':
+                    length = LENGTH_LONG;
+                    break;
+
+                case 'L':
+                    length = LENGTH_DOUBLE;
+                    break;
+
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    if (dot == true)
+                    {
+                        dot = false;
+                        precision = atoi(format);
+                    }
+                    else
+                    {
+                        width = atoi(format);
+                    }
+                    while (isdigit(*format))
+                        format++;
+                    format--;
+                    break;
+
+                default:
+                    done = true;
+                    format--;
+                    break;
+                }
+                format++;
+            }
+
+            // Get specifier.
+            spec = *format;
+            format++;
+
+            // Character.
+            if (spec == 'c' || spec == '%')
+            {
+                if (length != LENGTH_WIDE)
+                {
+                    char c = (char) va_arg(arg, int);
+                    fputc(c, stdout);
+                    written++;
+                }
+                continue;
+            }
+
+            // String.
+            if (spec == 's')
+            {
+                // Get precision from va_arg if specified.
+                if (precision == PRECISION_ARG)
+                    precision = (int) va_arg(arg, int);
+
+                // Get pointer to string.
+                const char *s = (const char*) va_arg(arg, const char *);
+
+                if (precision > 0)
+                {
+                    fputn(s, precision, stdout);
+                    written += precision;
+                }
+                else
+                {
+                    puts(s);
+                    written += strlen(s);
+                }
+            }
+
+            // Signed decimal integer.
+            if (spec == 'd' || spec == 'i')
+            {
+                // Get width from va_arg if specified.
+                if (width == WIDTH_ARG)
+                    width = (int) va_arg(arg, int);
+
+                char tmp[100 + width];
+                long n;
+                int pad;
+
+                // Get integer.
+                if (length == LENGTH_SHORT)
+                    n = (short) va_arg(arg, int);
+                if (length == LENGTH_DEFAULT)
+                    n = (int) va_arg(arg, int);
+                if (length == LENGTH_LONG)
+                    n = (long) va_arg(arg, long);
+
+                // Format string.
+                if (force_sign == true)
+                {
+                    if (n < 0)
+                        tmp[0] = '-';
+                    else
+                        tmp[0] = '+';
+                    litoa(labs(n), tmp+1, 10);
+                }
+                else if (force_space == true)
+                {
+                    if (n < 0)
+                        tmp[0] = '-';
+                    else
+                        tmp[0] = ' ';
+                    litoa(labs(n), tmp+1, 10);
+                }
+                else
+                {
+                    litoa(n, tmp, 10);
+                }
+
+                fputs(tmp, stdout);
+                written += strlen(tmp);
+            }
+
+            // Reset tags.
+            left_justify = false;
+            force_sign = false;
+            force_space = false;
+            force_spec = false;
+            zero_pad = false;
+            width = -1;
+            precision = -1;
+            length = LENGTH_DEFAULT;
+        }
+
+        len++;
+    }
+
+    // Print anything left.
+    fputs(format, stdout);
+
+    return (written);
 }
 
 ssize_t write_null(const void *s, size_t n)

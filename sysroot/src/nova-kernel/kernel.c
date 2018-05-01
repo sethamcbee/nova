@@ -24,17 +24,13 @@ void kernel_main(void)
     // Kernel loop.
     while (1)
     {
-        puts("> ");
+        printf("> ");
         fflush(stdout);
         gets(s);
-        if (strcmp(s, "help") == 0)
-        {
-            puts("I cannot help you.\n");
-        }
     }
 
     // The kernel is not intended to return; halt.
-    kernel_print("\nEnd of kernel code. Halt.");
+    fputs("\nEnd of kernel code. Halt.", stderr);
     kernel_halt();
 }
 
