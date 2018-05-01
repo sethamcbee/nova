@@ -17,24 +17,21 @@
 
 #ifdef ARCH_X86_64
     #include <arch/x86_64/cpu.h>
-    #include <arch/x86_64/pic.h>
-    #include <arch/x86_64/ps2.h>
+    #include <arch/x86_64/devices/ps2.h>
 #endif
 
 #ifdef ARCH_X86
     #include <arch/x86/cpu.h>
-    #include <arch/x86/pic.h>
-    #include <arch/x86/ps2.h>
+    #include <arch/x86/devices/ps2.h>
 #endif
 
+// Flushes the keyboard buffer.
 static void ps2_kb_flush(void);
 
 static bool control;
 static bool shift;
 static bool alt;
 static uint8_t code_last;
-static bool ignore_next;
-static bool release_code;
 
 void ps2_keyboard_initialize(void)
 {
@@ -81,7 +78,6 @@ void ps2_keyboard_initialize(void)
     control = false;
     alt = false;
     code_last = 0;
-    ignore_next = false;
 }
 
 void ps2_keyboard_main(void)
@@ -96,17 +92,15 @@ void ps2_keyboard_main(void)
 
 void ps2_keyboard_handle(uint8_t code)
 {
-    if (ignore_next == true)
-    {
-        ignore_next = false;
-        return;
-    }
-
     switch (code)
     {
 //// Ordinary keystrokes. ////
 
+// Letters.
+
     case 0x1C:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('A', stdin);
         else
@@ -114,6 +108,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x32:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('B', stdin);
         else
@@ -121,6 +117,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x21:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('C', stdin);
         else
@@ -128,6 +126,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x23:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('D', stdin);
         else
@@ -135,6 +135,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x24:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('E', stdin);
         else
@@ -142,6 +144,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x2B:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('F', stdin);
         else
@@ -149,6 +153,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x34:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('G', stdin);
         else
@@ -156,6 +162,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x33:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('H', stdin);
         else
@@ -163,6 +171,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x43:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('I', stdin);
         else
@@ -170,6 +180,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x3B:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('J', stdin);
         else
@@ -177,6 +189,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x42:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('K', stdin);
         else
@@ -184,6 +198,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x4B:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('L', stdin);
         else
@@ -191,6 +207,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x3A:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('M', stdin);
         else
@@ -198,6 +216,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x31:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('N', stdin);
         else
@@ -205,6 +225,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x44:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('O', stdin);
         else
@@ -212,6 +234,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x4D:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('P', stdin);
         else
@@ -219,6 +243,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x15:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('Q', stdin);
         else
@@ -226,6 +252,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x2D:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('R', stdin);
         else
@@ -233,6 +261,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x1B:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('S', stdin);
         else
@@ -240,6 +270,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x2C:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('T', stdin);
         else
@@ -247,6 +279,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x3C:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('U', stdin);
         else
@@ -254,6 +288,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x2A:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('V', stdin);
         else
@@ -261,6 +297,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x1D:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('W', stdin);
         else
@@ -268,6 +306,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x22:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('X', stdin);
         else
@@ -275,6 +315,8 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x35:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('Y', stdin);
         else
@@ -282,25 +324,114 @@ void ps2_keyboard_handle(uint8_t code)
         break;
 
     case 0x1A:
+        if (code_last == 0xF0)
+            break;
         if (shift)
             fputc('Z', stdin);
         else
             fputc('z', stdin);
         break;
 
+// Numbers.
+
+    case 0x16:
+        if (code_last == 0xF0)
+            break;
+        fputc('1', stdin);
+        break;
+
+    case 0x1E:
+        if (code_last == 0xF0)
+            break;
+        fputc('2', stdin);
+        break;
+
+    case 0x26:
+        if (code_last == 0xF0)
+            break;
+        fputc('3', stdin);
+        break;
+
+    case 0x25:
+        if (code_last == 0xF0)
+            break;
+        fputc('4', stdin);
+        break;
+
+    case 0x2E:
+        if (code_last == 0xF0)
+            break;
+        fputc('5', stdin);
+        break;
+
+    case 0x36:
+        if (code_last == 0xF0)
+            break;
+        fputc('6', stdin);
+        break;
+
+    case 0x3D:
+        if (code_last == 0xF0)
+            break;
+        fputc('7', stdin);
+        break;
+
+    case 0x3E:
+        if (code_last == 0xF0)
+            break;
+        fputc('8', stdin);
+        break;
+
+    case 0x46:
+        if (code_last == 0xF0)
+            break;
+        fputc('9', stdin);
+        break;
+
+    case 0x45:
+        if (code_last == 0xF0)
+            break;
+        fputc('0', stdin);
+        break;
+
+// Whitespace.
+
+    // Space.
     case 0x29:
+        if (code_last == 0xF0)
+            break;
         fputc(' ', stdin);
         break;
 
+    // Enter.
     case 0x5A:
+        if (code_last == 0xF0)
+            break;
         fputc('\n', stdin);
+        break;
+
+// Modifiers.
+
+    // Left shift.
+    case 0x12:
+        if (code_last == 0xF0)
+            shift = false;
+        else
+            shift = true;
+        break;
+
+    // Right shift.
+    case 0x59:
+        if (code_last == 0xF0)
+            shift = false;
+        else
+            shift = true;
         break;
 
 //// Special cases. ////
 
     // Key released.
     case 0xF0:
-        ignore_next = true;
         break;
 
 //// Command codes. ////
@@ -338,6 +469,8 @@ void ps2_keyboard_handle(uint8_t code)
     default:
         break;
     }
+
+    code_last = code;
 }
 
 static void ps2_kb_flush(void)

@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #include <arch/x86/gdt.h>
-#include <arch/x86/idt.h>
-#include <arch/x86/isr.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/isr.h>
 
 void idt_encode_entry(void *pos, Idt_Entry entry)
 {

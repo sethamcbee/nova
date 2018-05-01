@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #include <arch/x86_64/gdt.h>
-#include <arch/x86_64/idt.h>
-#include <arch/x86_64/isr.h>
+#include <arch/x86_64/interrupts/idt.h>
+#include <arch/x86_64/interrupts/isr.h>
 
 uint64_t idt[256 * 2];
 

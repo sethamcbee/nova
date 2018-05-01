@@ -28,8 +28,8 @@ typedef struct FILE
     size_t pos;
     size_t len;
     size_t max_len;
-    int mode;
-    int io;
+    int buf_mode;
+    int io_mode;
 } FILE;
 
 FILE *stdin;

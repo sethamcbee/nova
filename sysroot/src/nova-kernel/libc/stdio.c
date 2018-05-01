@@ -27,8 +27,8 @@ void stdio_init(void)
     stdin_file.pos = 0;
     stdin_file.len = 0;
     stdin_file.max_len = 1000;
-    stdin_file.mode = _IOLBF;
-    stdin_file.io = _IOI;
+    stdin_file.buf_mode = _IOLBF;
+    stdin_file.io_mode = _IOI;
     stdin = &stdin_file;
 
     // Set up stdout.
@@ -37,8 +37,8 @@ void stdio_init(void)
     stdout_file.pos = 0;
     stdout_file.len = 0;
     stdout_file.max_len = 10000;
-    stdout_file.mode = _IOLBF;
-    stdout_file.io = _IOO;
+    stdout_file.buf_mode = _IOLBF;
+    stdout_file.io_mode = _IOO;
     stdout = &stdout_file;
 
     // Set up stderr.
@@ -47,8 +47,8 @@ void stdio_init(void)
     stderr_file.pos = 0;
     stderr_file.len = 0;
     stderr_file.max_len = 1000;
-    stderr_file.mode = _IONBF;
-    stderr_file.io = _IOO;
+    stderr_file.buf_mode = _IONBF;
+    stderr_file.io_mode = _IOO;
     stderr = &stderr_file;
 }
 
@@ -91,7 +91,7 @@ int fputc(int c, FILE *stream)
     size_t pos = stream->pos;
     size_t len = stream->len;
     size_t max_len = stream->max_len;
-    int mode = stream->mode;
+    int buf_mode = stream->buf_mode;
 
     // Check if the stream is at maximum length.
     if (len == max_len)
@@ -116,15 +116,15 @@ int fputc(int c, FILE *stream)
     stream->len++;
 
     // Check if the buffer should be flushed.
-    if (mode == _IONBF)
+    if (buf_mode == _IONBF)
     {
         fflush(stream);
     }
-    else if (mode == _IOLBF && (c == '\n' || len == max_len))
+    else if (buf_mode == _IOLBF && (c == '\n' || len == max_len))
     {
         fflush(stream);
     }
-    else if (mode == _IOFBF && len == max_len)
+    else if (buf_mode == _IOFBF && len == max_len)
     {
         fflush(stream);
     }

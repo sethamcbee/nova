@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <arch/x86/cpu.h>
-#include <arch/x86/pic.h>
+#include <arch/x86_64/cpu.h>
+#include <arch/x86_64/devices/pic.h>
 
 void pic_initialize(void)
 {
@@ -16,22 +16,11 @@ void pic_initialize(void)
     uint8_t mask1;
     uint8_t mask2;
 
-    // Disable all IRQs except the Cascade.
-    pic_irq_disable(0);
-    pic_irq_disable(1);
-    pic_irq_disable(3);
-    pic_irq_disable(4);
-    pic_irq_disable(5);
-    pic_irq_disable(6);
-    pic_irq_disable(7);
-    pic_irq_disable(8);
-    pic_irq_disable(9);
-    pic_irq_disable(10);
-    pic_irq_disable(11);
-    pic_irq_disable(12);
-    pic_irq_disable(13);
-    pic_irq_disable(14);
-    pic_irq_disable(15);
+    // Disable all IRQs.
+    for (uint8_t i = 0; i < 16; i++)
+    {
+        pic_irq_disable(i);
+    }
 
     // Backup IRQ masks.
     mask1 = cpu_inb(PIC1_DATA);

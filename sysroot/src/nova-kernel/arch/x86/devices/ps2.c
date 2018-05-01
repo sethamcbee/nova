@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #include <globals.h>
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/ps2.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/devices/ps2.h>
 
 // Helper functions. Waits until the controller is ready for I/O.
 static void ps2_ready_send(void);

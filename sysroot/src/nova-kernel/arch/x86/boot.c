@@ -10,9 +10,9 @@
 
 #include <kernel.h>
 #include <arch/x86/cpu.h>
-#include <arch/x86/idt.h>
-#include <arch/x86/pic.h>
 #include <arch/x86/multiboot2.h>
+#include <arch/x86/devices/pic.h>
+#include <arch/x86/interrupts/idt.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
 
