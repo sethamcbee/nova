@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,12 +27,15 @@
 // Flushes the keyboard buffer.
 static void ps2_kb_flush(void);
 
+static FILE ps2_keyboard_file;
+static char ps2_keyboard_buf[100 + 2];
+
 static bool control;
 static bool shift;
 static bool alt;
 static uint8_t code_last;
 
-void ps2_keyboard_initialize(void)
+void ps2_keyboard_init(void)
 {
     #if defined(ARCH_X86_64) || defined(ARCH_X86)
         ps2_keyboard_queue_count = 0;
@@ -78,6 +80,17 @@ void ps2_keyboard_initialize(void)
     control = false;
     alt = false;
     code_last = 0;
+
+    // Set up stdio interface.
+    ps2_keyboard_buf[101] = '\0';
+    ps2_keyboard_file.buf = ps2_keyboard_buf;
+    ps2_keyboard_file.pos = 0;
+    ps2_keyboard_file.len = 0;
+    ps2_keyboard_file.max_len = 100;
+    ps2_keyboard_file.buf_mode = _IONBF;
+    ps2_keyboard_file.io_mode = _IOI;
+    ps2_keyboard_file.read = read_null;
+    ps2_keyboard_stream = &ps2_keyboard_file;
 }
 
 void ps2_keyboard_main(void)
@@ -102,234 +115,234 @@ void ps2_keyboard_handle(uint8_t code)
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('A', stdin);
+            rputc('A', ps2_keyboard_stream);
         else
-            fputc('a', stdin);
+            rputc('a', ps2_keyboard_stream);
         break;
 
     case 0x32:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('B', stdin);
+            rputc('B', ps2_keyboard_stream);
         else
-            fputc('b', stdin);
+            rputc('b', ps2_keyboard_stream);
         break;
 
     case 0x21:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('C', stdin);
+            rputc('C', ps2_keyboard_stream);
         else
-            fputc('c', stdin);
+            rputc('c', ps2_keyboard_stream);
         break;
 
     case 0x23:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('D', stdin);
+            rputc('D', ps2_keyboard_stream);
         else
-            fputc('d', stdin);
+            rputc('d', ps2_keyboard_stream);
         break;
 
     case 0x24:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('E', stdin);
+            rputc('E', ps2_keyboard_stream);
         else
-            fputc('e', stdin);
+            rputc('e', ps2_keyboard_stream);
         break;
 
     case 0x2B:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('F', stdin);
+            rputc('F', ps2_keyboard_stream);
         else
-            fputc('f', stdin);
+            rputc('f', ps2_keyboard_stream);
         break;
 
     case 0x34:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('G', stdin);
+            rputc('G', ps2_keyboard_stream);
         else
-            fputc('g', stdin);
+            rputc('g', ps2_keyboard_stream);
         break;
 
     case 0x33:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('H', stdin);
+            rputc('H', ps2_keyboard_stream);
         else
-            fputc('h', stdin);
+            rputc('h', ps2_keyboard_stream);
         break;
 
     case 0x43:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('I', stdin);
+            rputc('I', ps2_keyboard_stream);
         else
-            fputc('i', stdin);
+            rputc('i', ps2_keyboard_stream);
         break;
 
     case 0x3B:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('J', stdin);
+            rputc('J', ps2_keyboard_stream);
         else
-            fputc('j', stdin);
+            rputc('j', ps2_keyboard_stream);
         break;
 
     case 0x42:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('K', stdin);
+            rputc('K', ps2_keyboard_stream);
         else
-            fputc('k', stdin);
+            rputc('k', ps2_keyboard_stream);
         break;
 
     case 0x4B:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('L', stdin);
+            rputc('L', ps2_keyboard_stream);
         else
-            fputc('l', stdin);
+            rputc('l', ps2_keyboard_stream);
         break;
 
     case 0x3A:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('M', stdin);
+            rputc('M', ps2_keyboard_stream);
         else
-            fputc('m', stdin);
+            rputc('m', ps2_keyboard_stream);
         break;
 
     case 0x31:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('N', stdin);
+            rputc('N', ps2_keyboard_stream);
         else
-            fputc('n', stdin);
+            rputc('n', ps2_keyboard_stream);
         break;
 
     case 0x44:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('O', stdin);
+            rputc('O', ps2_keyboard_stream);
         else
-            fputc('o', stdin);
+            rputc('o', ps2_keyboard_stream);
         break;
 
     case 0x4D:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('P', stdin);
+            rputc('P', ps2_keyboard_stream);
         else
-            fputc('p', stdin);
+            rputc('p', ps2_keyboard_stream);
         break;
 
     case 0x15:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('Q', stdin);
+            rputc('Q', ps2_keyboard_stream);
         else
-            fputc('q', stdin);
+            rputc('q', ps2_keyboard_stream);
         break;
 
     case 0x2D:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('R', stdin);
+            rputc('R', ps2_keyboard_stream);
         else
-            fputc('r', stdin);
+            rputc('r', ps2_keyboard_stream);
         break;
 
     case 0x1B:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('S', stdin);
+            rputc('S', ps2_keyboard_stream);
         else
-            fputc('s', stdin);
+            rputc('s', ps2_keyboard_stream);
         break;
 
     case 0x2C:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('T', stdin);
+            rputc('T', ps2_keyboard_stream);
         else
-            fputc('t', stdin);
+            rputc('t', ps2_keyboard_stream);
         break;
 
     case 0x3C:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('U', stdin);
+            rputc('U', ps2_keyboard_stream);
         else
-            fputc('u', stdin);
+            rputc('u', ps2_keyboard_stream);
         break;
 
     case 0x2A:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('V', stdin);
+            rputc('V', ps2_keyboard_stream);
         else
-            fputc('v', stdin);
+            rputc('v', ps2_keyboard_stream);
         break;
 
     case 0x1D:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('W', stdin);
+            rputc('W', ps2_keyboard_stream);
         else
-            fputc('w', stdin);
+            rputc('w', ps2_keyboard_stream);
         break;
 
     case 0x22:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('X', stdin);
+            rputc('X', ps2_keyboard_stream);
         else
-            fputc('x', stdin);
+            rputc('x', ps2_keyboard_stream);
         break;
 
     case 0x35:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('Y', stdin);
+            rputc('Y', ps2_keyboard_stream);
         else
-            fputc('y', stdin);
+            rputc('y', ps2_keyboard_stream);
         break;
 
     case 0x1A:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('Z', stdin);
+            rputc('Z', ps2_keyboard_stream);
         else
-            fputc('z', stdin);
+            rputc('z', ps2_keyboard_stream);
         break;
 
 // Numbers.
@@ -338,90 +351,90 @@ void ps2_keyboard_handle(uint8_t code)
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('!', stdin);
+            rputc('!', ps2_keyboard_stream);
         else
-            fputc('1', stdin);
+            rputc('1', ps2_keyboard_stream);
         break;
 
     case 0x1E:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('@', stdin);
+            rputc('@', ps2_keyboard_stream);
         else
-            fputc('2', stdin);
+            rputc('2', ps2_keyboard_stream);
         break;
 
     case 0x26:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('#', stdin);
+            rputc('#', ps2_keyboard_stream);
         else
-            fputc('3', stdin);
+            rputc('3', ps2_keyboard_stream);
         break;
 
     case 0x25:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('$', stdin);
+            rputc('$', ps2_keyboard_stream);
         else
-            fputc('4', stdin);
+            rputc('4', ps2_keyboard_stream);
         break;
 
     case 0x2E:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('%', stdin);
+            rputc('%', ps2_keyboard_stream);
         else
-            fputc('5', stdin);
+            rputc('5', ps2_keyboard_stream);
         break;
 
     case 0x36:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('^', stdin);
+            rputc('^', ps2_keyboard_stream);
         else
-            fputc('6', stdin);
+            rputc('6', ps2_keyboard_stream);
         break;
 
     case 0x3D:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('&', stdin);
+            rputc('&', ps2_keyboard_stream);
         else
-            fputc('7', stdin);
+            rputc('7', ps2_keyboard_stream);
         break;
 
     case 0x3E:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('*', stdin);
+            rputc('*', ps2_keyboard_stream);
         else
-            fputc('8', stdin);
+            rputc('8', ps2_keyboard_stream);
         break;
 
     case 0x46:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('(', stdin);
+            rputc('(', ps2_keyboard_stream);
         else
-            fputc('9', stdin);
+            rputc('9', ps2_keyboard_stream);
         break;
 
     case 0x45:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc(')', stdin);
+            rputc(')', ps2_keyboard_stream);
         else
-            fputc('0', stdin);
+            rputc('0', ps2_keyboard_stream);
         break;
 
 // Whitespace.
@@ -430,21 +443,21 @@ void ps2_keyboard_handle(uint8_t code)
     case 0x29:
         if (code_last == 0xF0)
             break;
-        fputc(' ', stdin);
+        rputc(' ', ps2_keyboard_stream);
         break;
 
     // Enter.
     case 0x5A:
         if (code_last == 0xF0)
             break;
-        fputc('\n', stdin);
+        rputc('\n', ps2_keyboard_stream);
         break;
 
     // Tab.
     case 0x0D:
         if (code_last == 0xF0)
             break;
-        fputc('\t', stdin);
+        rputc('\t', ps2_keyboard_stream);
         break;
 
 // Punctuation and special characters.
@@ -453,99 +466,100 @@ void ps2_keyboard_handle(uint8_t code)
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('~', stdin);
+            rputc('~', ps2_keyboard_stream);
         else
-            fputc('`', stdin);
+            rputc('`', ps2_keyboard_stream);
         break;
 
     case 0x4E:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('_', stdin);
+            rputc('_', ps2_keyboard_stream);
         else
-            fputc('-', stdin);
+            rputc('-', ps2_keyboard_stream);
         break;
 
     case 0x55:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('+', stdin);
+            rputc('+', ps2_keyboard_stream);
         else
-            fputc('=', stdin);
+            rputc('=', ps2_keyboard_stream);
         break;
 
     case 0x54:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('{', stdin);
+            rputc('{', ps2_keyboard_stream);
         else
-            fputc('[', stdin);
+            rputc('[', ps2_keyboard_stream);
         break;
 
     case 0x5B:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('}', stdin);
+            rputc('}', ps2_keyboard_stream);
         else
-            fputc(']', stdin);
+            rputc(']', ps2_keyboard_stream);
         break;
 
     case 0x5D:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('|', stdin);
+            rputc('|', ps2_keyboard_stream);
         else
-            fputc('\\', stdin);
+            rputc('\\', ps2_keyboard_stream);
         break;
 
     case 0x4C:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc(':', stdin);
+            rputc(':', ps2_keyboard_stream);
         else
-            fputc(';', stdin);
+            rputc(';', ps2_keyboard_stream);
         break;
 
     case 0x52:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('"', stdin);
+            rputc('"', ps2_keyboard_stream);
         else
-            fputc('\'', stdin);
+            rputc('\'', ps2_keyboard_stream);
         break;
 
     case 0x41:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('<', stdin);
+            rputc('<', ps2_keyboard_stream);
         else
-            fputc(',', stdin);
+            rputc(',', ps2_keyboard_stream);
         break;
 
     case 0x49:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('>', stdin);
+            rputc('>', ps2_keyboard_stream);
         else
-            fputc('.', stdin);
+            rputc('.', ps2_keyboard_stream);
         break;
 
     case 0x4A:
         if (code_last == 0xF0)
             break;
         if (shift)
-            fputc('?', stdin);
+            rputc('?', ps2_keyboard_stream);
         else
-            fputc('/', stdin);
+            rputc('/', ps2_keyboard_stream);
+        break;
 
 // Modifiers.
 
@@ -553,7 +567,7 @@ void ps2_keyboard_handle(uint8_t code)
     case 0x66:
         if (code_last == 0xF0)
             break;
-        fputc('\b', stdin);
+        rputc('\b', ps2_keyboard_stream);
         break;
 
     // Left shift.

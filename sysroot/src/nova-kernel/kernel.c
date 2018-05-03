@@ -13,14 +13,25 @@
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
+#include <hal/tty.h>
+
+#ifdef ARCH_X86_64
+    #include <arch/x86_64/cpu.h>
+#endif
+
+#ifdef ARCH_X86
+    #include <arch/x86/cpu.h>
+#endif
 
 void kernel_main(void)
 {
     // Initialize STDIO.
     stdio_init();
+    tty_init();
+    stdout = tty_outs;
+    stdin = tty_ins;
 
     char s[10000];
-    char t[100];
     const char user[] = "sethamcbee@nova:";
     const char dir[] = "/";
 
@@ -29,11 +40,9 @@ void kernel_main(void)
     {
         printf("%s%s$ ", user, dir);
         fflush(stdout);
-        gets(s);
 
-        // Echo user input.
-        sprintf(t, "%s\n", s);
-        printf("%s", t);
+        // Get user input.
+        scanf("%s", s);
     }
 
     // The kernel is not intended to return; halt.

@@ -39,7 +39,7 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     pic_initialize();
     kernel_log("PIC initialized.\n");
 
-    ps2_keyboard_initialize();
+    ps2_keyboard_init();
     kernel_log("Keyboard initialized.\n");
 
     // Enable supported IRQs.
@@ -70,7 +70,7 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
 
     mb_end = (struct multiboot_tag*) (((uint8_t*)mb_tag) + mb_tag->type);
     kernel_log("Multiboot2: Boot information struct\n\tSize: ");
-    itoa(mb_tag->type, s, 10);
+    itoa(mb_tag->type, s);
     kernel_log(s);
     kernel_log("\n");
     mb_tag = (struct multiboot_tag*) (((uint8_t*)mb_tag) + 8);
@@ -107,10 +107,10 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
             memory_map_found = true;
             mb_mmap = (struct multiboot_tag_mmap*)mb_tag;
             kernel_log("Memory map:\n\tSize: ");
-            sitoa(mb_mmap->size, s, 10);
+            sitoa(mb_mmap->size, s);
             kernel_log(s);
             kernel_log("\n\tEntry size: ");
-            sitoa(mb_mmap->entry_size, s, 10);
+            sitoa(mb_mmap->entry_size, s);
             kernel_log(s);
             kernel_log("\n");
             multiboot2_parse_mmap(mb_mmap);
@@ -119,10 +119,10 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
         // Treat unsupported tag as basic tag.
         default:
             kernel_log("Basic tag\n\tType: ");
-            itoa(mb_tag->type, s, 10);
+            itoa(mb_tag->type, s);
             kernel_log(s);
             kernel_log("\n\tSize: ");
-            itoa(mb_tag->size, s, 10);
+            itoa(mb_tag->size, s);
             kernel_log(s);
             break;
         }
@@ -173,16 +173,16 @@ void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap)
     for (size_t i = 0; i < mb_mmap->size / mb_mmap->entry_size; i++)
     {
         kernel_log("\nMemory map entry: ");
-        sitoa(i, s, 10);
+        sitoa(i, s);
         kernel_log(s);
         kernel_log("\n\tBase address: ");
-        sitoa(multiboot2_mmap[i].addr, s, 16);
+        _sitoa(multiboot2_mmap[i].addr, s, 16);
         kernel_log(s);
         kernel_log("\n\tLength (bytes): ");
-        sitoa(multiboot2_mmap[i].len, s, 16);
+        _sitoa(multiboot2_mmap[i].len, s, 16);
         kernel_log(s);
         kernel_log("\n\tType: ");
-        sitoa(multiboot2_mmap[i].type, s, 10);
+        _sitoa(multiboot2_mmap[i].type, s, 10);
         kernel_log(s);
     }
 }

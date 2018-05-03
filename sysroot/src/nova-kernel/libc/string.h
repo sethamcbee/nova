@@ -271,4 +271,6 @@ void* memset(void* s, int c, size_t n);
  */
 char* strrev(char* s, const char* ct);
 
+char * strtok (char *s, const char *delim);
+
 #endif /* STRING_H */

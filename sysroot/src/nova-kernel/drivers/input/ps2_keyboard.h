@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <stdio.h>
+
 // PS/2 keyboard responses.
 #define PS2_KB_ACK        0xFA
 #define PS2_KB_ECHO       0xEE
@@ -43,7 +45,7 @@
 // PS/2 keyboard typematic bits.
 // TODO: Handle this.
 
-void ps2_keyboard_initialize(void);
+void ps2_keyboard_init(void);
 
 void ps2_keyboard_main(void);
 
@@ -56,5 +58,8 @@ uint8_t ps2_keyboard_queue_count;
 
 // Stores keyboard mapping.
 char ps2_keyboard_table[256];
+
+// stdio input device.
+FILE *ps2_keyboard_stream;
 
 #endif // PS2_KEYBOARD_H

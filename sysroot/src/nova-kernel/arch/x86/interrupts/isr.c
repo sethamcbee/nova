@@ -48,7 +48,7 @@ void isr_13_ext(uint32_t error_code)
     // Check which selector the exception originated from.
     uint16_t selector = (error_code >> (ISR_ERROR_INDEX_BIT)) & ISR_ERROR_INDEX_MASK;
     char str[10];
-    itoa(selector, str, 10);
+    itoa(selector, str);
     kernel_log("\n\tGPF: Selector index - ");
     kernel_log(str);
     kernel_log("\n");

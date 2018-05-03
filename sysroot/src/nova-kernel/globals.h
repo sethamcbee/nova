@@ -22,7 +22,7 @@
 #ifndef GLOBALS_H_INCLUDED
 #define GLOBALS_H_INCLUDED
 
-typedef long ssize_t;
+typedef long long ssize_t;
 
 /**
  * @brief Sets a bit, giving it a value of 1.
