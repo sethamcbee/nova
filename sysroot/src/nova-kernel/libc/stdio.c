@@ -25,11 +25,11 @@
 #define LENGTH_DOUBLE       2
 
 // STUB. Eventually these should be implemented using the VFS.
-static char stdin_buf[1000 + 2];
+static char stdin_buf[1000];
 static FILE stdin_file;
-static char stdout_buf[10000 + 2];
+static char stdout_buf[10000];
 static FILE stdout_file;
-static char stderr_buf[1000 + 2];
+static char stderr_buf[1000];
 static FILE stderr_file;
 
 int rgetc(FILE *stream)
@@ -67,7 +67,7 @@ int rputc(int c, FILE *stream)
     }
 
     // Check if the buffer should wrap around.
-    if (pos + len >= max_len - 1)
+    if (pos + len >= max_len)
     {
         size_t tmp_len = len + pos - max_len;
         buf[pos + tmp_len] = c;
@@ -75,7 +75,6 @@ int rputc(int c, FILE *stream)
     else
     {
         buf[pos + len] = c;
-        buf[pos + len + 1] = '\0';
     }
 
     stream->len++;
@@ -100,7 +99,6 @@ int rungetc(int c, FILE *stream)
 void stdio_init(void)
 {
     // Set up stdin.
-    stdin_buf[1001] = '\0';
     stdin_file.buf = stdin_buf;
     stdin_file.pos = 0;
     stdin_file.len = 0;
@@ -111,7 +109,6 @@ void stdio_init(void)
     stdin = &stdin_file;
 
     // Set up stdout.
-    stdout_buf[10001] = '\0';
     stdout_file.buf = stdout_buf;
     stdout_file.pos = 0;
     stdout_file.len = 0;
@@ -122,7 +119,6 @@ void stdio_init(void)
     stdout = &stdout_file;
 
     // Set up stderr.
-    stderr_buf[1001] = '\0';
     stderr_file.buf = stderr_buf;
     stderr_file.pos = 0;
     stderr_file.len = 0;
@@ -235,7 +231,8 @@ int fputs(const char *s, FILE *stream)
 
 int puts(const char *s)
 {
-    return ( fputs(s, stdout) );
+    fputs(s, stdout);
+    return ( fputc('\n', stdout) );
 }
 
 int fgetc(FILE *stream)

@@ -13,7 +13,7 @@ BUILD_DIR=./build
 SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
-ARCH=x86
+ARCH=x86_64
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -96,7 +96,7 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
-OPTIMIZE=-O2 -mno-sse
+OPTIMIZE=-O3 -mno-sse
 ifeq ($(ARCH), x86_64)
 	GCC_PREFIX=x86_64-elf-
 	AS=$(GCC_DIR)/$(GCC_PREFIX)as
@@ -131,6 +131,7 @@ ifeq ($(ARCH), x86_64)
 		-z max-page-size=4096 \
 		-ffreestanding \
 		-nostdlib \
+		-static \
 		-lgcc
 endif
 ifeq ($(ARCH), x86)

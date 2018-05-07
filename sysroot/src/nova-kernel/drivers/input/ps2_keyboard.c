@@ -28,7 +28,7 @@
 static void ps2_kb_flush(void);
 
 static FILE ps2_keyboard_file;
-static char ps2_keyboard_buf[100 + 2];
+static char ps2_keyboard_buf[100];
 
 static bool control;
 static bool shift;
@@ -82,7 +82,6 @@ void ps2_keyboard_init(void)
     code_last = 0;
 
     // Set up stdio interface.
-    ps2_keyboard_buf[101] = '\0';
     ps2_keyboard_file.buf = ps2_keyboard_buf;
     ps2_keyboard_file.pos = 0;
     ps2_keyboard_file.len = 0;

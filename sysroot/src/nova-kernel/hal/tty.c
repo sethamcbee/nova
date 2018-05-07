@@ -15,9 +15,9 @@
 #include <hal/tty.h>
 
 static FILE tty_out_file;
-static char tty_out_buf[10000 + 2];
+static char tty_out_buf[10000];
 static FILE tty_in_file;
-static char tty_in_buf[1000 + 2];
+static char tty_in_buf[1000];
 static char tty_in_str[1000 + 1];
 static size_t tty_in_len;
 static ssize_t (*ext_write)(const void *, size_t n);
@@ -26,6 +26,7 @@ static ssize_t (*ext_write)(const void *, size_t n);
 // Writes data.
 static ssize_t tty_write(const void *s, size_t n)
 {
+    ssize_t ret = 0;
     return ( ext_write(s, n) );
 }
 
@@ -55,7 +56,7 @@ static ssize_t tty_read(void *s, size_t n)
             c = rgetc(tty_ins);
         }
 
-        if (len == n)
+        if (len == n && c != EOF)
             rungetc(c, tty_ins);
 
         return (len);
@@ -65,8 +66,17 @@ static ssize_t tty_read(void *s, size_t n)
     while (ps2_keyboard_stream->len == 0)
         ; // Wait.
     c = rgetc(ps2_keyboard_stream);
-    while (c != EOF && tty_in_len < 1000)
+    while (tty_in_len < tty_in_file.max_len)
     {
+        // Handle EOF.
+        if (c == EOF)
+        {
+            while (ps2_keyboard_stream->len == 0)
+                ; // Wait.
+            c = rgetc(ps2_keyboard_stream);
+            continue;
+        }
+
         // Handle backspace.
         if (c == '\b')
         {
@@ -97,7 +107,7 @@ static ssize_t tty_read(void *s, size_t n)
             tty_in_len++;
         }
 
-        // Newline delimitted.
+        // Keyboard is newline delimitted.
         if (c == '\n')
         {
             break;
@@ -140,7 +150,6 @@ static ssize_t tty_read(void *s, size_t n)
 void tty_init(void)
 {
     // Set up stdio interface.
-    tty_out_buf[10001] = '\0';
     tty_out_file.buf = tty_out_buf;
     tty_out_file.pos = 0;
     tty_out_file.len = 0;
@@ -150,7 +159,6 @@ void tty_init(void)
     tty_out_file.write = tty_write;
     tty_outs = &tty_out_file;
 
-    tty_in_buf[1001] = '\0';
     tty_in_file.buf = tty_in_buf;
     tty_in_file.pos = 0;
     tty_in_file.len = 0;

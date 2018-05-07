@@ -23,6 +23,8 @@
     #include <arch/x86/cpu.h>
 #endif
 
+extern uint64_t irq_spurious_count;
+
 void kernel_main(void)
 {
     // Initialize STDIO.
@@ -43,6 +45,9 @@ void kernel_main(void)
 
         // Get user input.
         scanf("%s", s);
+
+        if (strcmp(s, "spurious") == 0)
+            printf("Spurious IRQS: %d\n", irq_spurious_count);
     }
 
     // The kernel is not intended to return; halt.
