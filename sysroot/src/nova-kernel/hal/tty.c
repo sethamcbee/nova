@@ -17,8 +17,8 @@
 static FILE tty_out_file;
 static char tty_out_buf[10000];
 static FILE tty_in_file;
-static char tty_in_buf[1000];
-static char tty_in_str[1000 + 1];
+static char tty_in_buf[10000];
+static char tty_in_str[10000 + 1];
 static size_t tty_in_len;
 static ssize_t (*ext_write)(const void *, size_t n);
 //static ssize_t (*ext_read)(void *, size_t n);
@@ -162,7 +162,7 @@ void tty_init(void)
     tty_in_file.buf = tty_in_buf;
     tty_in_file.pos = 0;
     tty_in_file.len = 0;
-    tty_in_file.max_len = 1000;
+    tty_in_file.max_len = 10000;
     tty_in_file.buf_mode = _IOLBF;
     tty_in_file.io_mode = _IOO;
     tty_in_file.read = tty_read;

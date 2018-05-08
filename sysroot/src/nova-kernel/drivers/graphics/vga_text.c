@@ -68,18 +68,19 @@ ssize_t vga_text_write(const void *str, size_t len)
             break;
         }
 
+        // Move cursor to start of next line.
         if (vga_cur_x >= VGA_TEXT_WIDTH)
         {
             vga_cur_x = 0;
             vga_cur_y++;
         }
+
+        // Scroll terminal.
         if (vga_cur_y >= VGA_TEXT_HEIGHT)
         {
-            // Copy all entries up a row.
-            for (size_t k = 0; k < VGA_TEXT_WIDTH*(VGA_TEXT_HEIGHT - 1); k++)
-            {
-                vga_buffer[k] = vga_buffer[k + VGA_TEXT_WIDTH];
-            }
+            // Copy data.
+            size_t bytes = 2 * VGA_TEXT_WIDTH * (VGA_TEXT_HEIGHT - 1);
+            memmove(vga_buffer, vga_buffer + VGA_TEXT_WIDTH, bytes);
 
             // Decrement row.
             vga_cur_y--;

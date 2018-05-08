@@ -79,7 +79,7 @@ int rputc(int c, FILE *stream)
 
     stream->len++;
 
-    return (0);
+    return (c);
 }
 
 int rungetc(int c, FILE *stream)
@@ -177,17 +177,19 @@ void clearerr(FILE *stream)
 
 int fputn(const char *s, size_t n, FILE *stream)
 {
-    int ret = EOF;
+    int bytes = 0;
 
     for (size_t i = 0; i < n; i++)
     {
-        ret = fputc(s[i], stream);
+        int cur_byte = fputc(s[i], stream);
 
-        if (ret == EOF)
+        if (cur_byte == EOF)
             return (EOF);
+
+        bytes++;
     }
 
-    return (ret);
+    return (bytes);
 }
 
 int fputc(int c, FILE *stream)

@@ -79,8 +79,8 @@ void* memmove(void* s, const void* ct, size_t n)
         return (s);
     }
 
-    /* If s is lower in memory than ct, then copy memory backwards. */
-    if (s < ct)
+    /* If ct is lower in memory than s, then copy memory backwards. */
+    if (ct < s)
     {
         for (size_t i = 0; i < n; ++i)
         {
@@ -88,7 +88,6 @@ void* memmove(void* s, const void* ct, size_t n)
         }
         return (s);
     }
-    /* If s is higher in memory than ct, then copy memory forwards. */
     else
     {
         for (size_t i = 0; i < n; ++i)

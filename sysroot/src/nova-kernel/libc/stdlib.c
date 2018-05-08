@@ -29,6 +29,17 @@
 
 #include <globals.h>
 
+#ifdef ARCH_X86_64
+    #include <arch/x86_64/pmm.h>
+#endif
+
+void* malloc(size_t size)
+{
+    #ifdef ARCH_X86_64
+	return ( pmm_malloc(size) );
+    #endif
+}
+
 int abs(int n)
 {
     if (n < 0)

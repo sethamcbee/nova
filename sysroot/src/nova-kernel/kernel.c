@@ -24,6 +24,9 @@
 #endif
 
 extern uint64_t irq_spurious_count;
+extern size_t pmm_mem_start;
+extern size_t pmm_mem_free;
+extern size_t pmm_mem_max;
 
 void kernel_main(void)
 {
@@ -45,9 +48,6 @@ void kernel_main(void)
 
         // Get user input.
         scanf("%s", s);
-
-        if (strcmp(s, "spurious") == 0)
-            printf("Spurious IRQS: %d\n", irq_spurious_count);
     }
 
     // The kernel is not intended to return; halt.
@@ -72,7 +72,7 @@ int kernel_print(const char *s)
     size_t max_len = 100000;
 
     // Find the length of the string.
-    for (len = 0; len < max_len; len++)
+    for (len = 0; len <= max_len; len++)
     {
         if (s[len] == '\0')
         {
@@ -92,8 +92,6 @@ int kernel_print(const char *s)
 
 int kernel_log(const char *s)
 {
-    // Later on, this might be stored elsewhere, but for now
-    // we'll just print it if debugging.
     int ret = 0;
     //ret = kernel_print(s);
     return (ret);
@@ -104,7 +102,11 @@ void kernel_halt(void)
 {
     #if defined(ARCH_X86_64) || defined(ARCH_X86)
         // Disable interrupts.
-        asm volatile ("cli \n");
+        asm volatile
+        (
+            "cli \n"
+            "hlt \n"
+        );
     #endif
 
     while (1)

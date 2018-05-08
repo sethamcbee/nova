@@ -26,6 +26,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// Allocates a block of memory and returns a pointer to the start
+// of the block, or NULL if the block could not be allocated.
+void* malloc(size_t size);
+
 /**
  * @brief Converts string to double.
  *
