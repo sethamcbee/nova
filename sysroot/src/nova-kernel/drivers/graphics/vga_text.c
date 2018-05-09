@@ -80,7 +80,7 @@ ssize_t vga_text_write(const void *str, size_t len)
         {
             // Copy data.
             size_t bytes = 2 * VGA_TEXT_WIDTH * (VGA_TEXT_HEIGHT - 1);
-            memmove(vga_buffer, vga_buffer + VGA_TEXT_WIDTH, bytes);
+            memmove((void*) vga_buffer, (void*) (vga_buffer + VGA_TEXT_WIDTH), bytes);
 
             // Decrement row.
             vga_cur_y--;

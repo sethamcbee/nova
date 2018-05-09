@@ -15,13 +15,7 @@
 #include <drivers/input/ps2_keyboard.h>
 #include <hal/tty.h>
 
-#ifdef ARCH_X86_64
-    #include <arch/x86_64/cpu.h>
-#endif
-
-#ifdef ARCH_X86
-    #include <arch/x86/cpu.h>
-#endif
+#include <arch/x86_64/tss.h>
 
 extern uint64_t irq_spurious_count;
 extern size_t pmm_mem_start;
@@ -101,7 +95,7 @@ __attribute__((noreturn))
 void kernel_halt(void)
 {
     #if defined(ARCH_X86_64) || defined(ARCH_X86)
-        // Disable interrupts.
+        // Disable interrupts and halt.
         asm volatile
         (
             "cli \n"

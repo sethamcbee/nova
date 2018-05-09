@@ -2,6 +2,9 @@
 # Created: 2017-10-11
 # Description: x86-64 initial boot file: first code ran by the bootloader.
 
+.extern gdt_init
+.extern gdt_ptr
+
 # Declare constants for the Multiboot2 header.
 .set MB_MAGIC, 0xE85250D6 # Must be present for bootloader to find header
 .set MB_ARCH, 0 # constant for x86 family
@@ -116,17 +119,17 @@ _start:
 
 # Setup GDT and jump to long mode.
 Lgdt_load:
-    movl $gdt_pointer, %eax # Load pointer to GDT to %eax
-    lgdt (%eax) # Tell CPU to load descriptor
-    movw $0x10, %ax # Load data entry from GDT
+    movl $gdt_ptr, %eax		# Load pointer to GDT to %eax
+    lgdt (%eax)			# Tell CPU to load descriptor
+    movw $0x10, %ax		# Load data entry from GDT
     movw %ax, %ds
     movw %ax, %es
     movw %ax, %fs
     movw %ax, %gs
     movw %ax, %ss
-    pushl $0x08 # Load code entry from GDT
+    pushl $0x08			# Load code entry from GDT
     pushl $enter_64
-    retf # We far jump to load the selector.
+    retf			# We far jump to load the selector.
 enter_64:
 .code64
 # Moves the address of the Multiboot info structure to %rdi

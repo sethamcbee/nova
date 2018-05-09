@@ -12,6 +12,7 @@
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/multiboot2.h>
 #include <arch/x86_64/pmm.h>
+#include <arch/x86_64/tss.h>
 #include <arch/x86_64/devices/pic.h>
 #include <arch/x86_64/interrupts/idt.h>
 #include <drivers/graphics/vga_text.h>
@@ -27,23 +28,21 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     // Initialize terminal.
     kernel_write = vga_text_write;
     vga_text_initialize();
-    kernel_log("Terminal initialized.\n");
 
     // Verify that the Multiboot2 magic word was passed correctly.
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC)
     {
-        kernel_log("MULTIBOOT2 BOOTLOADER SIGNATURE IS INVALID.");
+        kernel_panic("MULTIBOOT2 BOOTLOADER SIGNATURE IS INVALID.");
     }
 
     idt_initialize();
-    kernel_log("IDT initialized.\n");
+
+    tss_init();
 
     // Initialize PIC (disables all IRQs).
     pic_initialize();
-    kernel_log("PIC initialized.\n");
 
     ps2_keyboard_init();
-    kernel_log("Keyboard initialized.\n");
 
     // Enable supported IRQs.
     pic_irq_enable(IRQ_PIT);
@@ -73,7 +72,6 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
     bool memory_map_found = false;
 
     mb_end = (struct multiboot_tag*) (((uint8_t*)mb_tag) + mb_tag->type);
-    kernel_log("Multiboot2: Boot information struct\n\tSize: ");
     itoa(mb_tag->type, s);
     kernel_log(s);
     kernel_log("\n");
@@ -88,50 +86,29 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
             break;
         }
 
-        kernel_log("Multiboot2: "); // Formatting.
-
         switch (mb_tag->type)
         {
         // Boot command line string.
         case MULTIBOOT_TAG_TYPE_CMDLINE:
             mb_tag_string = (struct multiboot_tag_string*)mb_tag;
-            kernel_log("Boot command line:\n\t");
-            kernel_log(mb_tag_string->string);
             break;
 
         // Bootloader name string.
         case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
             mb_tag_string = (struct multiboot_tag_string*)mb_tag;
-            kernel_log("Bootloader name:\n\t");
-            kernel_log(mb_tag_string->string);
             break;
 
         // Memory map.
         case MULTIBOOT_TAG_TYPE_MMAP:
             memory_map_found = true;
             mb_mmap = (struct multiboot_tag_mmap*)mb_tag;
-            kernel_log("Memory map:\n\tSize: ");
-            sitoa(mb_mmap->size, s);
-            kernel_log(s);
-            kernel_log("\n\tEntry size: ");
-            sitoa(mb_mmap->entry_size, s);
-            kernel_log(s);
-            kernel_log("\n");
             multiboot2_parse_mmap(mb_mmap);
             break;
 
         // Treat unsupported tag as basic tag.
         default:
-            kernel_log("Basic tag\n\tType: ");
-            itoa(mb_tag->type, s);
-            kernel_log(s);
-            kernel_log("\n\tSize: ");
-            itoa(mb_tag->size, s);
-            kernel_log(s);
             break;
         }
-
-        kernel_log("\n");   // Formatting.
 
         // Calculate offset of next tag, including padding up to 8-byte
         // boundary.
@@ -180,6 +157,8 @@ void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap)
     // Pass info to the PMM.
     for (size_t i = 0; i < mb_mmap->size / mb_mmap->entry_size; i++)
     {
+        // STUB. We're just using the first contiguous region of
+        // available memory we find.
         if (multiboot2_mmap[i].type == 1)
         {
             pmm_mem_max = multiboot2_mmap[i].len;
@@ -191,22 +170,4 @@ void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap)
     pmm_mem_start += 0x10000;
     pmm_mem_max -= 0x10000;
     pmm_mem_free = pmm_mem_max;
-
-    // Log memory map entries.
-    char s[30];
-    for (size_t i = 0; i < mb_mmap->size / mb_mmap->entry_size; i++)
-    {
-        kernel_log("\nMemory map entry: ");
-        sitoa(i, s);
-        kernel_log(s);
-        kernel_log("\n\tBase address: ");
-        _sitoa(multiboot2_mmap[i].addr, s, 16);
-        kernel_log(s);
-        kernel_log("\n\tLength (bytes): ");
-        _sitoa(multiboot2_mmap[i].len, s, 16);
-        kernel_log(s);
-        kernel_log("\n\tType: ");
-        _sitoa(multiboot2_mmap[i].type, s, 10);
-        kernel_log(s);
-    }
 }

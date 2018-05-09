@@ -24,7 +24,7 @@ void isr_13_ext(uint32_t error_code)
     // Check whether the exception was triggered externally.
     if (BIT_CHECK(error_code, ISR_ERROR_EXTERNAL_BIT))
     {
-        kernel_log("\n\tGPF: Exception triggered externally.\n");
+        kernel_print("\n\tGPF: Exception triggered externally.\n");
     }
 
     // Check which table the exception originated from.
@@ -32,26 +32,26 @@ void isr_13_ext(uint32_t error_code)
 
     if (table == ISR_ERROR_TABLE_GDT)
     {
-        kernel_log("\n\tGPF: Error occurred in the GDT.");
+        kernel_print("\n\tGPF: Error occurred in the GDT.");
     }
 
     if (table == ISR_ERROR_TABLE_LDT)
     {
-        kernel_log("\n\tGPF: Error occurred in the LDT.");
+        kernel_print("\n\tGPF: Error occurred in the LDT.");
     }
 
     if (table == ISR_ERROR_TABLE_IDT1 || table == ISR_ERROR_TABLE_IDT2)
     {
-        kernel_log("\n\tGPF: Error occurred in the IDT.");
+        kernel_print("\n\tGPF: Error occurred in the IDT.");
     }
 
     // Check which selector the exception originated from.
     uint16_t selector = (error_code >> ISR_ERROR_INDEX_BIT) & ISR_ERROR_INDEX_MASK;
     char str[10];
     itoa(selector, str);
-    kernel_log("\n\tGPF: Selector index - ");
-    kernel_log(str);
-    kernel_log("\n");
+    kernel_print("\n\tGPF: Selector index ");
+    kernel_print(str);
+    kernel_print("\n");
 }
 
 void isr_32_ext(void)
