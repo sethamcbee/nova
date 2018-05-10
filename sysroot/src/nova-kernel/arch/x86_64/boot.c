@@ -18,8 +18,6 @@
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
 
-extern size_t _sections_end;
-
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
 
@@ -51,12 +49,8 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     // TODO: Set up timer.
 
     // Parse Multiboot2 structure.
-    // Physical memory manager info is gathered during this process.
+    // Physical memory manager is initialized during this process.
     multiboot2_parse(mb_tag);
-
-    pmm_init();
-
-    // TODO: Set up paging.
 
     asm volatile ("sti \n"); // We can safely enable interrupts now.
 
@@ -68,7 +62,7 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
     char s[20];
     struct multiboot_tag *mb_end;
     struct multiboot_tag_string *mb_tag_string;
-    struct multiboot_tag_mmap *mb_mmap;
+    struct multiboot_tag_mmap *mb_mmap = NULL;
     bool memory_map_found = false;
 
     mb_end = (struct multiboot_tag*) (((uint8_t*)mb_tag) + mb_tag->type);
@@ -102,7 +96,6 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
         case MULTIBOOT_TAG_TYPE_MMAP:
             memory_map_found = true;
             mb_mmap = (struct multiboot_tag_mmap*)mb_tag;
-            multiboot2_parse_mmap(mb_mmap);
             break;
 
         // Treat unsupported tag as basic tag.
@@ -117,10 +110,6 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
         {
             offset += 8 - (mb_tag->size % 8);
         }
-        if (offset == 0)
-        {
-            offset += 8;
-        }
 
         mb_tag = (struct multiboot_tag*) (((uint8_t*)mb_tag) + offset);
     }
@@ -130,44 +119,8 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
     {
         kernel_panic("NO MULTIBOOT2 MEMORY MAP FOUND.");
     }
+
+    // Initialize physical memory manager.
+    pmm_init(mb_mmap);
 }
 
-
-void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap)
-{
-    // Initialize the physical memory manager.
-    pmm_mem_start = 0;
-    pmm_mem_max = 0;
-    pmm_mem_free = 0;
-
-    // TODO: Search for large enough space to store mb_mmap->size bytes
-    // and allocate this space dynamically, to be used by the paging
-    // structure.
-    struct multiboot_mmap_entry multiboot2_mmap[mb_mmap->size / mb_mmap->entry_size];
-
-    // Iterate over memory map and copy entries.
-    for (size_t i = 0; i < mb_mmap->size / mb_mmap->entry_size; i++)
-    {
-        multiboot2_mmap[i].addr = mb_mmap->entries[i].addr;
-        multiboot2_mmap[i].len = mb_mmap->entries[i].len;
-        multiboot2_mmap[i].type = mb_mmap->entries[i].type;
-        multiboot2_mmap[i].zero = 0;
-    }
-
-    // Pass info to the PMM.
-    for (size_t i = 0; i < mb_mmap->size / mb_mmap->entry_size; i++)
-    {
-        // STUB. We're just using the first contiguous region of
-        // available memory we find.
-        if (multiboot2_mmap[i].type == 1)
-        {
-            pmm_mem_max = multiboot2_mmap[i].len;
-            pmm_mem_start = multiboot2_mmap[i].addr;
-            break;
-        }
-    }
-
-    pmm_mem_start += 0x10000;
-    pmm_mem_max -= 0x10000;
-    pmm_mem_free = pmm_mem_max;
-}

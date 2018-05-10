@@ -38,7 +38,7 @@ void tss_init(void)
     tss_descriptor->reserved_2 = 0;
 
     // Initialize TSS.
-    tss.rsp0 = 1;   // This should point to a per-process kernel stack.
+    tss.rsp0 = 0;   // This should point to a per-process kernel stack.
     tss.ist1 = 0;
     tss.ist2 = 0;
     tss.ist3 = 0;

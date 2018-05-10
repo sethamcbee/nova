@@ -39,20 +39,21 @@ mb_info:
 mb_magic:
 	.skip 4
 
-# Define temporary paging structure. This will only be a stub, so
-# real paging can be handled in C by kernel_main.
-.section .tmp_paging
-.align (0x1000) # align to page boundary
-Lpaging_struct_start:
-Lpml4:
-	.skip 0x1000
-Lpdp:
-	.skip 0x1000
-Lpd:
-	.skip 0x1000
-Lpt:
-	.skip 0x1000
-Lpaging_struct_end:
+# Kernel paging structure.
+.section .bss
+.align 0x1000
+.global pml4
+pml4:
+    .skip 0x1000
+.global pdp0
+pdp0:
+    .skip 0x1000
+.global pd0
+pd0:
+    .skip 0x1000
+.global pt0
+pt0:
+    .skip 0x1000
 
 # Define main kernel stack.
 .section .bss
@@ -79,29 +80,29 @@ _start:
     movl %eax, mb_magic
     movl %ebx, mb_info
 
-# Setup temporary page table. Some code from OSDev.org wiki.
-    movl $0x1000, %edi # set first location to iterate from
-    movl %edi, %cr3
-    xorl %eax, %eax
-    movl $0x1000, %ecx # set number of iterations to 4KiB
-    rep stosl # clear all (sets each long to value of %eax)
-    movl %cr3, %edi # set %edi to beginning again
-    movl $0x2003, (%edi)
-    addl $0x1000, %edi
-    movl $0x3003, (%edi)
-    addl $0x1000, %edi
-    movl $0x4003, (%edi)
-    addl $0x1000, %edi
+# Setup initial page structure.
+    movl $0x1000, %edi   # Set location of PML4.
+    movl %edi, %cr3	 # Set PML4 in %CR3 register.
+    xorl %eax, %eax      # Zero %eax.
+    movl $0x1000, %ecx   # Clear 16 KiB.
+    rep stosl            # Clear all tables.
+    movl %cr3, %edi      # Set %edi to PML4.
+    movl $0x2003, (%edi) # Point PML4 to PDP.
+    addl $0x1000, %edi   # Set %edi to PDP.
+    movl $0x3003, (%edi) # Point PDP to PD.
+    addl $0x1000, %edi   # Set %edi to PD.
+    movl $0x4003, (%edi) # Point PD0 to PT0.
+    addl $0x1000, %edi   # Set %edi to PT0.
 
-    movl $00000003, %ebx # set pages to PRESENT, and RW
-    movl $512, %ecx # loop 512 times
-.Lset_entry:
+    movl $00000003, %ebx # Set pages to present and writeable.
+    movl $512, %ecx      # Loop 512 times (number of entries in table).
+fill_pt1:
     movl %ebx, (%edi)
     addl $0x1000, %ebx
-    addl $8, %edi # iterate eight bytes
-    loop .Lset_entry
+    addl $8, %edi # Iterate to next table entry.
+	loop fill_pt1
 
-# Set CR4.PAE.
+# Enable PAE.
     movl %cr4, %eax
     orl $CR4_PAE_MASK, %eax
     movl %eax, %cr4

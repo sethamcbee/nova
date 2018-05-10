@@ -35,9 +35,8 @@
 
 void* malloc(size_t size)
 {
-    #ifdef ARCH_X86_64
-	return ( pmm_malloc(size) );
-    #endif
+    // STUB.
+    return NULL;
 }
 
 int abs(int n)

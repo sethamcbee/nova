@@ -106,7 +106,7 @@ void* memset(void* s, int c, size_t n)
     {
         s1[i] = c1;
     }
-    return (s1);
+    return (s);
 }
 
 char* strcat(char* s, const char* ct)

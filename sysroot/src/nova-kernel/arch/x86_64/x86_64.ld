@@ -8,9 +8,8 @@ ENTRY(_start)
 
 SECTIONS
 {
-	/* Start loading sections at 1MiB. */
+	/* Start loading kernel sections at 1MiB. */
 	. = 1M;
-	_sections_start = .;
 
 	/* Multiboot header must be first so it can be found by the
 	 * bootloader. */
@@ -43,13 +42,6 @@ SECTIONS
 		*(.bss)
 	}
 	_section_bss_end = .;
-
-	_section_tmp_paging_start = .;
-	.tmp_paging BLOCK(4K) : ALIGN(4K)
-	{
-		*(.tmp_paging)
-	}
-	_section_tmp_paging_end = .;
 
 	_sections_end = .;
 }

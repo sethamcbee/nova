@@ -17,11 +17,6 @@
 
 #include <arch/x86_64/tss.h>
 
-extern uint64_t irq_spurious_count;
-extern size_t pmm_mem_start;
-extern size_t pmm_mem_free;
-extern size_t pmm_mem_max;
-
 void kernel_main(void)
 {
     // Initialize STDIO.
@@ -34,6 +29,13 @@ void kernel_main(void)
     const char user[] = "sethamcbee@nova:";
     const char dir[] = "/";
 
+    extern pmm_frames_free;
+    extern pmm_frames_available;
+    extern pmm_frames_unavailable;
+    printf("Free page frames: %ld\n", pmm_frames_free);
+    printf("Available page frames: %ld\n", pmm_frames_available);
+    printf("Unavailable page frames: %ld\n", pmm_frames_unavailable);
+
     // Kernel loop.
     while (1)
     {
@@ -42,6 +44,23 @@ void kernel_main(void)
 
         // Get user input.
         scanf("%s", s);
+
+        if (strcmp(s, "alloc") == 0)
+        {
+            extern size_t pmm_bitmap_alloc(void);
+            size_t addr = pmm_bitmap_alloc();
+            fprintf(stdout, "Address: %ld\n", addr);
+            for (size_t i = 0; i < 0x1000; i++)
+                ((char*)addr)[i] = 0xFF;
+        }
+        if (strcmp(s, "free") == 0)
+        {
+            extern void pmm_bitmap_free(size_t addr);
+            size_t addr;
+            printf("Address to free: ");
+            scanf("%ld", &addr);
+            pmm_bitmap_free(addr);
+        }
     }
 
     // The kernel is not intended to return; halt.

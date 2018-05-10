@@ -1,5 +1,5 @@
 // Authors: Seth McBee
-// Created: 2017-10-17
+// Created: 2018-5-8
 // Description: x86-64 TSS constants and declarations.
 
 #ifndef TSS_H
@@ -51,7 +51,8 @@ typedef struct __attribute__((packed))
 } Tss;
 
 // Long mode TSS.
-Tss tss;
+__attribute__((aligned(16)))
+volatile Tss tss;
 
 // Must be called to set up the TSS.
 void tss_init(void);
