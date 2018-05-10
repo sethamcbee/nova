@@ -16,6 +16,7 @@
 // Defined in linker script.
 extern void* _sections_end;
 
+// Initializes paging - identity maps first 8 MiB.
 static void pmm_paging_init(void);
 
 void pmm_init(struct multiboot_tag_mmap *mb_mmap)
@@ -94,7 +95,7 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
     memset(pmm_bitmap, 0xFF, pmm_bitmap_len);
 
     // Minimum base address to consider a frame to be free.
-    uint64_t base_min = (uint64_t)&pmm_bitmap + pmm_bitmap_len;
+    uint64_t base_min = (uint64_t)pmm_bitmap + pmm_bitmap_len;
 
     // Allocate stack of pages that are available to processes,
     // starting at the end of kernel memory.
@@ -251,7 +252,7 @@ void pmm_paging_init(void)
         }
     }
 
-    // Reload PML4.
+    // Load new PML4.
     asm volatile
     (
         "movq %0, %%cr3 \n"
@@ -259,6 +260,13 @@ void pmm_paging_init(void)
         : "a" (pml4_addr)
         :
     );
+
+    // Reclaim boot paging structure.
+    pmm_bitmap_free(0x1000); // PML4
+    pmm_bitmap_free(0x2000); // PDP
+    pmm_bitmap_free(0x3000); // PD
+    pmm_bitmap_free(0x4000); // PT0
+    pmm_bitmap_free(0x5000); // PT1
 }
 
 void pmm_bitmap_free(size_t addr)

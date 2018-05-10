@@ -92,6 +92,7 @@ _start:
     movl $0x3003, (%edi) # Point PDP to PD.
     addl $0x1000, %edi   # Set %edi to PD.
     movl $0x4003, (%edi) # Point PD0 to PT0.
+    movl $0x5003, 8(%edi)# Point PD1 to PT1.
     addl $0x1000, %edi   # Set %edi to PT0.
 
     movl $00000003, %ebx # Set pages to present and writeable.
@@ -100,7 +101,15 @@ fill_pt1:
     movl %ebx, (%edi)
     addl $0x1000, %ebx
     addl $8, %edi # Iterate to next table entry.
-	loop fill_pt1
+        loop fill_pt1
+
+    movl $00000003, %ebx
+    movl $512, %ecx
+fill_pt2:
+    movl %ebx, (%edi)
+    addl $0x1000, %ebx
+    addl $8, %edi
+        loop fill_pt2
 
 # Enable PAE.
     movl %cr4, %eax
