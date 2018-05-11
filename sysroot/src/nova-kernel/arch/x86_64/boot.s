@@ -45,15 +45,6 @@ mb_magic:
 .global pml4
 pml4:
     .skip 0x1000
-.global pdpt0
-pdpt0:
-    .skip 0x1000
-.global pd0
-pd0:
-    .skip 0x1000
-.global pt0
-pt0:
-    .skip 0x1000
 
 # Define main kernel stack.
 .section .bss

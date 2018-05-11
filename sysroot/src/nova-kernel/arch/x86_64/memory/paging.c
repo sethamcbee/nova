@@ -10,23 +10,23 @@
 
 #include <arch/x86_64/memory/paging.h>
 #include <arch/x86_64/memory/pmm.h>
+#include <arch/x86_64/memory/vmm.h>
 
 void paging_init(void)
 {
     // Addresses of the initial paging structures.
     uint64_t pml4_addr = (uint64_t)&pml4;
-    uint64_t pdpt0_addr = (uint64_t)&pdpt0;
-    uint64_t pd0_addr = (uint64_t)&pd0;
-    uint64_t pt0_addr = (uint64_t)&pt0;
 
     // Zero the paging structures.
     memset((void*) pml4, 0, PAGE_SIZE);
-    memset((void*) pdpt0, 0, PAGE_SIZE);
-    memset((void*) pd0, 0, PAGE_SIZE);
-    memset((void*) pt0, 0, PAGE_SIZE);
 
-    // Identity map first 8 MiB.
+    // Identity map first 8 MiB, except for first page.
+    for (size_t i = 1; i < 0x800000; i += PAGE_SIZE)
+    {
+        vmm_page_map((void*)i, (void*)i, PG_PR | PG_RW);
+    }
 
+    #if 0
     // First PML4 entry.
     pml4[0].present = 1;
     pml4[0].write_enabled = 1;
@@ -104,7 +104,7 @@ void paging_init(void)
         // Identity map two megabytes in new page table.
         for (size_t pt_index = 0; pt_index < 512; pt_index++)
         {
-            uint64_t page_addr = (pt_index + pd_index*PAGE_SIZE)*PAGE_SIZE;
+            uint64_t page_addr = (pt_index + pd_index*512)*PAGE_SIZE;
             pt_i[pt_index].present = 1;
             pt_i[pt_index].write_enabled = 1;
             pt_i[pt_index].user = 0;
@@ -119,6 +119,7 @@ void paging_init(void)
             pt_i[pt_index].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         }
     }
+    #endif
 
     // Load new PML4.
     asm volatile
