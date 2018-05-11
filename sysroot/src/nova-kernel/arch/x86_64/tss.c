@@ -46,6 +46,7 @@ void tss_init(void)
     tss.ist5 = 0;
     tss.ist6 = 0;
     tss.ist7 = 0;
+    tss.iopb_offset = tss_size;
 
     load_tss();
 }
@@ -53,6 +54,7 @@ void tss_init(void)
 static void load_tss(void)
 {
     uint16_t selector = GDT_TSS;
+    selector |= 0b11;
     asm volatile
     (
         "ltr %0 \n"

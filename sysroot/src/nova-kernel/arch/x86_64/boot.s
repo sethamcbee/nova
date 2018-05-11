@@ -45,8 +45,8 @@ mb_magic:
 .global pml4
 pml4:
     .skip 0x1000
-.global pdp0
-pdp0:
+.global pdpt0
+pdpt0:
     .skip 0x1000
 .global pd0
 pd0:
@@ -80,7 +80,7 @@ _start:
     movl %eax, mb_magic
     movl %ebx, mb_info
 
-# Setup initial page structure.
+# Setup boot paging structure.
     movl $0x1000, %edi   # Set location of PML4.
     movl %edi, %cr3	 # Set PML4 in %CR3 register.
     xorl %eax, %eax      # Zero %eax.
@@ -102,8 +102,6 @@ fill_pt1:
     addl $0x1000, %ebx
     addl $8, %edi # Iterate to next table entry.
         loop fill_pt1
-
-    movl $00000003, %ebx
     movl $512, %ecx
 fill_pt2:
     movl %ebx, (%edi)

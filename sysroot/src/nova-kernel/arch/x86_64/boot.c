@@ -11,10 +11,11 @@
 #include <kernel.h>
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/multiboot2.h>
-#include <arch/x86_64/pmm.h>
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/devices/pic.h>
 #include <arch/x86_64/interrupts/idt.h>
+#include <arch/x86_64/memory/paging.h>
+#include <arch/x86_64/memory/pmm.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
 
@@ -33,6 +34,12 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
         kernel_panic("MULTIBOOT2 BOOTLOADER SIGNATURE IS INVALID.");
     }
 
+    // Parse Multiboot2 structure.
+    // Physical memory manager is initialized during this process.
+    multiboot2_parse(mb_tag);
+
+    paging_init();
+
     idt_initialize();
 
     tss_init();
@@ -47,10 +54,6 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     pic_irq_enable(IRQ_KEYBOARD);
 
     // TODO: Set up timer.
-
-    // Parse Multiboot2 structure.
-    // Physical memory manager is initialized during this process.
-    multiboot2_parse(mb_tag);
 
     asm volatile ("sti \n"); // We can safely enable interrupts now.
 

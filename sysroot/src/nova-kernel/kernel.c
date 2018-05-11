@@ -29,13 +29,6 @@ void kernel_main(void)
     const char user[] = "sethamcbee@nova:";
     const char dir[] = "/";
 
-    extern pmm_frames_free;
-    extern pmm_frames_available;
-    extern pmm_frames_unavailable;
-    printf("Free page frames: %ld\n", pmm_frames_free);
-    printf("Available page frames: %ld\n", pmm_frames_available);
-    printf("Unavailable page frames: %ld\n", pmm_frames_unavailable);
-
     // Kernel loop.
     while (1)
     {
@@ -45,21 +38,13 @@ void kernel_main(void)
         // Get user input.
         scanf("%s", s);
 
-        if (strcmp(s, "alloc") == 0)
+        if (strcmp(s, "vmm") == 0)
         {
-            extern size_t pmm_bitmap_alloc(void);
-            size_t addr = pmm_bitmap_alloc();
-            fprintf(stdout, "Address: %ld\n", addr);
-            for (size_t i = 0; i < 0x1000; i++)
-                ((char*)addr)[i] = 0xFF;
-        }
-        if (strcmp(s, "free") == 0)
-        {
-            extern void pmm_bitmap_free(size_t addr);
             size_t addr;
-            printf("Address to free: ");
+            printf("v addr: ");
             scanf("%ld", &addr);
-            pmm_bitmap_free(addr);
+            addr = (size_t) vmm_phys_addr((void*) addr);
+            printf("p addr: %ld\n", addr);
         }
     }
 

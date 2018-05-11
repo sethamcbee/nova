@@ -11,13 +11,11 @@
 #include <globals.h>
 #include <kernel.h>
 #include <arch/x86_64/multiboot2.h>
-#include <arch/x86_64/pmm.h>
+#include <arch/x86_64/memory/paging.h>
+#include <arch/x86_64/memory/pmm.h>
 
 // Defined in linker script.
 extern void* _sections_end;
-
-// Initializes paging - identity maps first 8 MiB.
-static void pmm_paging_init(void);
 
 void pmm_init(struct multiboot_tag_mmap *mb_mmap)
 {
@@ -86,16 +84,24 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
         }
     }
 
-    // Set bitmap to full, and align length to page boundary.
+    // Align bitmap length to page boundary..
     pmm_bitmap_len = pmm_frames_available / 8;
     if (pmm_bitmap_len % 8 != 0)
     {
         pmm_bitmap_len += 1 - (pmm_bitmap_len % 8);
     }
+
+    // Set all bitmap entries to used.
     memset(pmm_bitmap, 0xFF, pmm_bitmap_len);
 
     // Minimum base address to consider a frame to be free.
     uint64_t base_min = (uint64_t)pmm_bitmap + pmm_bitmap_len;
+
+    // Verify that bitmap fits below our initial paged memory (4 MiB).
+    if (base_min >= 0x400000)
+    {
+        kernel_panic("Not enough paged memory to allocate PMM bitmap.");
+    }
 
     // Allocate stack of pages that are available to processes,
     // starting at the end of kernel memory.
@@ -126,7 +132,7 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
             {
                 if (addr >= base_min)
                 {
-                    pmm_bitmap_free(addr);
+                    pmm_frame_free(addr);
                 }
                 addr += PAGE_SIZE;
                 len -= PAGE_SIZE;
@@ -134,142 +140,11 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
         }
     }
 
-    // Initialize new paging struct.
-    pmm_paging_init();
-
     // TODO: Allocate structures to manage special unavailable memory
     // (like ACPI).
-
-    // TODO: Reclaim boot paging structure.
 }
 
-void pmm_paging_init(void)
-{
-    // Addresses of the initial paging structures.
-    uint64_t pml4_addr = (uint64_t)&pml4;
-    uint64_t pdp0_addr = (uint64_t)&pdp0;
-    uint64_t pd0_addr = (uint64_t)&pd0;
-    uint64_t pt0_addr = (uint64_t)&pt0;
-
-    // Zero the paging structures.
-    memset((void*) pml4, 0, PAGE_SIZE);
-    memset((void*) pdp0, 0, PAGE_SIZE);
-    memset((void*) pd0, 0, PAGE_SIZE);
-    // pt0 will be completely filled so no need to zero.
-
-    // Identity map first 8 MiB.
-
-    // First PML4 entry.
-    pml4[0].present = 1;
-    pml4[0].write_enabled = 1;
-    pml4[0].user = 0;
-    pml4[0].write_through = 0;
-    pml4[0].cache_disabled = 0;
-    pml4[0].accessed = 0;
-    pml4[0].zero_low = 0;
-    pml4[0].zero_high = 0;
-    pml4[0].sign_extend = 0;
-    pml4[0].dir_ptr_addr_low = (pdp0_addr >> 12) & 0xFFFFF;
-    pml4[0].dir_ptr_addr_high = (pdp0_addr >> 32) & 0xFFFFF;
-
-    // First PDP entry.
-    pdp0[0].present = 1;
-    pdp0[0].write_enabled = 1;
-    pdp0[0].user = 0;
-    pdp0[0].write_through = 0;
-    pdp0[0].cache_disabled = 0;
-    pdp0[0].accessed = 0;
-    pdp0[0].zero = 0;
-    pdp0[0].sign_extend = 0;
-    pdp0[0].dir_addr_low = (pd0_addr >> 12) & 0xFFFFF;
-    pdp0[0].dir_addr_high = (pd0_addr >> 32) & 0xFFFFF;
-
-    // First PD entry.
-    pd0[0].present = 1;
-    pd0[0].write_enabled = 1;
-    pd0[0].user = 0;
-    pd0[0].write_through = 0;
-    pd0[0].cache_disabled = 0;
-    pd0[0].accessed = 0;
-    pd0[0].zero = 0;
-    pd0[0].sign_extend = 0;
-    pd0[0].table_addr_low = (pt0_addr >> 12) & 0xFFFFF;
-    pd0[0].table_addr_high = (pt0_addr >> 32) & 0xFFFFF;
-
-    // Identity map first two megabytes.
-    for (size_t i = 0; i < 512; i++)
-    {
-        uint64_t page_addr = i * PAGE_SIZE;
-        pt0[i].present = 1;
-        pt0[i].write_enabled = 1;
-        pt0[i].user = 0;
-        pt0[i].write_through = 0;
-        pt0[i].cache_disabled = 0;
-        pt0[i].accessed = 0;
-        pt0[i].dirty = 0;
-        pt0[i].attr = 0;
-        pt0[i].global = 0;
-        pt0[i].sign_extend = 0;
-        pt0[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
-        pt0[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
-    }
-
-    // Allocate more page tables as needed and map next 6 MiB.
-    for (size_t pd_index = 1; pd_index < 4; pd_index++)
-    {
-        // Allocate new page for new page table.
-        size_t pt_i_addr = pmm_bitmap_alloc();
-        Pte *pt_i = (Pte*) pt_i_addr;
-
-        // Build page table entry.
-        pd0[pd_index].present = 1;
-        pd0[pd_index].write_enabled = 1;
-        pd0[pd_index].user = 0;
-        pd0[pd_index].write_through = 0;
-        pd0[pd_index].cache_disabled = 0;
-        pd0[pd_index].accessed = 0;
-        pd0[pd_index].zero = 0;
-        pd0[pd_index].sign_extend = 0;
-        pd0[pd_index].table_addr_low = (pt_i_addr >> 12) & 0xFFFFF;
-        pd0[pd_index].table_addr_high = (pt_i_addr >> 32) & 0xFFFFF;
-
-        // Identity map next two megabytes.
-        for (size_t pt_index = 0; pt_index < 512; pt_index++)
-        {
-            uint64_t page_addr = (pt_index + pd_index*PAGE_SIZE)*PAGE_SIZE;
-            pt_i[pt_index].present = 1;
-            pt_i[pt_index].write_enabled = 1;
-            pt_i[pt_index].user = 0;
-            pt_i[pt_index].write_through = 0;
-            pt_i[pt_index].cache_disabled = 0;
-            pt_i[pt_index].accessed = 0;
-            pt_i[pt_index].dirty = 0;
-            pt_i[pt_index].attr = 0;
-            pt_i[pt_index].global = 0;
-            pt_i[pt_index].sign_extend = 0;
-            pt_i[pt_index].page_addr_low = (page_addr >> 12) & 0xFFFFF;
-            pt_i[pt_index].page_addr_high = (page_addr >> 32) & 0xFFFFF;
-        }
-    }
-
-    // Load new PML4.
-    asm volatile
-    (
-        "movq %0, %%cr3 \n"
-        :
-        : "a" (pml4_addr)
-        :
-    );
-
-    // Reclaim boot paging structure.
-    pmm_bitmap_free(0x1000); // PML4
-    pmm_bitmap_free(0x2000); // PDP
-    pmm_bitmap_free(0x3000); // PD
-    pmm_bitmap_free(0x4000); // PT0
-    pmm_bitmap_free(0x5000); // PT1
-}
-
-void pmm_bitmap_free(size_t addr)
+void pmm_frame_free(size_t addr)
 {
     size_t frame_num = addr / PAGE_SIZE;
     size_t byte = frame_num / 8;
@@ -281,7 +156,7 @@ void pmm_bitmap_free(size_t addr)
     pmm_frames_used--;
 }
 
-size_t pmm_bitmap_alloc(void)
+size_t pmm_frame_alloc(void)
 {
     // Find first empty page.
     for (size_t byte = 0; byte < pmm_bitmap_len; byte++)
