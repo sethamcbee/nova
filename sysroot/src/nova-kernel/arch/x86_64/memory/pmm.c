@@ -132,7 +132,7 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
             {
                 if (addr >= base_min)
                 {
-                    pmm_frame_free(addr);
+                    pmm_frame_free((void*)addr);
                 }
                 addr += PAGE_SIZE;
                 len -= PAGE_SIZE;
@@ -144,9 +144,9 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
     // (like ACPI).
 }
 
-void pmm_frame_free(size_t addr)
+void pmm_frame_free(void* addr)
 {
-    size_t frame_num = addr / PAGE_SIZE;
+    size_t frame_num = (size_t)addr / PAGE_SIZE;
     size_t byte = frame_num / 8;
     uint8_t bit = frame_num % 8;
 
@@ -156,8 +156,14 @@ void pmm_frame_free(size_t addr)
     pmm_frames_used--;
 }
 
-size_t pmm_frame_alloc(void)
+void* pmm_frame_alloc(void)
 {
+    // Check if any frames are available.
+    if (pmm_frames_free == 0)
+    {
+        return (NULL);
+    }
+
     // Find first empty page.
     for (size_t byte = 0; byte < pmm_bitmap_len; byte++)
     {
@@ -174,13 +180,13 @@ size_t pmm_frame_alloc(void)
                     pmm_bitmap[byte] = BIT_SET(pmm_bitmap[byte], bit);
                     pmm_frames_free--;
                     pmm_frames_used++;
-                    size_t addr = PAGE_SIZE * (8 * byte + bit);
+                    void *addr = (void*) (PAGE_SIZE * (8 * byte + bit));
                     return (addr);
                 }
             }
         }
     }
 
-    // Else.
-    return (0);
+    // Else (this should never be reached).
+    return (NULL);
 }

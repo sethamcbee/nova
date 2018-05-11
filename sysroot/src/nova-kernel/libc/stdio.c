@@ -722,7 +722,7 @@ int vfscanf(FILE *stream, const char *format, va_list arg)
                 char tmp[tmp_max];
                 int pad;
                 char c = fgetc(stream);
-                while (isdigit(c))
+                while (isdigit(c) || c == '-')
                 {
                     tmp[tmp_len] = c;
                     tmp_len++;

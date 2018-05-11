@@ -69,9 +69,38 @@ void* vmm_phys_addr(void* virt)
     return ((void*) phys_addr);
 }
 
-void* vmm_virt_addr(void* phys)
+void vmm_init(void)
 {
-    return (NULL);
+    // Addresses of the initial paging structures.
+    uint64_t pml4_addr = (uint64_t)&pml4;
+
+    // Zero the paging structures.
+    memset((void*) pml4, 0, PAGE_SIZE);
+
+    // Set up recursive PML4 mapping.
+    vmm_page_map((void*)pml4, (void*)0xfffffffffffff000, PG_PR | PG_RW);
+
+    // Identity map first 8 MiB, except for first page.
+    for (size_t i = PAGE_SIZE; i < 0x800000; i += PAGE_SIZE)
+    {
+        vmm_page_map((void*)i, (void*)i, PG_PR | PG_RW);
+    }
+
+    // Load new PML4.
+    asm volatile
+    (
+        "movq %0, %%cr3 \n"
+        :
+        : "a" (pml4_addr)
+        :
+    );
+
+    // Reclaim boot paging structure.
+    pmm_frame_free((void*) 0x1000); // PML4
+    pmm_frame_free((void*) 0x2000); // PDP
+    pmm_frame_free((void*) 0x3000); // PD
+    pmm_frame_free((void*) 0x4000); // PT0
+    pmm_frame_free((void*) 0x5000); // PT1
 }
 
 void vmm_page_map(void* phys, void* virt, uint16_t flags)
@@ -113,7 +142,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
             pml4[pml4_i].accessed = 1;
 
         // Make new PDPT.
-        tmp_addr = pmm_frame_alloc();
+        tmp_addr = (size_t) pmm_frame_alloc();
         memset((void*)tmp_addr, 0, PAGE_SIZE);
         pml4[pml4_i].dir_ptr_addr_high = (tmp_addr >> 32) & 0xFFFFF;
         pml4[pml4_i].dir_ptr_addr_low = (tmp_addr >> 12) & 0xFFFFF;
@@ -144,7 +173,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
             pdpt[pdpt_i].accessed = 1;
 
         // Make new PD.
-        tmp_addr = pmm_frame_alloc();
+        tmp_addr = (size_t) pmm_frame_alloc();
         memset((void*)tmp_addr, 0, PAGE_SIZE);
         pdpt[pdpt_i].dir_addr_high = (tmp_addr >> 32) & 0xFFFFF;
         pdpt[pdpt_i].dir_addr_low = (tmp_addr >> 12) & 0xFFFFF;
@@ -175,7 +204,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
             pd[pd_i].accessed = 1;
 
         // Make new PT.
-        tmp_addr = pmm_frame_alloc();
+        tmp_addr = (size_t) pmm_frame_alloc();
         memset((void*)tmp_addr, 0, PAGE_SIZE);
         pd[pd_i].table_addr_high = (tmp_addr >> 32) & 0xFFFFF;
         pd[pd_i].table_addr_low = (tmp_addr >> 12) & 0xFFFFF;

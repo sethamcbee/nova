@@ -46,6 +46,24 @@ void kernel_main(void)
             addr = (size_t) vmm_phys_addr((void*) addr);
             printf("p addr: %ld\n", addr);
         }
+        if (strcmp(s, "malloc") == 0)
+        {
+            int bytes;
+            char *mem;
+            printf("Bytes: ");
+            scanf("%d", &bytes);
+            mem = (char*) malloc(bytes);
+            for (size_t i = 0; i < bytes; i++)
+                mem[i] = 255;
+            printf("Addr: %ld\n", (long)mem);
+        }
+        if (strcmp(s, "free") == 0)
+        {
+            char *mem;
+            printf("Addr: ");
+            scanf("%ld", &mem);
+            free(mem);
+        }
     }
 
     // The kernel is not intended to return; halt.

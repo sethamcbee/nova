@@ -33,11 +33,13 @@
     #include <arch/x86_64/memory/pmm.h>
 #endif
 
+#if 0
 void* malloc(size_t size)
 {
     // STUB.
     return NULL;
 }
+#endif
 
 int abs(int n)
 {

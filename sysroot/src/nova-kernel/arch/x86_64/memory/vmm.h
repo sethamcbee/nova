@@ -11,8 +11,8 @@
 // Convert virtual address to physical address.
 void* vmm_phys_addr(void* virt);
 
-// Convert physical address to virtual address.
-void* vmm_virt_addr(void* phys);
+// Initializes virtual memory manager.
+void vmm_init(void);
 
 // Map a physical page to a virtual address.
 void vmm_page_map(void* phys, void* virt, uint16_t flags);
