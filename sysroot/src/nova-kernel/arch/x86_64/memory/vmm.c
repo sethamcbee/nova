@@ -121,8 +121,8 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     Pte *pt;
 
     // Clear lowest 12 bits of both addresses.
-    phys_addr ^= 0xFFF;
-    virt_addr ^= 0xFFF;
+    phys_addr &= ~0xFFF;
+    virt_addr &= ~0xFFF;
 
     // Calculate table entries.
     uint16_t pml4_i = PML4_INDEX(virt_addr);
@@ -135,19 +135,22 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     // Check if PML4 entry does not exist.
     if (pml4[pml4_i].present == 0)
     {
+        Pml4e tmp_pml4e = {0};
+
         // Set relevant flags.
         if (BIT_CHECK(flags, PG_PR_BIT))
-            pml4[pml4_i].present = 1;
+            tmp_pml4e.present = 1;
         if (BIT_CHECK(flags, PG_RW_BIT))
-            pml4[pml4_i].write_enabled = 1;
+            tmp_pml4e.write_enabled = 1;
         if (BIT_CHECK(flags, PG_U_BIT))
-            pml4[pml4_i].user = 1;
+            tmp_pml4e.user = 1;
         if (BIT_CHECK(flags, PG_WT_BIT))
-            pml4[pml4_i].write_through = 1;
+            tmp_pml4e.write_through = 1;
         if (BIT_CHECK(flags, PG_CD_BIT))
-            pml4[pml4_i].cache_disabled = 1;
+            tmp_pml4e.cache_disabled = 1;
         if (BIT_CHECK(flags, PG_AC_BIT))
-            pml4[pml4_i].accessed = 1;
+            tmp_pml4e.accessed = 1;
+        pml4[pml4_i] = tmp_pml4e;
 
         // Make new PDPT.
         tmp_addr = (size_t) pmm_frame_alloc();
@@ -166,19 +169,22 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     // Check if PDPT entry does not exist.
     if (pdpt[pdpt_i].present == 0)
     {
+        Pdpte tmp_pdpte = {0};
+
         // Set relevant flags.
         if (BIT_CHECK(flags, PG_PR_BIT))
-            pdpt[pdpt_i].present = 1;
+            tmp_pdpte.present = 1;
         if (BIT_CHECK(flags, PG_RW_BIT))
-            pdpt[pdpt_i].write_enabled = 1;
+            tmp_pdpte.write_enabled = 1;
         if (BIT_CHECK(flags, PG_U_BIT))
-            pdpt[pdpt_i].user = 1;
+            tmp_pdpte.user = 1;
         if (BIT_CHECK(flags, PG_WT_BIT))
-            pdpt[pdpt_i].write_through = 1;
+            tmp_pdpte.write_through = 1;
         if (BIT_CHECK(flags, PG_CD_BIT))
-            pdpt[pdpt_i].cache_disabled = 1;
+            tmp_pdpte.cache_disabled = 1;
         if (BIT_CHECK(flags, PG_AC_BIT))
-            pdpt[pdpt_i].accessed = 1;
+            tmp_pdpte.accessed = 1;
+        pdpt[pdpt_i] = tmp_pdpte;
 
         // Make new PD.
         tmp_addr = (size_t) pmm_frame_alloc();
@@ -197,19 +203,22 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     // Check if PD entry does not exist.
     if (pd[pd_i].present == 0)
     {
+        Pde tmp_pde = {0};
+
         // Set relevant flags.
         if (BIT_CHECK(flags, PG_PR_BIT))
-            pd[pd_i].present = 1;
+            tmp_pde.present = 1;
         if (BIT_CHECK(flags, PG_RW_BIT))
-            pd[pd_i].write_enabled = 1;
+            tmp_pde.write_enabled = 1;
         if (BIT_CHECK(flags, PG_U_BIT))
-            pd[pd_i].user = 1;
+            tmp_pde.user = 1;
         if (BIT_CHECK(flags, PG_WT_BIT))
-            pd[pd_i].write_through = 1;
+            tmp_pde.write_through = 1;
         if (BIT_CHECK(flags, PG_CD_BIT))
-            pd[pd_i].cache_disabled = 1;
+            tmp_pde.cache_disabled = 1;
         if (BIT_CHECK(flags, PG_AC_BIT))
-            pd[pd_i].accessed = 1;
+            tmp_pde.accessed = 1;
+        pd[pd_i] = tmp_pde;
 
         // Make new PT.
         tmp_addr = (size_t) pmm_frame_alloc();
@@ -226,24 +235,27 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     }
 
     // Modify PT entry.
+    Pte tmp_pte = {0};
+
     if (BIT_CHECK(flags, PG_PR_BIT))
-        pt[pt_i].present = 1;
+        tmp_pte.present = 1;
     if (BIT_CHECK(flags, PG_RW_BIT))
-        pt[pt_i].write_enabled = 1;
+        tmp_pte.write_enabled = 1;
     if (BIT_CHECK(flags, PG_U_BIT))
-        pt[pt_i].user = 1;
+        tmp_pte.user = 1;
     if (BIT_CHECK(flags, PG_WT_BIT))
-        pt[pt_i].write_through = 1;
+        tmp_pte.write_through = 1;
     if (BIT_CHECK(flags, PG_CD_BIT))
-        pt[pt_i].cache_disabled = 1;
+        tmp_pte.cache_disabled = 1;
     if (BIT_CHECK(flags, PG_AC_BIT))
-        pt[pt_i].accessed = 1;
+        tmp_pte.accessed = 1;
     if (BIT_CHECK(flags, PG_DT_BIT))
-        pt[pt_i].dirty = 1;
+        tmp_pte.dirty = 1;
     if (BIT_CHECK(flags, PG_AT_BIT))
-        pt[pt_i].attr = 1;
+        tmp_pte.attr = 1;
     if (BIT_CHECK(flags, PG_GL_BIT))
-        pt[pt_i].global = 1;
-    pt[pt_i].page_addr_high = (phys_addr >> 32) & 0xFFFFF;
-    pt[pt_i].page_addr_low = (phys_addr >> 12) & 0xFFFFF;
+        tmp_pte.global = 1;
+    tmp_pte.page_addr_high = (phys_addr >> 32) & 0xFFFFF;
+    tmp_pte.page_addr_low = (phys_addr >> 12) & 0xFFFFF;
+    pt[pt_i] = tmp_pte;
 }
