@@ -5,16 +5,15 @@
 .set IDT_SIZE, (256 * 16 - 1)
 
 # Define IDT pointer.
-.data
+.text
 .global idt_pointer
 .align 16
 idt_pointer:
     .word IDT_SIZE
     .quad idt
 
-.text
 .global idt_load
 idt_load:
-    movl $idt_pointer, %eax # Load pointer to IDT to %eax
-    lidt (%eax) # Tell CPU to load descriptor
+    movabs $idt_pointer, %rax # Load pointer to IDT to %eax
+    lidt (%rax) # Tell CPU to load descriptor
     ret

@@ -111,6 +111,7 @@ ifeq ($(ARCH), x86_64)
 		-std=gnu11 \
 		-ffreestanding \
 		-Wall \
+		-mcmodel=kernel \
 		-mno-red-zone
 	CPP=$(GCC_DIR)/$(GCC_PREFIX)g++
 	CPPFLAGS=\
@@ -123,6 +124,7 @@ ifeq ($(ARCH), x86_64)
 		-Wall \
 		-fno-exceptions \
 		-fno-rtti \
+		-mcmodel=kernel \
 		-mno-red-zone
 	LD=$(CC)
 	LDFLAGS=\

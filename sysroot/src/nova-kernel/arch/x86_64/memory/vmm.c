@@ -13,6 +13,10 @@
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 
+extern void* phys_end;
+extern size_t BOOT_OFFSET;
+extern size_t KERNEL_OFFSET;
+
 void* vmm_phys_addr(void* virt)
 {
     size_t phys_addr;
@@ -29,7 +33,7 @@ void* vmm_phys_addr(void* virt)
     uint16_t offset = PT_OFFSET(virt_addr);
 
     // Check for valid PML4 entry.
-    if (pml4[pml4_i].present == false)
+    if (pml4[pml4_i].present == 0)
     {
         return (NULL);
     }
@@ -38,7 +42,7 @@ void* vmm_phys_addr(void* virt)
     phys_addr = ((size_t)pml4[pml4_i].dir_ptr_addr_high) << 32;
     phys_addr |= ((size_t)pml4[pml4_i].dir_ptr_addr_low) << 12;
     pdpt = (Pdpte*) phys_addr;
-    if (pdpt[pdpt_i].present == false)
+    if (pdpt[pdpt_i].present == 0)
     {
         return (NULL);
     }
@@ -47,7 +51,7 @@ void* vmm_phys_addr(void* virt)
     phys_addr = ((size_t)pdpt[pdpt_i].dir_addr_high) << 32;
     phys_addr |= ((size_t)pdpt[pdpt_i].dir_addr_low) << 12;
     pd = (Pde*) phys_addr;
-    if (pd[pd_i].present == false)
+    if (pd[pd_i].present == 0)
     {
         return (NULL);
     }
@@ -56,7 +60,7 @@ void* vmm_phys_addr(void* virt)
     phys_addr = ((size_t)pd[pd_i].table_addr_high) << 32;
     phys_addr |= ((size_t)pd[pd_i].table_addr_low) << 12;
     pt = (Pte*) phys_addr;
-    if (pt[pt_i].present == false)
+    if (pt[pt_i].present == 0)
     {
         return (NULL);
     }
@@ -72,35 +76,39 @@ void* vmm_phys_addr(void* virt)
 void vmm_init(void)
 {
     // Addresses of the initial paging structures.
-    uint64_t pml4_addr = (uint64_t)&pml4;
-
-    // Zero the paging structures.
-    memset((void*) pml4, 0, PAGE_SIZE);
+    pml4 = (Pml4e*)0x1000;
 
     // Set up recursive PML4 mapping.
     vmm_page_map((void*)pml4, (void*)0xfffffffffffff000, PG_PR | PG_RW);
 
-    // Identity map first 8 MiB, except for first page.
-    for (size_t i = PAGE_SIZE; i < 0x800000; i += PAGE_SIZE)
+    // Identity map first 1 MiB, except for first page.
+    vmm_page_map((void*)0x0, (void*)0x0, 0);
+    for (size_t i = PAGE_SIZE; i < 0x100000; i += PAGE_SIZE)
     {
         vmm_page_map((void*)i, (void*)i, PG_PR | PG_RW);
     }
 
-    // Load new PML4.
+    // Map higher kernel memory.
+    size_t to_map = (size_t)&phys_end + pmm_bitmap_len;
+    for (size_t i = BOOT_OFFSET; i < to_map; i+= PAGE_SIZE)
+    {
+        vmm_page_map((void*)i, (void*)(i + KERNEL_OFFSET), PG_PR | PG_RW);
+    }
+
+    // Reload PML4.
     asm volatile
     (
         "movq %0, %%cr3 \n"
         :
-        : "a" (pml4_addr)
+        : "a" ((size_t) pml4)
         :
     );
 
     // Reclaim boot paging structure.
-    pmm_frame_free((void*) 0x1000); // PML4
-    pmm_frame_free((void*) 0x2000); // PDP
-    pmm_frame_free((void*) 0x3000); // PD
-    pmm_frame_free((void*) 0x4000); // PT0
-    pmm_frame_free((void*) 0x5000); // PT1
+    //pmm_frame_free((void*) 0x2000); // PDP
+    //pmm_frame_free((void*) 0x3000); // PD
+    //pmm_frame_free((void*) 0x4000); // PT0
+    //pmm_frame_free((void*) 0x5000); // PT1
 }
 
 void vmm_page_map(void* phys, void* virt, uint16_t flags)

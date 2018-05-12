@@ -15,7 +15,7 @@
 #include <arch/x86_64/memory/pmm.h>
 
 // Defined in linker script.
-extern void* _sections_end;
+extern void* phys_end;
 
 void pmm_init(struct multiboot_tag_mmap *mb_mmap)
 {
@@ -23,7 +23,7 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
     size_t mmap_entry_count = mb_mmap->size / mb_mmap->entry_size;
 
     // Point frame bitmap to end of kernel memory, aligned to next page.
-    pmm_bitmap = (uint8_t*)&_sections_end;
+    pmm_bitmap = (uint8_t*)&phys_end;
     if ((size_t)&pmm_bitmap % PAGE_SIZE != 0)
     {
         pmm_bitmap += PAGE_SIZE - ((size_t)&pmm_bitmap % PAGE_SIZE);
@@ -97,8 +97,8 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
     // Minimum base address to consider a frame to be free.
     uint64_t base_min = (uint64_t)pmm_bitmap + pmm_bitmap_len;
 
-    // Verify that bitmap fits below our initial paged memory (4 MiB).
-    if (base_min >= 0x400000)
+    // Verify that bitmap fits below our initial paged memory.
+    if (base_min >= (size_t)&phys_end + 0x200000)
     {
         kernel_panic("Not enough paged memory to allocate PMM bitmap.");
     }

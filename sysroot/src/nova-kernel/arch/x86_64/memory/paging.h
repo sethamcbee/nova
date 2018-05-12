@@ -118,4 +118,4 @@ typedef struct
 void paging_init(void);
 
 // Top level paging structure.
-extern Pml4e pml4[512] __attribute__((aligned(PAGE_SIZE)));
+Pml4e *pml4 __attribute__((aligned(PAGE_SIZE)));

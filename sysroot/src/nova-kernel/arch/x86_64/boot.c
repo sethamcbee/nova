@@ -10,6 +10,7 @@
 
 #include <kernel.h>
 #include <arch/x86_64/cpu.h>
+#include <arch/x86_64/gdt.h>
 #include <arch/x86_64/multiboot2.h>
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/devices/pic.h>
@@ -38,20 +39,17 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     // Physical memory manager is initialized during this process.
     multiboot2_parse(mb_tag);
 
+    gdt_init();
     vmm_init();
-
     idt_initialize();
-
     tss_init();
 
     // Initialize PIC (disables all IRQs).
     pic_initialize();
-
-    ps2_keyboard_init();
-
-    // Enable supported IRQs.
     pic_irq_enable(IRQ_PIT);
     pic_irq_enable(IRQ_KEYBOARD);
+
+    ps2_keyboard_init();
 
     // TODO: Set up timer.
 

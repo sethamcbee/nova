@@ -7,6 +7,7 @@
 .global gdt_entry
 .global gdt_start
 .global gdt_ptr
+.global gdt_init
 
 .extern tss
 
@@ -19,7 +20,17 @@ gdt_ptr:
     .word GDT_SIZE
     .quad gdt_start         # Address of GDT
 
+# Initializes GDT.
+.text
+gdt_init:
+    push %rax
+    movq $gdt_ptr, %rax
+    lgdt (%rax)
+    pop %rax
+    ret
+
 # Define GDT.
+.data
 .align 16
 gdt_entry:
 gdt_start:

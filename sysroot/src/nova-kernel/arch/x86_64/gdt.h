@@ -46,6 +46,9 @@ typedef struct __attribute__((packed))
     uint64_t base;
 } Gdt_Ptr;
 
+// Initializes GDT.
+void gdt_init(void);
+
 // GDT structure, declared in assembly file.
 Gdt_Entry gdt_entry[GDT_ENTRY_COUNT] __attribute__((aligned(16)));
 
