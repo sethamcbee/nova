@@ -11,13 +11,6 @@
 #define PAGE_SIZE   (0x1000) // 4 KiB pages.
 #define PAGE_COUNT  512      // Entries per table.
 
-// Macros for physical address calculation.
-#define PML4_INDEX(addr)    ((((size_t)(addr)) >> 39) & 511)
-#define PDPT_INDEX(addr)    ((((size_t)(addr)) >> 30) & 511)
-#define PD_INDEX(addr)    ((((size_t)(addr)) >> 21) & 511)
-#define PT_INDEX(addr)    ((((size_t)(addr)) >> 12) & 511)
-#define PT_OFFSET(addr)    ((size_t)(addr) & 0xFFF)
-
 // Flags for mapping entries.
 #define PG_PR 0b000000001 // Present.
 #define PG_RW 0b000000010 // Write-enabled.
@@ -50,7 +43,8 @@ typedef struct __attribute__((packed))
     uint8_t ignored : 1;
     uint8_t zero_low : 1;
     uint8_t zero_high : 1;
-    uint8_t available_low : 3;
+    uint8_t exists : 1;
+    uint8_t available_low : 2;
     uint32_t dir_ptr_addr_low : 20;
     uint32_t dir_ptr_addr_high : 20;
     uint16_t available_high : 11;
@@ -69,7 +63,8 @@ typedef struct __attribute__((packed))
     uint8_t ignored_low : 1;
     uint8_t zero : 1;
     uint8_t ignored_high : 1;
-    uint8_t available_low : 3;
+    uint8_t exists : 1;
+    uint8_t available_low : 2;
     uint32_t dir_addr_low : 20;
     uint32_t dir_addr_high : 20;
     uint16_t available_high : 11;
@@ -88,7 +83,8 @@ typedef struct __attribute__((packed))
     uint8_t ignored_low : 1;
     uint8_t zero : 1;
     uint8_t ignored_high : 1;
-    uint8_t available_low : 3;
+    uint8_t exists : 1;
+    uint8_t available_low : 2;
     uint32_t table_addr_low : 20;
     uint32_t table_addr_high : 20;
     uint16_t available_high : 11;
@@ -107,15 +103,17 @@ typedef struct
     uint8_t dirty : 1;
     uint8_t attr : 1;
     uint8_t global : 1;
-    uint8_t available_low : 3;
+    uint8_t exists : 1;
+    uint8_t available_low : 2;
     uint32_t page_addr_low : 20;
     uint32_t page_addr_high : 20;
     uint16_t available_high : 11;
     uint8_t sign_extend : 1;
 } __attribute__((packed)) Pte;
 
-// Sets up initial paging structures.
-void paging_init(void);
-
-// Top level paging structure.
-Pml4e *pml4 __attribute__((aligned(PAGE_SIZE)));
+// Initial kernel paging structures.
+Pml4e pml4[512] __attribute__((aligned(PAGE_SIZE)));
+Pdpte pdpt0[512] __attribute__((aligned(PAGE_SIZE)));
+Pde pd0[512] __attribute__((aligned(PAGE_SIZE)));
+Pte pt0[512] __attribute__((aligned(PAGE_SIZE)));
+Pte pt1[512] __attribute__((aligned(PAGE_SIZE)));

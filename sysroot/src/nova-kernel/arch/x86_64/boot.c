@@ -40,8 +40,8 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     multiboot2_parse(mb_tag);
 
     gdt_init();
-    vmm_init();
     idt_initialize();
+    vmm_init();
     tss_init();
 
     // Initialize PIC (disables all IRQs).

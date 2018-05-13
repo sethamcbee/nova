@@ -6,17 +6,20 @@ OUTPUT_FORMAT(elf64-x86-64)
 ENTRY(start)
 
 BOOT_OFFSET = 0x100000;
-KERNEL_OFFSET = 0xffffffff80000000;
+KERNEL_OFFSET = 0xFFFFFFFF80000000;
 
 SECTIONS
 {
 	. = BOOT_OFFSET;
 	phys_start = .;
 
+	init_start = .;
 	.init :
 	{
+		. = ALIGN(0x1000);
 		KEEP(*(.init))
 	}
+	init_end = .;
 
 	. += KERNEL_OFFSET;
 

@@ -29,6 +29,15 @@ void kernel_main(void)
     const char user[] = "sethamcbee@nova:";
     const char dir[] = "/";
 
+    uint64_t size = 0;
+    //uint8_t *p = (uint8_t*) malloc(512);
+    //while (p != NULL)
+    //{
+    //    size += 512;
+    //    printf("Malloc'd bytes: %ld\n", size);
+    //    p = (uint8_t*) malloc(512);
+    //}
+
     // Kernel loop.
     while (1)
     {

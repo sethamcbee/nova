@@ -21,7 +21,7 @@ int liballoc_unlock(void)
 
 void* liballoc_alloc(int pages)
 {
-    return ( (void*) pmm_frame_alloc() );
+    return ( vmm_page_alloc_kernel() );
 }
 
 int liballoc_free(void* page,int pages)

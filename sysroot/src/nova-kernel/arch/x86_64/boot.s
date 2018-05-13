@@ -170,10 +170,12 @@ enter64:
     movl $0x7000, %edi            # Move to PT0.
 
     movl $00000003, %ebx # Set pages to present and writeable.
+    movl $512, %ecx
 fill_high_pt1:
     movl %ebx, (%edi)
     addl $0x1000, %ebx
     addl $8, %edi
+        loop fill_high_pt1
     movl $512, %ecx
 fill_high_pt2:
     movl %ebx, (%edi)
@@ -201,6 +203,9 @@ fill_high_pt2:
             jmp 1b
 
 .bss
+.align 16
+.global kernel_stack_bottom
+kernel_stack_bottom:
     .skip 0x2000 # 8 KiB.
 .global kernel_stack_top
 kernel_stack_top:
