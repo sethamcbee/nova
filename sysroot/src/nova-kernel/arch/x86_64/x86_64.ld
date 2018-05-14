@@ -14,26 +14,27 @@ SECTIONS
 	phys_start = .;
 
 	init_start = .;
+	. = ALIGN(0x1000);
 	.init :
 	{
-		. = ALIGN(0x1000);
 		KEEP(*(.init))
 	}
 	init_end = .;
 
 	. += KERNEL_OFFSET;
 
+	kernel_ro_start = . - KERNEL_OFFSET;
 	.text : AT(ADDR(.text) - KERNEL_OFFSET)
 	{
-		. = ALIGN(0x1000);
 		*(.text)
 	}
 
 	.rodata : AT(ADDR(.rodata) - KERNEL_OFFSET)
 	{
-		. = ALIGN(0x1000);
 		*(.rodata)
 	}
+	. = ALIGN(0x1000);
+	kernel_ro_end = . - KERNEL_OFFSET;
 
 	.data : AT(ADDR(.data) - KERNEL_OFFSET)
 	{
@@ -43,10 +44,9 @@ SECTIONS
 
 	.bss : AT(ADDR(.bss) - KERNEL_OFFSET)
 	{
-		. = ALIGN(0x1000);
 		*(COMMON)
 		*(.bss)
 	}
-
+	. = ALIGN(0x1000);
 	phys_end = . - KERNEL_OFFSET;
 }

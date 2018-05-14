@@ -13,8 +13,10 @@ static const size_t BOOT_OFFSET = 0x100000UL;
 static const size_t KERNEL_OFFSET = 0xFFFFFFFF80000000UL;
 static const size_t MEMORY_MAX = 0xFFFFFFFFFFFFFFFFUL;
 static const size_t RECURSIVE_INDEX = 510;
-extern void* phys_start;
-extern void* phys_end;
+extern void *phys_start;
+extern void *phys_end;
+extern void *kernel_ro_start;
+extern void *kernel_ro_end;
 
 // Macros for physical address calculation.
 #define PML4_INDEX(addr)    ((((size_t)(addr)) >> 39) & 511UL)

@@ -136,8 +136,9 @@ void vmm_init(void)
     pd0[1].table_addr_high = (pt1_phys >> 32) & 0xFFFFF;
     pd0[1].table_addr_low = (pt1_phys >> 12) & 0xFFFFF;
 
-    // Map kernel pages (up to 4 MiB).
-    for (size_t i = 0; i < 512; i++)
+    // Map kernel pages (from 1 MiB to 4 MiB).
+    // This will be remapped anyway after loading the new PML4.
+    for (size_t i = (0x100000 / PAGE_SIZE); i < 512; i++)
     {
         size_t page_addr = i * PAGE_SIZE;
         pt0[i].present = 1;
@@ -172,8 +173,13 @@ void vmm_init(void)
         vmm_page_map((void*)addr, (void*)addr, PG_PR | PG_RW);
     }
 
-    // Remap kernel memory.
-    for (size_t addr = 0x200000; addr < 0x400000; addr += PAGE_SIZE)
+    // Remap kernel code and rodata.
+    for (size_t addr = (size_t)&kernel_ro_start; addr < (size_t)&kernel_ro_end; addr += PAGE_SIZE)
+    {
+        vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR);
+    }
+    // Remap kernel data and bss.
+    for (size_t addr = (size_t)&kernel_ro_end; addr < (size_t)&phys_end; addr += PAGE_SIZE)
     {
         vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR | PG_RW);
     }
@@ -258,8 +264,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
 
         // Set relevant flags.
         tmp_pml4e.present = 1;
-        if (BIT_CHECK(flags, PG_RW_BIT))
-            tmp_pml4e.write_enabled = 1;
+        tmp_pml4e.write_enabled = 1;
         if (BIT_CHECK(flags, PG_U_BIT))
             tmp_pml4e.user = 1;
         if (BIT_CHECK(flags, PG_WT_BIT))
@@ -287,8 +292,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
 
         // Set relevant flags.
         tmp_pdpte.present = 1;
-        if (BIT_CHECK(flags, PG_RW_BIT))
-            tmp_pdpte.write_enabled = 1;
+        tmp_pdpte.write_enabled = 1;
         if (BIT_CHECK(flags, PG_U_BIT))
             tmp_pdpte.user = 1;
         if (BIT_CHECK(flags, PG_WT_BIT))
@@ -316,8 +320,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
 
         // Set relevant flags.
         tmp_pde.present = 1;
-        if (BIT_CHECK(flags, PG_RW_BIT))
-            tmp_pde.write_enabled = 1;
+        tmp_pde.write_enabled = 1;
         if (BIT_CHECK(flags, PG_U_BIT))
             tmp_pde.user = 1;
         if (BIT_CHECK(flags, PG_WT_BIT))
@@ -432,4 +435,3 @@ void* vmm_page_alloc_kernel(void)
     // Else.
     return (NULL);
 }
-
