@@ -15,9 +15,174 @@
 
 extern void* pml4_start;
 
+static Pml4e* vmm_pml4(void)
+{
+    uint64_t addr = (RECURSIVE_INDEX << 39);
+
+    if ((addr & (111UL << 47)) > 0)
+    {
+        // Sign extend.
+        addr |= 0xFFFF000000000000UL;
+    }
+
+    addr |= RECURSIVE_INDEX << 30;
+    addr |= RECURSIVE_INDEX << 21;
+    addr |= RECURSIVE_INDEX << 12;
+
+    Pml4e *pml4 = (Pml4e*)addr;
+    return (pml4);
+}
+
+static Pdpte* vmm_pdpt(uint64_t pml4_i)
+{
+    uint64_t addr = (RECURSIVE_INDEX << 39);
+
+    if ((addr & (111UL << 47)) > 0)
+    {
+        // Sign extend.
+        addr |= 0xFFFF000000000000UL;
+    }
+
+    addr |= RECURSIVE_INDEX << 30;
+    addr |= RECURSIVE_INDEX << 21;
+    addr |= pml4_i << 12;
+
+    Pdpte *pdpt = (Pdpte*)addr;
+    return (pdpt);
+}
+
+static Pde* vmm_pd(uint64_t pml4_i, uint64_t pdpt_i)
+{
+    uint64_t addr = (RECURSIVE_INDEX << 39);
+
+    if ((addr & (111UL << 47)) > 0)
+    {
+        // Sign extend.
+        addr |= 0xFFFF000000000000UL;
+    }
+
+    addr |= RECURSIVE_INDEX << 30;
+    addr |= pml4_i << 21;
+    addr |= pdpt_i << 12;
+
+    Pde *pd = (Pde*)addr;
+    return (pd);
+}
+
+static Pte* vmm_pt(uint64_t pml4_i, uint64_t pdpt_i, uint64_t pd_i)
+{
+    uint64_t addr = (RECURSIVE_INDEX << 39);
+
+    if ((addr & (111UL << 47)) > 0)
+    {
+        // Sign extend.
+        addr |= 0xFFFF000000000000UL;
+    }
+
+    addr |= pml4_i << 30;
+    addr |= pdpt_i << 21;
+    addr |= pd_i << 12;
+
+    Pte *pt = (Pte*)addr;
+    return (pt);
+}
+
+static void vmm_flush(void)
+{
+    size_t pml4_phys = (size_t)&pml40 - KERNEL_OFFSET;
+
+    // Reload PML4.
+    asm volatile
+    (
+        "movq %0, %%cr3 \n"
+        :
+        : "a" ((size_t) pml4_phys) // Physical address of the PML4.
+        :
+    );
+}
+
+void vmm_init(void)
+{
+    size_t KERNEL_PML4 = ((KERNEL_OFFSET >> 39) & 511);
+    size_t KERNEL_PDPT = ((KERNEL_OFFSET >> 30) & 511);
+
+    // Physical addresses of tables.
+    size_t pml4_phys = (size_t)&pml40 - KERNEL_OFFSET;
+    size_t pdpt0_phys = (size_t)&pdpt0 - KERNEL_OFFSET;
+    size_t pd0_phys = (size_t)&pd0 - KERNEL_OFFSET;
+    size_t pt0_phys = (size_t)&pt0 - KERNEL_OFFSET;
+    size_t pt1_phys = (size_t)&pt1 - KERNEL_OFFSET;
+
+    // Set up higher level paging structures.
+    memset((void*)pml40, 0, PAGE_SIZE);
+    memset((void*)pdpt0, 0, PAGE_SIZE);
+    memset((void*)pd0, 0, PAGE_SIZE);
+    memset((void*)pt0, 0, PAGE_SIZE);
+    memset((void*)pt1, 0, PAGE_SIZE);
+    pml40[KERNEL_PML4].present = 1;
+    pml40[KERNEL_PML4].write_enabled = 1;
+    pml40[KERNEL_PML4].dir_ptr_addr_high = (pdpt0_phys >> 32) & 0xFFFFF;
+    pml40[KERNEL_PML4].dir_ptr_addr_low = (pdpt0_phys >> 12) & 0xFFFFF;
+    pdpt0[KERNEL_PDPT].present = 1;
+    pdpt0[KERNEL_PDPT].write_enabled = 1;
+    pdpt0[KERNEL_PDPT].dir_addr_high = (pd0_phys >> 32) & 0xFFFFF;
+    pdpt0[KERNEL_PDPT].dir_addr_low = (pd0_phys >> 12) & 0xFFFFF;
+    pd0[0].present = 1;
+    pd0[0].write_enabled = 1;
+    pd0[0].table_addr_high = (pt0_phys >> 32) & 0xFFFFF;
+    pd0[0].table_addr_low = (pt0_phys >> 12) & 0xFFFFF;
+    pd0[1].present = 1;
+    pd0[1].write_enabled = 1;
+    pd0[1].table_addr_high = (pt1_phys >> 32) & 0xFFFFF;
+    pd0[1].table_addr_low = (pt1_phys >> 12) & 0xFFFFF;
+
+    // Map kernel pages (up to 4 MiB).
+    for (size_t i = 0; i < 512; i++)
+    {
+        size_t page_addr = i * PAGE_SIZE;
+        pt0[i].present = 1;
+        pt0[i].write_enabled = 1;
+        pt0[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
+        pt0[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
+    }
+    for (size_t i = 0; i < 512; i++)
+    {
+        size_t page_addr = i * PAGE_SIZE + 0x200000;
+        pt1[i].present = 1;
+        pt1[i].write_enabled = 1;
+        pt1[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
+        pt1[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
+    }
+
+    // Set up recursive mapping.
+    pml40[RECURSIVE_INDEX].present = 1;
+    pml40[RECURSIVE_INDEX].write_enabled = 1;
+    pml40[RECURSIVE_INDEX].dir_ptr_addr_high = (pml4_phys >> 32) & 0xFFFFF;
+    pml40[RECURSIVE_INDEX].dir_ptr_addr_low = (pml4_phys >> 12) & 0xFFFFF;
+
+    // Reload PML4.
+    vmm_flush();
+
+    // Re-initialize physical memory manager.
+    pmm_bitmap = pmm_bitmap + KERNEL_OFFSET;
+
+    // Identity map lowest 1 MiB, except the first page.
+    for (size_t addr = PAGE_SIZE; addr < 0x100000; addr += PAGE_SIZE)
+    {
+        vmm_page_map((void*)addr, (void*)addr, PG_PR | PG_RW);
+    }
+
+    // Remap kernel memory.
+    for (size_t addr = 0x200000; addr < 0x400000; addr += PAGE_SIZE)
+    {
+        vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR | PG_RW);
+    }
+}
+
 void* vmm_phys_addr(void* virt)
 {
     size_t virt_addr = (size_t)virt;
+    Pml4e *pml4;
     Pdpte *pdpt;
     Pde *pd;
     Pte *pt;
@@ -30,27 +195,28 @@ void* vmm_phys_addr(void* virt)
     uint16_t offset = PT_OFFSET(virt_addr);
 
     // Check for valid PML4 entry.
+    pml4 = vmm_pml4();
     if (pml4[pml4_i].present == 0)
     {
         return (NULL);
     }
 
-    // Find PDPT.
-    pdpt = (Pdpte*)(PDPT_BASE + 0x1000*pml4_i);
+    // Check for valid PDPT entry.
+    pdpt = vmm_pdpt(pml4_i);
     if (pdpt[pdpt_i].present == 0)
     {
         return (NULL);
     }
 
-    // Find PD.
-    pd = (Pde*)(PD_BASE + 0x1000*pdpt_i + 0x200000*pml4_i);
+    // Check for valid PD entry.
+    pd = vmm_pd(pml4_i, pdpt_i);
     if (pd[pd_i].present == 0)
     {
         return (NULL);
     }
 
-    // Find PT.
-    pt = (Pte*)(PT_BASE + 0x1000*pd_i + 0x200000*pdpt_i + 0x40000000*pml4_i);
+    // Check for valid PT entry.
+    pt = vmm_pt(pml4_i, pdpt_i, pd_i);
     if (pt[pt_i].present == 0)
     {
         return (NULL);
@@ -64,89 +230,12 @@ void* vmm_phys_addr(void* virt)
     return ((void*) phys_addr);
 }
 
-void vmm_init(void)
-{
-    size_t KERNEL_PML4 = ((KERNEL_OFFSET >> 39) & 511);
-    size_t KERNEL_PDPT = ((KERNEL_OFFSET >> 30) & 511);
-
-    // Physical addresses of tables.
-    size_t pml4_phys = (size_t)&pml4 - KERNEL_OFFSET;
-    size_t pdpt0_phys = (size_t)&pdpt0 - KERNEL_OFFSET;
-    size_t pd0_phys = (size_t)&pd0 - KERNEL_OFFSET;
-    size_t pt0_phys = (size_t)&pt0 - KERNEL_OFFSET;
-    size_t pt1_phys = (size_t)&pt1 - KERNEL_OFFSET;
-
-    // Set up higher level paging structures.
-    memset((void*)pml4, 0, PAGE_SIZE);
-    memset((void*)pdpt0, 0, PAGE_SIZE);
-    memset((void*)pd0, 0, PAGE_SIZE);
-    memset((void*)pt0, 0, PAGE_SIZE);
-    memset((void*)pt1, 0, PAGE_SIZE);
-    pml4[KERNEL_PML4].present = 1;
-    pml4[KERNEL_PML4].write_enabled = 1;
-    pml4[KERNEL_PML4].dir_ptr_addr_high = pdpt0_phys >> 32;
-    pml4[KERNEL_PML4].dir_ptr_addr_low = pdpt0_phys >> 12;
-    pdpt0[KERNEL_PDPT].present = 1;
-    pdpt0[KERNEL_PDPT].write_enabled = 1;
-    pdpt0[KERNEL_PDPT].dir_addr_high = pd0_phys >> 32;
-    pdpt0[KERNEL_PDPT].dir_addr_low = pd0_phys >> 12;
-    pd0[0].present = 1;
-    pd0[0].write_enabled = 1;
-    pd0[0].table_addr_high = pt0_phys >> 32;
-    pd0[0].table_addr_low = pt0_phys >> 12;
-    pd0[1].present = 1;
-    pd0[1].write_enabled = 1;
-    pd0[1].table_addr_high = pt1_phys >> 32;
-    pd0[1].table_addr_low = pt1_phys >> 12;
-
-    // Map kernel pages (up to 4 MiB).
-    for (size_t i = 0; i < 512; i++)
-    {
-        size_t page_addr = i * PAGE_SIZE;
-        pt0[i].present = 1;
-        pt0[i].write_enabled = 1;
-        pt0[i].page_addr_high = page_addr >> 32;
-        pt0[i].page_addr_low = page_addr >> 12;
-    }
-    for (size_t i = 0; i < 512; i++)
-    {
-        size_t page_addr = i * PAGE_SIZE + 0x200000;
-        pt1[i].present = 1;
-        pt1[i].write_enabled = 1;
-        pt1[i].page_addr_high = page_addr >> 32;
-        pt1[i].page_addr_low = page_addr >> 12;
-    }
-
-    // Set up recursive mapping.
-    pml4[RECURSIVE_INDEX].present = 1;
-    pml4[RECURSIVE_INDEX].write_enabled = 1;
-    pml4[RECURSIVE_INDEX].dir_ptr_addr_high = pml4_phys >> 32;
-    pml4[RECURSIVE_INDEX].dir_ptr_addr_low = pml4_phys >> 12;
-
-    // Reload PML4.
-    asm volatile
-    (
-        "movq %0, %%cr3 \n"
-        :
-        : "a" ((size_t) pml4_phys) // Physical address of the PML4.
-        :
-    );
-
-    // Re-initialize physical memory manager.
-    pmm_bitmap = pmm_bitmap + KERNEL_OFFSET;
-
-    // Identity map lowest 1 MiB.
-    for (size_t addr = 0; addr < 0x100000; addr += PAGE_SIZE)
-    {
-        vmm_page_map((void*)addr, (void*)addr, PG_PR | PG_RW);
-    }
-}
-
 void vmm_page_map(void* phys, void* virt, uint16_t flags)
 {
     size_t phys_addr = (size_t)phys;
     size_t virt_addr = (size_t)virt;
     size_t tmp_addr;
+    Pml4e *pml4;
     Pdpte *pdpt;
     Pde *pd;
     Pte *pt;
@@ -161,7 +250,8 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     uint16_t pd_i = PD_INDEX(virt_addr);
     uint16_t pt_i = PT_INDEX(virt_addr);
 
-    // Check if PML4 entry does not exist.
+    // Check PML4 entry.
+    pml4 = vmm_pml4();
     if (pml4[pml4_i].present == 0)
     {
         Pml4e tmp_pml4e = {0};
@@ -182,19 +272,15 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
 
         // Make new PDPT.
         tmp_addr = (size_t) pmm_frame_alloc();
-        pml4[pml4_i].dir_ptr_addr_high = (tmp_addr >> 32) & 0xFFFFF;
-        pml4[pml4_i].dir_ptr_addr_low = (tmp_addr >> 12) & 0xFFFFF;
-        tmp_addr = PDPT_BASE + 0x1000*pml4_i;
+        pml4[pml4_i].dir_ptr_addr_high = (tmp_addr >> 32) & 0xFFFF;
+        pml4[pml4_i].dir_ptr_addr_low = (tmp_addr >> 12) & 0xFFFF;
+        vmm_flush();
+        tmp_addr = (size_t) vmm_pdpt(pml4_i);
         memset((void*)tmp_addr, 0, PAGE_SIZE);
-        pdpt = (Pdpte*)tmp_addr;
-    }
-    else
-    {
-        tmp_addr = PDPT_BASE + 0x1000*pml4_i;
-        pdpt = (Pdpte*)tmp_addr;
     }
 
-    // Check if PDPT entry does not exist.
+    // Check PDPT entry.
+    pdpt = vmm_pdpt(pml4_i);
     if (pdpt[pdpt_i].present == 0)
     {
         Pdpte tmp_pdpte = {0};
@@ -211,23 +297,19 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
             tmp_pdpte.cache_disabled = 1;
         if (BIT_CHECK(flags, PG_AC_BIT))
             tmp_pdpte.accessed = 1;
-        pdpt[pd_i] = tmp_pdpte;
+        pdpt[pdpt_i] = tmp_pdpte;
 
         // Make new PD.
         tmp_addr = (size_t) pmm_frame_alloc();
-        pdpt[pdpt_i].dir_addr_high = (tmp_addr >> 32) & 0xFFFFF;
-        pdpt[pdpt_i].dir_addr_low = (tmp_addr >> 12) & 0xFFFFF;
-        tmp_addr = PD_BASE + 0x1000*pdpt_i + 0x200000*pml4_i;
+        pdpt[pdpt_i].dir_addr_high = (tmp_addr >> 32) & 0xFFFF;
+        pdpt[pdpt_i].dir_addr_low = (tmp_addr >> 12) & 0xFFFF;
+        vmm_flush();
+        tmp_addr = (size_t) vmm_pd(pml4_i, pdpt_i);
         memset((void*)tmp_addr, 0, PAGE_SIZE);
-        pd = (Pde*)tmp_addr;
-    }
-    else
-    {
-        tmp_addr = PD_BASE + 0x1000*pdpt_i + 0x200000*pml4_i;
-        pd = (Pde*)tmp_addr;
     }
 
-    // Check if PD entry does not exist.
+    // Check PD entry.
+    pd = vmm_pd(pml4_i, pdpt_i);
     if (pd[pd_i].present == 0)
     {
         Pde tmp_pde = {0};
@@ -250,17 +332,13 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
         tmp_addr = (size_t) pmm_frame_alloc();
         pd[pd_i].table_addr_high = (tmp_addr >> 32) & 0xFFFFF;
         pd[pd_i].table_addr_low = (tmp_addr >> 12) & 0xFFFFF;
-        tmp_addr = PT_BASE + 0x1000*pd_i + 0x200000*pdpt_i + 0x40000000*pml4_i;
+        vmm_flush();
+        tmp_addr = (size_t) vmm_pt(pml4_i, pdpt_i, pd_i);
         memset((void*)tmp_addr, 0, PAGE_SIZE);
-        pt = (Pte*)tmp_addr;
-    }
-    else
-    {
-        tmp_addr = PT_BASE + 0x1000*pd_i + 0x200000*pdpt_i + 0x40000000*pml4_i;
-        pt = (Pte*)tmp_addr;
     }
 
-    // Modify PT entry.
+    // Make PT entry.
+    pt = vmm_pt(pml4_i, pdpt_i, pd_i);
     Pte tmp_pte = {0};
     if (BIT_CHECK(flags, PG_PR_BIT))
         tmp_pte.present = 1;
@@ -283,6 +361,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     tmp_pte.page_addr_high = (phys_addr >> 32) & 0xFFFFF;
     tmp_pte.page_addr_low = (phys_addr >> 12) & 0xFFFFF;
     pt[pt_i] = tmp_pte;
+    vmm_flush();
 }
 
 void vmm_page_unmap(void *virt)
@@ -294,12 +373,13 @@ void vmm_page_unmap(void *virt)
     virt_addr &= ~0xFFF;
 
     // Calculate table entries.
+    uint16_t pml4_i = PML4_INDEX(virt_addr);
     uint16_t pdpt_i = PDPT_INDEX(virt_addr);
     uint16_t pd_i = PD_INDEX(virt_addr);
     uint16_t pt_i = PT_INDEX(virt_addr);
 
-    pt = (Pte*)(PT_BASE + 0x1000*pt_i + 0x200000*pd_i + 0x40000000*pdpt_i);
-    pt->present = 0;
+    pt = vmm_pt(pml4_i, pdpt_i, pd_i);
+    pt[pt_i].present = 0;
 }
 
 void vmm_table_flags(void* entry, uint16_t flags)
