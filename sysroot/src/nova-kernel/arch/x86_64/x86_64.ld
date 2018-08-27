@@ -23,6 +23,7 @@ SECTIONS
 
 	. += KERNEL_OFFSET;
 
+	kernel_start = .;
 	kernel_ro_start = . - KERNEL_OFFSET;
 	.text : AT(ADDR(.text) - KERNEL_OFFSET)
 	{
@@ -48,5 +49,6 @@ SECTIONS
 		*(.bss)
 	}
 	. = ALIGN(0x1000);
+	kernel_end = .;
 	phys_end = . - KERNEL_OFFSET;
 }

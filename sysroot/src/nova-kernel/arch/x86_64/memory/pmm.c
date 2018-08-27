@@ -15,7 +15,7 @@
 #include <arch/x86_64/memory/pmm.h>
 
 // Defined in linker script.
-extern void* phys_end;
+extern void *phys_end;
 
 void pmm_init(struct multiboot_tag_mmap *mb_mmap)
 {
