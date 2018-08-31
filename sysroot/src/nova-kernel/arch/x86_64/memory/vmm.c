@@ -14,6 +14,7 @@
 #include <arch/x86_64/memory/vmm.h>
 
 extern void* pml4_start;
+extern void* kernel_end;
 
 static Pml4e* vmm_pml4(void)
 {
@@ -367,7 +368,7 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     vmm_flush();
 }
 
-void vmm_page_unmap(void *virt)
+void vmm_page_unmap(void* virt)
 {
     Pte *pt;
     size_t virt_addr = (size_t)virt;
@@ -381,6 +382,7 @@ void vmm_page_unmap(void *virt)
     uint16_t pd_i = PD_INDEX(virt_addr);
     uint16_t pt_i = PT_INDEX(virt_addr);
 
+    // Mark the page as not present.
     pt = vmm_pt(pml4_i, pdpt_i, pd_i);
     pt[pt_i].present = 0;
 }
@@ -419,19 +421,33 @@ void vmm_table_flags(void* entry, uint16_t flags)
 void* vmm_page_alloc_kernel(void)
 {
     // Search kernel memory for a free page.
-    for (size_t virt = KERNEL_OFFSET; virt < MEMORY_MAX; virt += PAGE_SIZE)
+    for (size_t virt = (size_t)&kernel_end; virt < MEMORY_MAX; virt += PAGE_SIZE)
     {
         // If free page is found.
         if (vmm_phys_addr((void*) virt) == NULL)
         {
             // Allocate frame for this page.
-            void *frame = (void*) pmm_frame_alloc();
+            void* frame = (void*) pmm_frame_alloc();
             vmm_page_map(frame, (void*)virt, PG_PR | PG_RW);
 
-            return ( (void*)virt );
+            void* ret = (void*)virt;
+
+            return (ret);
         }
     }
 
     // Else.
     return (NULL);
+}
+
+void vmm_page_free_kernel(void* virt)
+{
+    void* phys = vmm_phys_addr(virt);
+
+    // Check that the virtual address exists.
+    if (phys != NULL)
+    {
+        vmm_page_unmap(virt);
+        pmm_frame_free(phys);
+    }
 }

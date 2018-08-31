@@ -98,6 +98,11 @@ int rungetc(int c, FILE *stream)
 
 void stdio_init(void)
 {
+    // STUB: This currently sets up fake FILEs for use if no TTY
+    // is available or ready for STDIO use.
+
+#if 0
+
     // Set up stdin.
     stdin_file.buf = stdin_buf;
     stdin_file.pos = 0;
@@ -127,6 +132,8 @@ void stdio_init(void)
     stderr_file.io_mode = _IOO;
     stderr_file.write = write_null;
     stderr = &stderr_file;
+
+#endif // if 0
 }
 
 int fflush(FILE *stream)

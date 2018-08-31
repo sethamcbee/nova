@@ -43,3 +43,7 @@ void vmm_table_flags(void *virt, uint16_t flags);
 // Allocate and map a page for kernel use. Return virtual address,
 // or NULL.
 void* vmm_page_alloc_kernel(void);
+
+// Frees a page that was used by the kernel. This unmaps the page, as
+// well as marking it as free in the PMM.
+void vmm_page_free_kernel(void *virt);

@@ -15,6 +15,7 @@
 #include <drivers/input/ps2_keyboard.h>
 #include <hal/tty.h>
 
+#include <arch/x86_64/memory/vmm.h>
 #include <arch/x86_64/tss.h>
 
 void kernel_main(void)
@@ -22,21 +23,13 @@ void kernel_main(void)
     // Initialize STDIO.
     stdio_init();
     tty_init();
-    stdout = tty_outs;
     stdin = tty_ins;
+    stdout = tty_outs;
+    stderr = tty_outs;
 
     char s[10000];
     const char user[] = "sethamcbee@nova:";
     const char dir[] = "/";
-
-    uint64_t size = 0;
-    //uint8_t *p = (uint8_t*) malloc(512);
-    //while (p != NULL)
-    //{
-    //    size += 512;
-    //    printf("Malloc'd bytes: %ld\n", size);
-    //    p = (uint8_t*) malloc(512);
-    //}
 
     // Kernel loop.
     while (1)
@@ -55,23 +48,24 @@ void kernel_main(void)
             addr = (size_t) vmm_phys_addr((void*) addr);
             printf("p addr: %ld\n", addr);
         }
-        if (strcmp(s, "malloc") == 0)
-        {
-            int bytes;
-            char *mem;
-            printf("Bytes: ");
-            scanf("%d", &bytes);
-            mem = (char*) malloc(bytes);
-            for (size_t i = 0; i < bytes; i++)
-                mem[i] = 255;
-            printf("Addr: %ld\n", (long)mem);
-        }
         if (strcmp(s, "free") == 0)
         {
-            char *mem;
-            printf("Addr: ");
-            scanf("%ld", &mem);
-            free(mem);
+            size_t addr;
+            printf("v addr: ");
+            scanf("%ld", &addr);
+            vmm_page_free_kernel(addr);
+            addr = (size_t) vmm_phys_addr((void*) addr);
+            printf("p addr: %ld\n", addr);
+        }
+        if (strcmp(s, "get") == 0)
+        {
+            void* addr;
+            addr = vmm_page_alloc_kernel();
+            printf("v addr: %ld\n", addr);
+            *((char*)addr) = 100; // test write
+
+            addr = vmm_phys_addr(addr);
+            printf("p addr: %ld\n", addr);
         }
     }
 

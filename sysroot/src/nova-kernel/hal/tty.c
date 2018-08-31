@@ -38,7 +38,10 @@ static ssize_t tty_read(void *s, size_t n)
     size_t len;
 
     // Flush stdout if the input stream is stdin.
-    fflush(stdout);
+    if (tty_ins == stdin)
+    {
+        fflush(stdout);
+    }
 
     // Check if the stream still holds data.
     if (tty_ins->len > 0)
