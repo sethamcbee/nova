@@ -26,24 +26,28 @@ extern void *kernel_ro_end;
 #define PT_OFFSET(addr)    ((size_t)(addr) & 0xFFFUL)
 
 // Convert virtual address to physical address.
-void* vmm_phys_addr(void *virt);
+void* vmm_phys_addr(void* virt);
 
 // Initializes virtual memory manager.
 void vmm_init(void);
 
 // Map a physical page to a virtual address.
-void vmm_page_map(void *phys, void *virt, uint16_t flags);
+void vmm_page_map(void* phys, void* virt, uint16_t flags);
 
 // Unmap a page.
-void vmm_page_unmap(void *virt);
+void vmm_page_unmap(void* virt);
 
 // Set flags for entry.
-void vmm_table_flags(void *virt, uint16_t flags);
+void vmm_table_flags(void* virt, uint16_t flags);
 
 // Allocate and map a page for kernel use. Return virtual address,
 // or NULL.
 void* vmm_page_alloc_kernel(void);
 
+// Allocate and map consecutive pages for kernel use. Return virtual
+// address of first page, or NULL.
+void* vmm_pages_alloc_kernel(size_t n);
+
 // Frees a page that was used by the kernel. This unmaps the page, as
 // well as marking it as free in the PMM.
-void vmm_page_free_kernel(void *virt);
+void vmm_page_free_kernel(void* virt);

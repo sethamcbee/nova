@@ -13,6 +13,7 @@
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
+#include <liballoc/liballoc.h>
 #include <hal/tty.h>
 
 #include <arch/x86_64/memory/vmm.h>
@@ -40,32 +41,8 @@ void kernel_main(void)
         // Get user input.
         scanf("%s", s);
 
-        if (strcmp(s, "vmm") == 0)
+        if (strcmp(s, "test") == 0)
         {
-            size_t addr;
-            printf("v addr: ");
-            scanf("%ld", &addr);
-            addr = (size_t) vmm_phys_addr((void*) addr);
-            printf("p addr: %ld\n", addr);
-        }
-        if (strcmp(s, "free") == 0)
-        {
-            size_t addr;
-            printf("v addr: ");
-            scanf("%ld", &addr);
-            vmm_page_free_kernel(addr);
-            addr = (size_t) vmm_phys_addr((void*) addr);
-            printf("p addr: %ld\n", addr);
-        }
-        if (strcmp(s, "get") == 0)
-        {
-            void* addr;
-            addr = vmm_page_alloc_kernel();
-            printf("v addr: %ld\n", addr);
-            *((char*)addr) = 100; // test write
-
-            addr = vmm_phys_addr(addr);
-            printf("p addr: %ld\n", addr);
         }
     }
 
@@ -119,14 +96,14 @@ int kernel_log(const char *s)
 __attribute__((noreturn))
 void kernel_halt(void)
 {
-    #if defined(ARCH_X86_64) || defined(ARCH_X86)
-        // Disable interrupts and halt.
-        asm volatile
-        (
-            "cli \n"
-            "hlt \n"
-        );
-    #endif
+#if defined(ARCH_X86_64) || defined(ARCH_X86)
+    // Disable interrupts and halt.
+    asm volatile
+    (
+        "cli \n"
+        "hlt \n"
+    );
+#endif
 
     while (1)
     {

@@ -2,8 +2,10 @@
 // Created: 2018-5-11
 // Description: Liballoc dependencies.
 
-#include <arch/x86_64/memory/pmm.h>
 #include <liballoc/liballoc.h>
+
+#include <arch/x86_64/memory/paging.h>
+#include <arch/x86_64/memory/vmm.h>
 
 // STUB.
 
@@ -21,11 +23,20 @@ int liballoc_unlock(void)
 
 void* liballoc_alloc(int pages)
 {
-    return ( vmm_page_alloc_kernel() );
+    if (pages == 0)
+        return (NULL);
+
+    return ( vmm_pages_alloc_kernel(pages) );
 }
 
 int liballoc_free(void* page,int pages)
 {
-    pmm_frame_free(page);
+    while (pages > 0)
+    {
+        vmm_page_free_kernel(page);
+        page += PAGE_SIZE;
+        pages--;
+    }
+
     return (0);
 }

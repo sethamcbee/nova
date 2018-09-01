@@ -427,7 +427,7 @@ void* vmm_page_alloc_kernel(void)
         if (vmm_phys_addr((void*) virt) == NULL)
         {
             // Allocate frame for this page.
-            void* frame = (void*) pmm_frame_alloc();
+            void* frame = pmm_frame_alloc();
             vmm_page_map(frame, (void*)virt, PG_PR | PG_RW);
 
             void* ret = (void*)virt;
@@ -437,6 +437,49 @@ void* vmm_page_alloc_kernel(void)
     }
 
     // Else.
+    return (NULL);
+}
+
+void* vmm_pages_alloc_kernel(size_t n)
+{
+    // Number of consecutive pages found so far.
+    size_t count = 0;
+    size_t start = (size_t)&kernel_end;
+
+    // Search kernel memory for free pages.
+    for (size_t virt = (size_t)&kernel_end; virt < MEMORY_MAX; virt += PAGE_SIZE)
+    {
+        // If this page is free.
+        if (vmm_phys_addr((void*) virt) == NULL)
+        {
+            count++;
+
+            // If target number of pages found.
+            if (count == n)
+            {
+                // Allocate frames and map these pages.
+                virt = start;
+                while (count > 0)
+                {
+                    void* frame = pmm_frame_alloc();
+                    vmm_page_map(frame, (void*)virt, PG_PR | PG_RW);
+                    count--;
+                    virt += PAGE_SIZE;
+                }
+
+                // Return pointer to first page.
+                void* ret = (void*)start;
+                return (ret);
+            }
+        }
+        else // Reset counter if we find a non-free page.
+        {
+            count = 0;
+            start = virt + PAGE_SIZE;
+        }
+    }
+
+    // If no pages are found.
     return (NULL);
 }
 
