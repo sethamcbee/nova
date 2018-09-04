@@ -165,6 +165,7 @@ void* pmm_frame_alloc(void)
     }
 
     // Find first empty page.
+    // TODO: Optimize this search.
     for (size_t byte = 0; byte < pmm_bitmap_len; byte++)
     {
         // Check if byte contains an empty page.
@@ -186,6 +187,10 @@ void* pmm_frame_alloc(void)
             }
         }
     }
+
+    // Since we don't currently support swapping or adequate signaling,
+    // just panic if we don't find a free frame.
+    kernel_panic("Out Of Memory: PMM could not find an available frame.");
 
     // Else (this should never be reached).
     return (NULL);
