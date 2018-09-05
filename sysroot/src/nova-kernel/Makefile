@@ -92,6 +92,11 @@ endif
 ifeq ($(STACK_GUARD), true)
 	DEFINES+=STACK_GUARD
 endif
+ifeq ($(DEBUG), true)
+	DEFINES+=DEBUG
+else
+	DEFINES+=NDEBUG
+endif
 
 # add prefix to defines
 DEFINES:=$(addprefix -D, $(DEFINES))

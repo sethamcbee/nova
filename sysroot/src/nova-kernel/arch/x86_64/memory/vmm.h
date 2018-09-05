@@ -8,6 +8,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <arch/x86_64/memory/paging.h>
+
 // Virtual address space constants.
 static const size_t BOOT_OFFSET = 0x100000UL;
 static const size_t KERNEL_OFFSET = 0xFFFFFFFF80000000UL;

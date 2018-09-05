@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,6 +28,7 @@ void userf(void)
 
     while (1)
     {
+        // Get user input.
         scanf("%s", s);
 
         if (strcmp(s, "sys") == 0)
@@ -105,7 +107,8 @@ int kernel_print(const char *s)
 
         if (len == max_len)
         {
-            kernel_print("!!kernel_print timeout!!");
+            kernel_write(s, len - 1);
+            kernel_print("\n!!kernel_print timeout!!\n");
             return (-1);
         }
     }
