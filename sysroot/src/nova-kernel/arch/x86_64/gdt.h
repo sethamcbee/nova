@@ -17,6 +17,8 @@
 #define GDT_USER_DATA       0x20
 #define GDT_TSS             0x28
 #define GDT_ENTRY_COUNT     6
+// Replace 0x?0 with 0x?3 for ring 3.
+// Replace 0x?8 with 0x?B for ring 3.
 
 // GDT entry structure.
 typedef struct __attribute__((packed))

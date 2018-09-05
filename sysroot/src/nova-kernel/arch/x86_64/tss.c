@@ -26,7 +26,7 @@ void tss_init(void)
     tss_descriptor->dc = 0;
     tss_descriptor->ex = 1;
     tss_descriptor->reserved_0 = 0;
-    tss_descriptor->privilege = 0;
+    tss_descriptor->privilege = 3;
     tss_descriptor->present = 1;
     tss_descriptor->limit_1 = 0xF & (tss_size >> 16);
     tss_descriptor->reserved_1 = 1;

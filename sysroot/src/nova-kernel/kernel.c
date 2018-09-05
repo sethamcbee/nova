@@ -19,6 +19,15 @@
 #include <arch/x86_64/memory/vmm.h>
 #include <arch/x86_64/tss.h>
 
+char user_stack[0x1000];
+
+void userf(void)
+{
+    printf("We did it!\n");
+
+    asm volatile ("int $0x10 \n");
+}
+
 void kernel_main(void)
 {
     // Initialize STDIO.
@@ -43,6 +52,40 @@ void kernel_main(void)
 
         if (strcmp(s, "test") == 0)
         {
+
+            // Set up TSS.
+            asm volatile
+            (
+                "movq %%rsp, %0\n"
+                : "=a" (tss.rsp0)
+                :
+                :
+            );
+
+            tss.rsp2 = &user_stack + 4000 + KERNEL_OFFSET;
+
+            // Jump to ring 3.
+            asm volatile
+            (
+                "movw $0x23, %%ax \n"  // Load segment regs.
+                "movw %%ax, %%ds \n"
+                "movw %%ax, %%es \n"
+                "movw %%ax, %%fs \n"
+                "movw %%ax, %%gs \n"
+                "pushq $0x23 \n"  // User data selector.
+                "pushq $(user_stack + 4000) \n"  // User stack.
+                "pushfq \n"
+                "pushq $0x1B \n"   // User code selector.
+                "pushq $userf \n"  // RIP to load.
+                "iretq \n"
+                "retloc: \n"
+                :
+                :
+                :
+            );
+
+            // Test.
+            printf("We're back from usermode.\n");
         }
     }
 

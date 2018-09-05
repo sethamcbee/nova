@@ -137,6 +137,12 @@ void vmm_init(void)
     pd0[1].table_addr_high = (pt1_phys >> 32) & 0xFFFFF;
     pd0[1].table_addr_low = (pt1_phys >> 12) & 0xFFFFF;
 
+    // TEST
+    pml40[KERNEL_PML4].user = 1;
+    pdpt0[KERNEL_PDPT].user = 1;
+    pd0[0].user = 1;
+    pd0[1].user = 1;
+
     // Map kernel pages (from 1 MiB to 4 MiB).
     // This will be remapped anyway after loading the new PML4.
     for (size_t i = (0x100000 / PAGE_SIZE); i < 512; i++)
@@ -146,6 +152,9 @@ void vmm_init(void)
         pt0[i].write_enabled = 1;
         pt0[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         pt0[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
+
+        //TEST
+        //pt0[i].user = 1;
     }
     for (size_t i = 0; i < 512; i++)
     {
@@ -154,6 +163,9 @@ void vmm_init(void)
         pt1[i].write_enabled = 1;
         pt1[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         pt1[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
+
+        //TEST
+        //pt0[i].user = 1;
     }
 
     // Set up recursive mapping.
@@ -161,6 +173,8 @@ void vmm_init(void)
     pml40[RECURSIVE_INDEX].write_enabled = 1;
     pml40[RECURSIVE_INDEX].dir_ptr_addr_high = (pml4_phys >> 32) & 0xFFFFF;
     pml40[RECURSIVE_INDEX].dir_ptr_addr_low = (pml4_phys >> 12) & 0xFFFFF;
+    //TEST
+    //pml40[RECURSIVE_INDEX].user = 1;
 
     // Reload PML4.
     vmm_flush();
@@ -171,18 +185,21 @@ void vmm_init(void)
     // Identity map lowest 1 MiB, except the first page.
     for (size_t addr = PAGE_SIZE; addr < 0x100000; addr += PAGE_SIZE)
     {
-        vmm_page_map((void*)addr, (void*)addr, PG_PR | PG_RW);
+        //vmm_page_map((void*)addr, (void*)addr, PG_PR | PG_RW);
+        vmm_page_map((void*)addr, (void*)addr, PG_PR | PG_RW | PG_U);
     }
 
     // Remap kernel code and rodata.
     for (size_t addr = (size_t)&kernel_ro_start; addr < (size_t)&kernel_ro_end; addr += PAGE_SIZE)
     {
-        vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR);
+        //vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR);
+        vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR | PG_U);
     }
     // Remap kernel data and bss.
     for (size_t addr = (size_t)&kernel_ro_end; addr < (size_t)&phys_end; addr += PAGE_SIZE)
     {
-        vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR | PG_RW);
+        //vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR | PG_RW);
+        vmm_page_map((void*)addr, (void*)(addr+KERNEL_OFFSET), PG_PR | PG_RW | PG_U);
     }
 }
 
@@ -385,6 +402,9 @@ void vmm_page_unmap(void* virt)
     // Mark the page as not present.
     pt = vmm_pt(pml4_i, pdpt_i, pd_i);
     pt[pt_i].present = 0;
+
+    // Probably unneccessary.
+    vmm_flush();
 }
 
 void vmm_table_flags(void* entry, uint16_t flags)
@@ -416,6 +436,8 @@ void vmm_table_flags(void* entry, uint16_t flags)
     tmp_pte.page_addr_high = (phys_addr >> 32) & 0xFFFFF;
     tmp_pte.page_addr_low = (phys_addr >> 12) & 0xFFFFF;
     *pt = tmp_pte;
+
+    vmm_flush();
 }
 
 void* vmm_page_alloc_kernel(void)
