@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <liballoc/liballoc.h>
+
+#include <arch/x86_64/tss.h>
+
 // Writes a byte to an IO port.
 static inline void cpu_outb(uint8_t val, uint16_t port)
 {
@@ -117,6 +121,56 @@ static inline uint64_t cpu_rdtsc(void)
         :
     );
     return (ret);
+}
+
+// Enters ring 3.
+static inline void cpu_ring3(uint64_t ex, uint64_t stk)
+{
+    // Set up TSS.
+    asm volatile
+    (
+        "movq %%rsp, %0\n"
+        : "=a" (tss.rsp0)
+        :
+        :
+    );
+    void* kstk = malloc(0x1000);
+    tss.rsp0 = (size_t)kstk;
+
+    // Jump to ring 3.
+    asm volatile
+    (
+        // Load segment regs.
+        "movw $0x23, %%ax \n"
+        "movw %%ax, %%ds \n"
+        "movw %%ax, %%es \n"
+        "movw %%ax, %%fs \n"
+        "movw %%ax, %%gs \n"
+
+        // User data selector.
+        "pushq $0x23 \n"
+
+        // User stack.
+        "pushq %1 \n"
+
+        // Eflags.
+        "pushfq \n"
+        // sti upon context switch.
+        "orq $0x200, (%%rsp) \n"
+
+        // User code selector.
+        "pushq $0x1B \n"
+
+        // RIP to jump to.
+        "pushq %0 \n"
+        "iretq \n"
+        :
+        : "g" (ex), "g" (stk)
+        : "rax", "memory"
+    );
+
+    // Free kernel stack.
+    free(kstk);
 }
 
 #endif // CPU_H

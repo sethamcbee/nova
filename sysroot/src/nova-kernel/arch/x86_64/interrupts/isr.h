@@ -70,7 +70,7 @@ void isr_44(void);
 void isr_45(void);
 void isr_46(void);
 void isr_47(void);
-void isr_80(void);
+void isr_128(void);
 
 // ISR C extensions.
 void isr_13_ext(uint32_t error_code);

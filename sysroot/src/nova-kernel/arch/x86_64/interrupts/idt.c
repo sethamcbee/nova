@@ -378,11 +378,11 @@ void idt_initialize(void)
     //// Other. ////
 
     // Syscall.
-    entry.offset = (uint64_t) isr_80;
+    entry.offset = (uint64_t) isr_128;
     entry.selector = GDT_KERNEL_CODE;
     entry.type = IDT_TRAP_GATE;
     entry.dpl = 3;
-    idt_encode_entry(&idt[80 * 2], entry);
+    idt_encode_entry(&idt[128 * 2], entry);
 
     // Load the descriptor.
     idt_load();

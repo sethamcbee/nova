@@ -14,6 +14,7 @@ SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
 ARCH=x86_64
+OPTIMIZE=-Og -mno-sse
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -96,7 +97,6 @@ endif
 DEFINES:=$(addprefix -D, $(DEFINES))
 
 # compiler settings
-OPTIMIZE=-O2 -mno-sse
 ifeq ($(ARCH), x86_64)
 	GCC_PREFIX=x86_64-elf-
 	AS=$(GCC_DIR)/$(GCC_PREFIX)as

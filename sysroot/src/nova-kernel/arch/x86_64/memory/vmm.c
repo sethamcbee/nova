@@ -152,9 +152,6 @@ void vmm_init(void)
         pt0[i].write_enabled = 1;
         pt0[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         pt0[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
-
-        //TEST
-        //pt0[i].user = 1;
     }
     for (size_t i = 0; i < 512; i++)
     {
@@ -163,9 +160,6 @@ void vmm_init(void)
         pt1[i].write_enabled = 1;
         pt1[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         pt1[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
-
-        //TEST
-        //pt0[i].user = 1;
     }
 
     // Set up recursive mapping.
@@ -173,8 +167,6 @@ void vmm_init(void)
     pml40[RECURSIVE_INDEX].write_enabled = 1;
     pml40[RECURSIVE_INDEX].dir_ptr_addr_high = (pml4_phys >> 32) & 0xFFFFF;
     pml40[RECURSIVE_INDEX].dir_ptr_addr_low = (pml4_phys >> 12) & 0xFFFFF;
-    //TEST
-    //pml40[RECURSIVE_INDEX].user = 1;
 
     // Reload PML4.
     vmm_flush();

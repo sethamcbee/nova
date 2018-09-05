@@ -16,14 +16,24 @@
 #include <liballoc/liballoc.h>
 #include <hal/tty.h>
 
-#include <arch/x86_64/memory/vmm.h>
+#include <arch/x86_64/cpu.h>
 #include <arch/x86_64/tss.h>
-
-char user_stack[0x1000];
+#include <arch/x86_64/memory/vmm.h>
 
 void userf(void)
 {
     printf("We did it!\n");
+    char s[1000];
+
+    while (1)
+    {
+        scanf("%s", s);
+
+        if (strcmp(s, "sys") == 0)
+        {
+            asm volatile ("int $0x80 \n");
+        }
+    }
 
     asm volatile ("int $0x10 \n");
 }
@@ -52,37 +62,12 @@ void kernel_main(void)
 
         if (strcmp(s, "test") == 0)
         {
+            char user_stack[0x1000];
 
-            // Set up TSS.
-            asm volatile
-            (
-                "movq %%rsp, %0\n"
-                : "=a" (tss.rsp0)
-                :
-                :
-            );
+            // Enter ring 3.
+            cpu_ring3((uint64_t)&userf, (uint64_t)user_stack + 4000);
 
-            tss.rsp2 = &user_stack + 4000 + KERNEL_OFFSET;
-
-            // Jump to ring 3.
-            asm volatile
-            (
-                "movw $0x23, %%ax \n"  // Load segment regs.
-                "movw %%ax, %%ds \n"
-                "movw %%ax, %%es \n"
-                "movw %%ax, %%fs \n"
-                "movw %%ax, %%gs \n"
-                "pushq $0x23 \n"  // User data selector.
-                "pushq $(user_stack + 4000) \n"  // User stack.
-                "pushfq \n"
-                "pushq $0x1B \n"   // User code selector.
-                "pushq $userf \n"  // RIP to load.
-                "iretq \n"
-                "retloc: \n"
-                :
-                :
-                :
-            );
+            free(user_stack);
 
             // Test.
             printf("We're back from usermode.\n");

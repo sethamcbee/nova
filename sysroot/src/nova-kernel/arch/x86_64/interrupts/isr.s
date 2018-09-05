@@ -130,6 +130,8 @@ panic_46:
 	.string "\n\tIRQ: ATA1\n"
 panic_47:
 	.string "\n\tIRQ: ATA2\n"
+panic_128:
+	.string "SYSCALL \n"
 
 .text
 
@@ -629,9 +631,12 @@ isr_47:
 	isr_pop
 	iretq
 
-.global isr_80
-isr_80:
+.global isr_128
+isr_128:
 	isr_push
+
+	movq $panic_128, %rdi
+	call kernel_print
 
 	isr_pop
 	iretq
