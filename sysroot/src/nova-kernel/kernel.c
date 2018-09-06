@@ -14,27 +14,32 @@
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
-#include <liballoc/liballoc.h>
 #include <hal/tty.h>
+#include <liballoc/liballoc.h>
+#include <proc/process.h>
+#include <proc/scheduler.h>
 
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/memory/vmm.h>
 
-void userf(void)
+void proc1(void)
 {
-    char s[1000];
-
     while (1)
     {
-        // Get user input.
-        printf("root@nova:/$ ");
-        scanf("%s", s);
+        printf("1");
+        fflush(stdout);
+        // TODO: Make printf not crash without fflush.
+    }
 
-        if (strcmp(s, "sys") == 0)
-        {
-            asm volatile ("int $0x80 \n");
-        }
+    asm volatile ("int $0x10 \n");
+}
+
+void proc2(void)
+{
+    while (1)
+    {
+        printf("1");
     }
 
     asm volatile ("int $0x10 \n");
@@ -53,6 +58,9 @@ void kernel_main(void)
     const char user[] = "kernel@nova:";
     const char dir[] = "/";
 
+    // Populate kernel process struct.
+    Process kernel_proc;
+
     // Kernel loop.
     while (1)
     {
@@ -67,7 +75,7 @@ void kernel_main(void)
             char user_stack[0x1000];
 
             // Enter ring 3.
-            cpu_ring3((uint64_t)&userf, (uint64_t)user_stack + 4000);
+            cpu_ring3((uint64_t)&proc1, (uint64_t)user_stack + 4000);
 
             free(user_stack);
 
