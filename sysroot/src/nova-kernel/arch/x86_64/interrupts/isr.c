@@ -54,6 +54,60 @@ void isr_13_ext(uint32_t error_code)
     kernel_print("\n");
 }
 
+void isr_14_ext(uint32_t error_code, uint64_t addr)
+{
+    kernel_print("\nPAGE FAULT:\n");
+
+    // Check first bit.
+    if (BIT_CHECK(error_code, ISR_PAGE_PR_BIT))
+    {
+        kernel_print("Attempted protection violation - ");
+    }
+    else
+    {
+        kernel_print("Attempted access on non-present page - ");
+    }
+
+    // Check RW.
+    if (BIT_CHECK(error_code, ISR_PAGE_RW_BIT))
+    {
+        kernel_print("invalid write attempted from ");
+    }
+    else
+    {
+        kernel_print("invalid read attempted from ");
+    }
+
+    // Check privilege.
+    if (BIT_CHECK(error_code, ISR_PAGE_U_BIT))
+    {
+        kernel_print("user mode.\n");
+    }
+    else
+    {
+        kernel_print("supervisor mode.\n");
+    }
+
+    // Check for reserved bit error.
+    if (BIT_CHECK(error_code, ISR_PAGE_R_BIT))
+    {
+        kernel_print("Reserved bit(s) incorrectly set.\n");
+    }
+
+    // Check for No-Execute bit fault.
+    if (BIT_CHECK(error_code, ISR_PAGE_I_BIT))
+    {
+        kernel_print("Attempted execution in memory marked No-Execute.\n");
+    }
+
+    // Print address of fault.
+    char str[30];
+    _litoa(addr, str, 16);
+    kernel_print("Address of fault: ");
+    kernel_print(str);
+    kernel_print("\n");
+}
+
 void isr_32_ext(void)
 {
     irq_pit_count++;

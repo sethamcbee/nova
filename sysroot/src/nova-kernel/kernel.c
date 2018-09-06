@@ -23,12 +23,12 @@
 
 void userf(void)
 {
-    printf("We did it!\n");
     char s[1000];
 
     while (1)
     {
         // Get user input.
+        printf("root@nova:/$ ");
         scanf("%s", s);
 
         if (strcmp(s, "sys") == 0)
@@ -50,7 +50,7 @@ void kernel_main(void)
     stderr = tty_outs;
 
     char s[10000];
-    const char user[] = "sethamcbee@nova:";
+    const char user[] = "kernel@nova:";
     const char dir[] = "/";
 
     // Kernel loop.

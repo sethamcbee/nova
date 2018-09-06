@@ -289,12 +289,26 @@ isr_13:
 
 .global isr_14
 isr_14:
+	# Get error code.
+	movq (%rsp), %r12
+
 	isr_push
+
+	# Get error address.
+	movq %cr2, %rsi
+
+	# Handle error code.
+	movq %r12, %rdi
+	call isr_14_ext
 
 	movq $panic_14, %rdi
 	call kernel_panic
 
 	isr_pop
+
+	# Remove error code from stack.
+	add $4, %rsp
+
 	iretq
 
 .global isr_15

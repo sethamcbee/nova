@@ -21,6 +21,13 @@
 #define ISR_ERROR_INDEX_BIT         4
 #define ISR_ERROR_INDEX_MASK        0b1111111111111
 
+// Paging error codes.
+#define ISR_PAGE_PR_BIT             0
+#define ISR_PAGE_RW_BIT             1
+#define ISR_PAGE_U_BIT              2
+#define ISR_PAGE_R_BIT              3
+#define ISR_PAGE_I_BIT              4
+
 // ISR entry points.
 void isr_0(void);
 void isr_1(void);
@@ -74,6 +81,7 @@ void isr_128(void);
 
 // ISR C extensions.
 void isr_13_ext(uint32_t error_code);
+void isr_14_ext(uint32_t error_code, uint64_t addr);
 void isr_32_ext(void);
 void isr_33_ext(void);
 void isr_39_ext(void);
