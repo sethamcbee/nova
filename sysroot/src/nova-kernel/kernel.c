@@ -23,7 +23,7 @@
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/memory/vmm.h>
 
-void proc1(void)
+void fun1(void)
 {
     while (1)
     {
@@ -35,11 +35,12 @@ void proc1(void)
     asm volatile ("int $0x10 \n");
 }
 
-void proc2(void)
+void fun2(void)
 {
     while (1)
     {
         printf("1");
+        fflush(stdout);
     }
 
     asm volatile ("int $0x10 \n");
@@ -58,8 +59,14 @@ void kernel_main(void)
     const char user[] = "kernel@nova:";
     const char dir[] = "/";
 
-    // Populate kernel process struct.
+    // Set up scheduler.
     Process kernel_proc;
+    kernel_proc.priv = 0;
+    Task kernel_task;
+    kernel_task.proc = &kernel_proc;
+    kernel_task.ticks = DEFAULT_TICKS;
+    kernel_task.next = &kernel_task;
+    cur_task = &kernel_task;
 
     // Kernel loop.
     while (1)
@@ -69,21 +76,28 @@ void kernel_main(void)
 
         // Get user input.
         scanf("%s", s);
-
         if (strcmp(s, "test") == 0)
         {
-            char user_stack[0x1000];
+            char* kstk1 = malloc(0x1000);
+            char* ustk1 = malloc(0x1000);
+
+            // Create process.
+            Process* proc1 = malloc(sizeof(Process));
+            proc1->reg.reg_rip = (uint64_t)&fun1;
+            proc1->reg.reg_rsp = (uint64_t)&ustk1 + 4000;
+            proc1->rsp0 = (uint64_t)&kstk1 + 4000;
+            proc1->priv = 3;
+            Task* task1 = malloc(sizeof(Task));
+            task1->proc = proc1;
+            task1->ticks = DEFAULT_TICKS;
+
+            // Queue process.
+            task_add(task1);
 
             // Enter ring 3.
-            cpu_ring3((uint64_t)&proc1, (uint64_t)user_stack + 4000);
-
-            free(user_stack);
-
-            // Test.
-            printf("We're back from usermode.\n");
+            //cpu_ring3((uint64_t)&proc1, (uint64_t)ustk1 + 4000, (uint64_t)kstk1+4000);
         }
     }
-
     // The kernel is not intended to return; halt.
     fputs("\nEnd of kernel code. Halt.", stderr);
     kernel_halt();

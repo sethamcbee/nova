@@ -9,6 +9,10 @@
 #include <stdlib.h>
 
 #include <kernel.h>
+#include <drivers/graphics/vga_text.h>
+#include <drivers/input/ps2_keyboard.h>
+#include <proc/scheduler.h>
+
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/multiboot2.h>
@@ -17,8 +21,6 @@
 #include <arch/x86_64/interrupts/idt.h>
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
-#include <drivers/graphics/vga_text.h>
-#include <drivers/input/ps2_keyboard.h>
 
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
@@ -52,6 +54,9 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     ps2_keyboard_init();
 
     // TODO: Set up timer.
+
+    // Initialize scheduler.
+    cur_task = NULL;
 
     asm volatile ("sti \n"); // We can safely enable interrupts now.
 

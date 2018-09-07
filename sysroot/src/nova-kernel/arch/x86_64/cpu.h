@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <liballoc/liballoc.h>
+#include <proc/process.h>
 
 #include <arch/x86_64/tss.h>
 
@@ -123,19 +124,72 @@ static inline uint64_t cpu_rdtsc(void)
     return (ret);
 }
 
-// Enters ring 3.
-static inline void cpu_ring3(uint64_t ex, uint64_t stk)
+// Enters ring 0.
+static inline void cpu_ring0(Process* proc)
 {
     // Set up TSS.
+    //asm volatile
+    //(
+    //    "movq %%rsp, %0\n"
+    //    : "=a" (tss.rsp0)
+    //    :
+    //    :
+    //);
+    //void* kstk = malloc(0x1000);
+    //tss.rsp0 = (size_t)kstk;
+
+    // Set up TSS.
+    tss.rsp0 = proc->rsp0;
+
+    // Jump to ring 0.
     asm volatile
     (
-        "movq %%rsp, %0\n"
-        : "=a" (tss.rsp0)
+        // Load segment regs.
+        "movw $0x10, %%ax \n"
+        "movw %%ax, %%ds \n"
+        "movw %%ax, %%es \n"
+        "movw %%ax, %%fs \n"
+        "movw %%ax, %%gs \n"
+
+        // Kernel data selector.
+        "pushq $0x10 \n"
+
+        // Kernel stack.
+        "pushq %1 \n"
+
+        // Eflags.
+        "pushfq \n"
+        // sti upon context switch.
+        "orq $0x200, (%%rsp) \n"
+
+        // Kernel code selector.
+        "pushq $0x08 \n"
+
+        // RIP to jump to.
+        "pushq %0 \n"
+        "iretq \n"
         :
-        :
+        : "g" (proc->reg.reg_rip), "g" (proc->reg.reg_rsp)
+        : "rax", "memory"
     );
-    void* kstk = malloc(0x1000);
-    tss.rsp0 = (size_t)kstk;
+}
+
+// Enters ring 3.
+static inline void cpu_ring3(Process* proc)
+{
+    // Set up TSS.
+    //asm volatile
+    //(
+    //    "movq %%rsp, %0\n"
+    //    : "=a" (tss.rsp0)
+    //    :
+    //    :
+    //);
+    //void* kstk = malloc(0x1000);
+    //tss.rsp0 = (size_t)kstk;
+
+    // Set up TSS.
+    tss.rsp0 = proc->rsp0;
 
     // Jump to ring 3.
     asm volatile
@@ -165,12 +219,9 @@ static inline void cpu_ring3(uint64_t ex, uint64_t stk)
         "pushq %0 \n"
         "iretq \n"
         :
-        : "g" (ex), "g" (stk)
+        : "g" (proc->reg.reg_rip), "g" (proc->reg.reg_rsp)
         : "rax", "memory"
     );
-
-    // Free kernel stack.
-    free(kstk);
 }
 
 #endif // CPU_H

@@ -133,6 +133,13 @@ panic_47:
 panic_128:
 	.string "SYSCALL \n"
 
+.data
+
+task_switch_tmp1:
+	.quad 0
+task_switch_tmp2:
+	.quad 0
+
 .text
 
 # Interrupt Service Routines.
@@ -485,8 +492,54 @@ isr_31:
 isr_32:
 	isr_push
 
+	# Handle IRQ.
 	call isr_32_ext
 
+	# Run scheduler.
+	call task_tick
+	cmp $0, %rax
+	je no_switch
+
+switch:
+	# Store registers for task switch.
+
+	call task_get_reg
+	# rax contains ptr.
+	movq %rax, task_switch_tmp1 # Store ptr.
+	isr_pop
+	movq %rax, task_switch_tmp2 # Store saved rax.
+	movq task_switch_tmp1, %rax # Retrieve ptr.
+	movq %rbx, 8(%rax)
+	movq %rcx, 16(%rax)
+	movq %rdx, 24(%rax)
+	movq %rbp, 32(%rax)
+	# rsp will go at 40(%rax)
+	movq %rsi, 48(%rax)
+	movq %rdi, 56(%rax)
+	movq %r8, 64(%rax)
+	movq %r9, 72(%rax)
+	movq %r10, 80(%rax)
+	movq %r11, 88(%rax)
+	movq %r12, 96(%rax)
+	movq %r13, 104(%rax)
+	movq %r14, 112(%rax)
+	movq %r15, 120(%rax)
+	# rip will go at 128(%rax)
+
+	# Fetch SP and IP.
+	popq %rbx    # RIP
+	movq %rbx, 128(%rax)
+	popq %rbx    # RFLAGS
+	movq %rbx, 136(%rax)
+
+	# Store rax.
+	movq task_switch_tmp2, %rbx
+	movq %rbx, (%rax)
+
+	call task_next
+	iretq
+
+no_switch:
 	isr_pop
 	iretq
 

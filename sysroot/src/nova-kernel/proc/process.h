@@ -8,11 +8,16 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <arch/x86_64/registers.h>
+
 typedef struct
 {
-    // Virtual location of the last stack location.
-    size_t stk;
+    // Virtual address of the register storage.
+    Registers reg;
 
-    // Virtual location of the last instruction.
-    size_t ex;
+    // RSP0 to store in TSS.
+    uint64_t rsp0;
+
+    // Kernel = 0, User = 3;
+    uint8_t priv;
 } Process;

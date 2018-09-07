@@ -10,11 +10,13 @@
 #include <stdlib.h>
 
 #include <kernel.h>
+#include <drivers/input/ps2_keyboard.h>
+#include <proc/scheduler.h>
+
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/devices/pic.h>
 #include <arch/x86_64/devices/ps2.h>
 #include <arch/x86_64/interrupts/isr.h>
-#include <drivers/input/ps2_keyboard.h>
 
 uint64_t irq_spurious_count = 0;
 uint64_t irq_pit_count = 0;
