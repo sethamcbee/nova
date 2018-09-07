@@ -145,32 +145,63 @@ static inline void cpu_ring0(Process* proc)
     asm volatile
     (
         // Load segment regs.
-        "movw $0x10, %%ax \n"
-        "movw %%ax, %%ds \n"
-        "movw %%ax, %%es \n"
-        "movw %%ax, %%fs \n"
-        "movw %%ax, %%gs \n"
+        "movw $0x10, %%bx \n"
+        "movw %%bx, %%ds \n"
+        "movw %%bx, %%es \n"
+        "movw %%bx, %%fs \n"
+        "movw %%bx, %%gs \n"
+
+        // Load registers with stored values.
+        // Skip rax for now.
+        // Skip rbx for now.
+        "movq 16(%%rax), %%rcx \n"
+        "movq 24(%%rax), %%rdx \n"
+        "movq 32(%%rax), %%rbp \n"
+        // rsp handled by iret.
+        "movq 48(%%rax), %%rsi \n"
+        "movq 56(%%rax), %%rdi \n"
+        "movq 64(%%rax), %%r8 \n"
+        "movq 72(%%rax), %%r9 \n"
+        "movq 80(%%rax), %%r10 \n"
+        "movq 88(%%rax), %%r11 \n"
+        "movq 96(%%rax), %%r12 \n"
+        "movq 104(%%rax), %%r13 \n"
+        "movq 112(%%rax), %%r14 \n"
+        "movq 120(%%rax), %%r15 \n"
+        // rip handled by iret.
+        // flags handled by iret.
 
         // Kernel data selector.
         "pushq $0x10 \n"
 
         // Kernel stack.
-        "pushq %1 \n"
+        "movq 40(%%rax), %%rbx \n"
+        "pushq %%rbx \n"
 
-        // Eflags.
-        "pushfq \n"
+        // Flags.
+        "movq 136(%%rax), %%rbx \n"
+        "pushq %%rbx \n"
+
         // sti upon context switch.
         "orq $0x200, (%%rsp) \n"
 
         // Kernel code selector.
         "pushq $0x08 \n"
 
-        // RIP to jump to.
-        "pushq %0 \n"
+        // rip to jump to.
+        "movq 128(%%rax), %%rbx \n"
+        "pushq %%rbx \n"
+
+        // Load rax and rbx with stored values.
+        "movq 8(%%rax), %%rbx \n"
+        "movq (%%rax), %%rax \n"
+
+        // Jump.
         "iretq \n"
         :
-        : "g" (proc->reg.reg_rip), "g" (proc->reg.reg_rsp)
-        : "rax", "memory"
+        : "a" (proc)
+        : "rdx", "rbp", "rsp", "rsi", "rdi",
+          "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "flags", "memory"
     );
 }
 
@@ -191,36 +222,70 @@ static inline void cpu_ring3(Process* proc)
     // Set up TSS.
     tss.rsp0 = proc->rsp0;
 
-    // Jump to ring 3.
+    // Set up TSS.
+    tss.rsp0 = proc->rsp0;
+
+    // Jump to ring 0.
     asm volatile
     (
         // Load segment regs.
-        "movw $0x23, %%ax \n"
-        "movw %%ax, %%ds \n"
-        "movw %%ax, %%es \n"
-        "movw %%ax, %%fs \n"
-        "movw %%ax, %%gs \n"
+        "movw $0x10, %%bx \n"
+        "movw %%bx, %%ds \n"
+        "movw %%bx, %%es \n"
+        "movw %%bx, %%fs \n"
+        "movw %%bx, %%gs \n"
+
+        // Load registers with stored values.
+        // Skip rax for now.
+        // Skip rbx for now.
+        "movq 16(%%rax), %%rcx \n"
+        "movq 24(%%rax), %%rdx \n"
+        "movq 32(%%rax), %%rbp \n"
+        // rsp handled by iret.
+        "movq 48(%%rax), %%rsi \n"
+        "movq 56(%%rax), %%rdi \n"
+        "movq 64(%%rax), %%r8 \n"
+        "movq 72(%%rax), %%r9 \n"
+        "movq 80(%%rax), %%r10 \n"
+        "movq 88(%%rax), %%r11 \n"
+        "movq 96(%%rax), %%r12 \n"
+        "movq 104(%%rax), %%r13 \n"
+        "movq 112(%%rax), %%r14 \n"
+        "movq 120(%%rax), %%r15 \n"
+        // rip handled by iret.
+        // flags handled by iret.
 
         // User data selector.
         "pushq $0x23 \n"
 
         // User stack.
-        "pushq %1 \n"
+        "movq 40(%%rax), %%rbx \n"
+        "pushq %%rbx \n"
 
-        // Eflags.
-        "pushfq \n"
+        // Flags.
+        "movq 136(%%rax), %%rbx \n"
+        "pushq %%rbx \n"
+
         // sti upon context switch.
         "orq $0x200, (%%rsp) \n"
 
         // User code selector.
         "pushq $0x1B \n"
 
-        // RIP to jump to.
-        "pushq %0 \n"
+        // rip to jump to.
+        "movq 128(%%rax), %%rbx \n"
+        "pushq %%rbx \n"
+
+        // Load rax and rbx with stored values.
+        "movq 8(%%rax), %%rbx \n"
+        "movq (%%rax), %%rax \n"
+
+        // Jump.
         "iretq \n"
         :
-        : "g" (proc->reg.reg_rip), "g" (proc->reg.reg_rsp)
-        : "rax", "memory"
+        : "a" (proc)
+        : "rdx", "rbp", "rsp", "rsi", "rdi",
+          "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "flags", "memory"
     );
 }
 

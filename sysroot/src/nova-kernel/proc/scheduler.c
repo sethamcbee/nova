@@ -47,7 +47,7 @@ void task_next(void)
 
     // Set up this task for its next turn.
     cur_task->ticks = DEFAULT_TICKS;
-    cur_task->proc->rsp0 = tss.rsp0;
+    //cur_task->proc->rsp0 = tss.rsp0;
 
     // Change task.
     cur_task = cur_task->next;

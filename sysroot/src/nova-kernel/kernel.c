@@ -62,6 +62,7 @@ void kernel_main(void)
     // Set up scheduler.
     Process kernel_proc;
     kernel_proc.priv = 0;
+    kernel_proc.rsp0 = 0;
     Task kernel_task;
     kernel_task.proc = &kernel_proc;
     kernel_task.ticks = DEFAULT_TICKS;
