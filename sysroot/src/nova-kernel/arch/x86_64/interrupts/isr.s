@@ -507,7 +507,6 @@ switch:
 	# rax contains ptr.
 	movq %rax, task_switch_tmp1 # Store ptr.
 	isr_pop
-	isr_push
 	movq %rax, task_switch_tmp2 # Store saved rax.
 	movq task_switch_tmp1, %rax # Retrieve ptr.
 	movq %rbx, 8(%rax)
@@ -526,19 +525,23 @@ switch:
 	movq %r14, 112(%rax)
 	movq %r15, 120(%rax)
 	# rip will go at 128(%rax)
+	# flags will go at 136(%rax)
 
-	# Fetch FLAGS, SP and IP.
+	# Fetch and store FLAGS, SP and IP.
 	popq %rbx    # RIP
 	movq %rbx, 128(%rax)
+	popq %rbx    # Eat CS
 	popq %rbx    # FLAGS
 	movq %rbx, 136(%rax)
 	popq %rbx    # RSP
 	movq %rbx, 40(%rax)
+	#popq %rbx    # Eat SS
 
 	# Store rax.
 	movq task_switch_tmp2, %rbx
 	movq %rbx, (%rax)
 
+	isr_push
 	call task_next
 	isr_pop
 	iretq
