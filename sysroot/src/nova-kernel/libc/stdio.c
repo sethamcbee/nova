@@ -201,12 +201,17 @@ int fputn(const char *s, size_t n, FILE *stream)
 
 int fputc(int c, FILE *stream)
 {
-    // Write character.
+    // Write character to buffer.
     rputc(c, stream);
 
     // Check if the buffer should be flushed.
     if (stream->buf_mode == _IONBF)
     {
+        fflush(stream);
+    }
+    else if (stream->len == stream->max_len)
+    {
+        // Always flush if we run out of room in the buffer.
         fflush(stream);
     }
     else if (stream->buf_mode == _IOLBF && (c == '\n' || stream->len == stream->max_len))

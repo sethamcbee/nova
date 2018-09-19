@@ -28,8 +28,6 @@ void fun1(void)
     while (1)
     {
         printf("1");
-        fflush(stdout);
-        // TODO: Make printf not crash without fflush.
     }
 
     asm volatile ("int $0x10 \n");
