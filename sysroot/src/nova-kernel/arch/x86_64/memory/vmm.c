@@ -152,6 +152,9 @@ void vmm_init(void)
         pt0[i].write_enabled = 1;
         pt0[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         pt0[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
+
+        // TEST
+        pt0[i].user = 1;
     }
     for (size_t i = 0; i < 512; i++)
     {
@@ -160,6 +163,9 @@ void vmm_init(void)
         pt1[i].write_enabled = 1;
         pt1[i].page_addr_high = (page_addr >> 32) & 0xFFFFF;
         pt1[i].page_addr_low = (page_addr >> 12) & 0xFFFFF;
+
+        // TEST
+        pt1[i].user = 1;
     }
 
     // Set up recursive mapping.
@@ -167,6 +173,9 @@ void vmm_init(void)
     pml40[RECURSIVE_INDEX].write_enabled = 1;
     pml40[RECURSIVE_INDEX].dir_ptr_addr_high = (pml4_phys >> 32) & 0xFFFFF;
     pml40[RECURSIVE_INDEX].dir_ptr_addr_low = (pml4_phys >> 12) & 0xFFFFF;
+
+    // TEST
+    pml40[RECURSIVE_INDEX].user = 1;
 
     // Reload PML4.
     vmm_flush();
@@ -255,6 +264,10 @@ void vmm_page_map(void* phys, void* virt, uint16_t flags)
     Pdpte *pdpt;
     Pde *pd;
     Pte *pt;
+
+    // TEST.
+    // Security risk.
+    flags |= PG_U;
 
     // Clear lowest 12 bits of both addresses.
     phys_addr &= ~0xFFF;
@@ -402,34 +415,10 @@ void vmm_page_unmap(void* virt)
 void vmm_table_flags(void* entry, uint16_t flags)
 {
     size_t phys_addr = (size_t) vmm_phys_addr(entry);
-    Pte *pt = (Pte*)phys_addr;
 
-    // Modify PT entry.
-    Pte tmp_pte = {0};
+    vmm_page_map((void*)phys_addr, entry, flags);
 
-    if (BIT_CHECK(flags, PG_PR_BIT))
-        tmp_pte.present = 1;
-    if (BIT_CHECK(flags, PG_RW_BIT))
-        tmp_pte.write_enabled = 1;
-    if (BIT_CHECK(flags, PG_U_BIT))
-        tmp_pte.user = 1;
-    if (BIT_CHECK(flags, PG_WT_BIT))
-        tmp_pte.write_through = 1;
-    if (BIT_CHECK(flags, PG_CD_BIT))
-        tmp_pte.cache_disabled = 1;
-    if (BIT_CHECK(flags, PG_AC_BIT))
-        tmp_pte.accessed = 1;
-    if (BIT_CHECK(flags, PG_DT_BIT))
-        tmp_pte.dirty = 1;
-    if (BIT_CHECK(flags, PG_AT_BIT))
-        tmp_pte.attr = 1;
-    if (BIT_CHECK(flags, PG_GL_BIT))
-        tmp_pte.global = 1;
-    tmp_pte.page_addr_high = (phys_addr >> 32) & 0xFFFFF;
-    tmp_pte.page_addr_low = (phys_addr >> 12) & 0xFFFFF;
-    *pt = tmp_pte;
-
-    vmm_flush();
+    //vmm_flush();
 }
 
 void* vmm_page_alloc_kernel(void)

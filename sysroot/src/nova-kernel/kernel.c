@@ -25,9 +25,11 @@
 
 void fun1(void)
 {
+    char* a = malloc(0x1000);
+
     while (1)
     {
-        printf("1");
+        scanf("%s", a);
     }
 
     asm volatile ("int $0x10 \n");
@@ -37,8 +39,10 @@ void fun2(void)
 {
     while (1)
     {
-        printf("1");
+        printf("0");
         fflush(stdout);
+        for (size_t i = 0; i < 0x100000; i++)
+            ;
     }
 
     asm volatile ("int $0x10 \n");
@@ -77,21 +81,44 @@ void kernel_main(void)
         scanf("%s", s);
         if (strcmp(s, "test") == 0)
         {
-            char* kstk1 = malloc(0x1000);
-            char* ustk1 = malloc(0x1000);
+            char* kstk1 = vmm_page_alloc_kernel();
+            vmm_table_flags((void*)kstk1, PG_PR | PG_RW | PG_U);
+            char* ustk1 = vmm_page_alloc_kernel();
+            vmm_table_flags((void*)ustk1, PG_PR | PG_RW | PG_U);
 
-            // Create process.
+            char* kstk2 = vmm_page_alloc_kernel();
+            vmm_table_flags((void*)kstk2, PG_PR | PG_RW | PG_U);
+            char* ustk2 = vmm_page_alloc_kernel();
+            vmm_table_flags((void*)ustk2, PG_PR | PG_RW | PG_U);
+
+            // Create process 1.
             Process* proc1 = malloc(sizeof(Process));
             proc1->reg.reg_rip = (uint64_t)&fun1;
-            proc1->reg.reg_rsp = (uint64_t)&ustk1 + 4000;
-            proc1->rsp0 = (uint64_t)&kstk1 + 4000;
+            proc1->reg.reg_rsp = (uint64_t)&ustk1 + 0x1000;
+            proc1->rsp0 = (uint64_t)&kstk1 + 0x1000;
             proc1->priv = 3;
             Task* task1 = malloc(sizeof(Task));
             task1->proc = proc1;
             task1->ticks = DEFAULT_TICKS;
 
-            // Queue process.
+            // Create process 2.
+            Process* proc2 = malloc(sizeof(Process));
+            proc2->reg.reg_rip = (uint64_t)&fun2;
+            proc2->reg.reg_rsp = (uint64_t)&ustk2 + 0x1000;
+            proc2->rsp0 = (uint64_t)&kstk2 + 0x1000;
+            proc2->priv = 3;
+            Task* task2 = malloc(sizeof(Task));
+            task2->proc = proc2;
+            task2->ticks = DEFAULT_TICKS;
+
+            // Queue processes.
+            //task_add(task2);
             task_add(task1);
+
+            // TEST.
+            task1->next = task1;
+            asm volatile ("hlt \n");
+            //printf("We're back!\n");
 
             // Enter ring 3.
             //cpu_ring3((uint64_t)&proc1, (uint64_t)ustk1 + 4000, (uint64_t)kstk1+4000);

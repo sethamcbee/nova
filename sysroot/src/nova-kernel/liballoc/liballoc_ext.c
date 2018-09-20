@@ -8,16 +8,17 @@
 #include <arch/x86_64/memory/vmm.h>
 
 // STUB.
+// Security risk.
 
 int liballoc_lock(void)
 {
-    asm volatile ("cli \n");
+    //asm volatile ("cli \n");
     return (0);
 }
 
 int liballoc_unlock(void)
 {
-    asm volatile ("sti \n");
+    //asm volatile ("sti \n");
     return (0);
 }
 
@@ -26,7 +27,10 @@ void* liballoc_alloc(int pages)
     if (pages == 0)
         return (NULL);
 
-    return ( vmm_pages_alloc_kernel(pages) );
+    void* ret = vmm_pages_alloc_kernel(pages);
+    vmm_table_flags(ret, PG_PR | PG_RW | PG_U);
+
+    return ( ret );
 }
 
 int liballoc_free(void* page,int pages)

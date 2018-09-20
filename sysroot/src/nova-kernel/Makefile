@@ -17,7 +17,7 @@ ARCH=x86_64
 OPTIMIZE=-Og -mno-sse
 
 # Whether to enable the __stack_chk_guard.
-STACK_GUARD=false
+STACK_GUARD=true
 
 # directories to export objects, binaries, ISOs, etc.
 OBJ_DIR=$(BUILD_DIR)/obj
