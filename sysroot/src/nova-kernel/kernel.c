@@ -23,13 +23,20 @@
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/memory/vmm.h>
 
+volatile int A;
+
 void fun1(void)
 {
-    char* a = malloc(0x1000);
+    //char* a = malloc(0x1000);
+    char a[512] = "0";
+
+    A = 100;
 
     while (1)
     {
-        scanf("%s", a);
+        A++;
+        for (size_t i = 0; i < 0x1000000; i++)
+            ;
     }
 
     asm volatile ("int $0x10 \n");
@@ -39,9 +46,8 @@ void fun2(void)
 {
     while (1)
     {
-        printf("0");
-        fflush(stdout);
-        for (size_t i = 0; i < 0x100000; i++)
+        A--;
+        for (size_t i = 0; i < 0x1000000; i++)
             ;
     }
 
@@ -112,16 +118,18 @@ void kernel_main(void)
             task2->ticks = DEFAULT_TICKS;
 
             // Queue processes.
-            //task_add(task2);
+            task_add(task2);
             task_add(task1);
 
             // TEST.
-            task1->next = task1;
+            //task1->next = task1;
             asm volatile ("hlt \n");
             //printf("We're back!\n");
-
-            // Enter ring 3.
-            //cpu_ring3((uint64_t)&proc1, (uint64_t)ustk1 + 4000, (uint64_t)kstk1+4000);
+            while (1)
+            {
+                printf("%d\n", A);
+                asm volatile ("hlt \n");
+            }
         }
     }
     // The kernel is not intended to return; halt.
