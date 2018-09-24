@@ -52,14 +52,7 @@ void task_next(void)
     // Change task.
     cur_task = cur_task->next;
     proc = cur_task->proc;
-    if (proc->priv == 3)
-    {
-        cpu_ring3(proc);
-    }
-    if (proc->priv == 0)
-    {
-        cpu_ring0(proc);
-    }
+    cpu_proc(proc);
 }
 
 void task_add(Task* new_task)

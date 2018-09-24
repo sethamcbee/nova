@@ -11,6 +11,7 @@
 
 #include <liballoc/liballoc.h>
 #include <proc/process.h>
+#include <proc/scheduler.h>
 
 #include <arch/x86_64/tss.h>
 
@@ -19,7 +20,7 @@ static inline void cpu_outb(uint8_t val, uint16_t port)
 {
     asm volatile
     (
-        "outb %0, %1\n"
+        "outb %0, %1 \n"
         :
         : "a" (val), "Nd" (port)
         : "memory"
@@ -31,7 +32,7 @@ static inline void cpu_outw(uint16_t val, uint16_t port)
 {
     asm volatile
     (
-        "outw %0, %1\n"
+        "outw %0, %1 \n"
         :
         : "a" (val), "Nd" (port)
         : "memory"
@@ -43,7 +44,7 @@ static inline void cpu_outl(uint32_t val, uint16_t port)
 {
     asm volatile
     (
-        "outl %0, %1\n"
+        "outl %0, %1 \n"
         :
         : "a" (val), "Nd" (port)
         : "memory"
@@ -57,7 +58,7 @@ static inline uint8_t cpu_inb(uint16_t port)
 
     asm volatile
     (
-        "inb %1, %0\n"
+        "inb %1, %0 \n"
         : "=a" (val)
         : "Nd" (port)
         : "memory"
@@ -73,7 +74,7 @@ static inline uint16_t cpu_inw(uint16_t port)
 
     asm volatile
     (
-        "inw %1, %0\n"
+        "inw %1, %0 \n"
         : "=a" (val)
         : "Nd" (port)
         : "memory"
@@ -89,7 +90,7 @@ static inline uint32_t cpu_inl(uint16_t port)
 
     asm volatile
     (
-        "inb %1, %0\n"
+        "inb %1, %0 \n"
         : "=a" (val)
         : "Nd" (port)
         : "memory"
@@ -103,7 +104,7 @@ static inline void cpu_io_wait(void)
 {
     asm volatile
     (
-        "outb %%al, $0x80"
+        "outb %%al, $0x80 \n"
         :
         : "a"(0)
         : "memory"
@@ -116,7 +117,7 @@ static inline uint64_t cpu_rdtsc(void)
     uint64_t ret;
     asm volatile
     (
-        "rdtsc"
+        "rdtsc \n"
         : "=A" (ret)
         :
         :
@@ -124,49 +125,30 @@ static inline uint64_t cpu_rdtsc(void)
     return (ret);
 }
 
-void cpu_ring0_asm(Registers* proc);
-void cpu_ring3_asm(Registers* proc);
-
-// Enters ring 0.
-static inline void cpu_ring0(Process* proc)
+// Returns the contents of the FLAGS register.
+static inline uint64_t cpu_get_flags(void)
 {
-    // Set up TSS.
-    //asm volatile
-    //(
-    //    "movq %%rsp, %0\n"
-    //    : "=a" (tss.rsp0)
-    //    :
-    //    :
-    //);
-    //void* kstk = malloc(0x1000);
-    //tss.rsp0 = (size_t)kstk;
-
-    // Set up TSS.
-    tss.rsp0 = proc->rsp0;
-
-    // Jump to ring 0.
-    cpu_ring0_asm(&proc->reg);
+    uint64_t ret;
+    asm volatile
+    (
+        "pushfq \n"
+        "popq %0 \n"
+        : "=A" (ret)
+        :
+        :
+    );
+    return (ret);
 }
 
-// Enters ring 3.
-static inline void cpu_ring3(Process* proc)
-{
-    // Set up TSS.
-    //asm volatile
-    //(
-    //    "movq %%rsp, %0\n"
-    //    : "=a" (tss.rsp0)
-    //    :
-    //    :
-    //);
-    //void* kstk = malloc(0x1000);
-    //tss.rsp0 = (size_t)kstk;
+void cpu_proc_asm(Process* proc);
 
-    // Set up TSS.
+static inline void cpu_proc(Process* proc)
+{
+    // Set up the TSS.
     tss.rsp0 = proc->rsp0;
 
-    // Jump to ring 3.
-    cpu_ring3_asm(&proc->reg);
+    // Jump to code.
+    cpu_proc_asm(proc);
 }
 
 #endif // CPU_H

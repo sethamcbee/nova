@@ -21,6 +21,16 @@
 uint64_t irq_spurious_count = 0;
 uint64_t irq_pit_count = 0;
 
+void isr_1_ext(uint64_t ip)
+{
+    // Print instruction of fault.
+    char str[20];
+    _itoa(ip, str, 16);
+    kernel_print("\n\tDebug exception: Error occurred at address ");
+    kernel_print(str);
+    kernel_print("\n");
+}
+
 void isr_13_ext(uint32_t error_code)
 {
     // Check whether the exception was triggered externally.

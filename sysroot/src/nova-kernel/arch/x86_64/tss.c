@@ -9,8 +9,6 @@
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/tss.h>
 
-static void load_tss(void);
-
 void tss_init(void)
 {
     Tss_Descriptor *tss_descriptor = (Tss_Descriptor*)&gdt_entry[GDT_TSS / 8];
@@ -48,13 +46,13 @@ void tss_init(void)
     tss.ist7 = 0;
     tss.iopb_offset = tss_size;
 
-    load_tss();
+    tss_load(RING3);
 }
 
-static void load_tss(void)
+void tss_load(uint16_t mask)
 {
     uint16_t selector = GDT_TSS;
-    selector |= 0b11;
+    selector |= mask;
     asm volatile
     (
         "ltr %0 \n"

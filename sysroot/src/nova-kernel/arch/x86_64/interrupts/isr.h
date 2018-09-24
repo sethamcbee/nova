@@ -80,6 +80,7 @@ void isr_47(void);
 void isr_128(void);
 
 // ISR C extensions.
+void isr_1_ext(uint64_t ip);
 void isr_13_ext(uint32_t error_code);
 void isr_14_ext(uint32_t error_code, uint64_t addr);
 void isr_32_ext(void);

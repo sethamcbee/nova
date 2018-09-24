@@ -20,6 +20,7 @@
 #include <proc/scheduler.h>
 
 #include <arch/x86_64/cpu.h>
+#include <arch/x86_64/gdt.h>
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/memory/vmm.h>
 
@@ -35,8 +36,9 @@ void fun1(void)
     while (1)
     {
         A++;
-        for (size_t i = 0; i < 0x1000000; i++)
-            ;
+        //printf("%d\n", A);
+        for (size_t i = 0; i < 0x100000; i++)
+            asm volatile ("nop \n" : : : "memory");
     }
 
     asm volatile ("int $0x10 \n");
@@ -47,8 +49,8 @@ void fun2(void)
     while (1)
     {
         A--;
-        for (size_t i = 0; i < 0x1000000; i++)
-            ;
+        for (size_t i = 0; i < 0x100000; i++)
+            asm volatile ("nop \n" : : : "memory");
     }
 
     asm volatile ("int $0x10 \n");
@@ -101,6 +103,9 @@ void kernel_main(void)
             Process* proc1 = malloc(sizeof(Process));
             proc1->reg.reg_rip = (uint64_t)&fun1;
             proc1->reg.reg_rsp = (uint64_t)&ustk1 + 0x1000;
+            proc1->reg.reg_flags = cpu_get_flags();
+            proc1->reg.reg_ss = GDT_USER_DATA | RING3;
+            proc1->reg.reg_cs = GDT_USER_CODE | RING3;
             proc1->rsp0 = (uint64_t)&kstk1 + 0x1000;
             proc1->priv = 3;
             Task* task1 = malloc(sizeof(Task));
@@ -111,6 +116,9 @@ void kernel_main(void)
             Process* proc2 = malloc(sizeof(Process));
             proc2->reg.reg_rip = (uint64_t)&fun2;
             proc2->reg.reg_rsp = (uint64_t)&ustk2 + 0x1000;
+            proc2->reg.reg_flags = cpu_get_flags();
+            proc2->reg.reg_ss = GDT_USER_DATA | RING3;
+            proc2->reg.reg_cs = GDT_USER_CODE | RING3;
             proc2->rsp0 = (uint64_t)&kstk2 + 0x1000;
             proc2->priv = 3;
             Task* task2 = malloc(sizeof(Task));
@@ -120,16 +128,10 @@ void kernel_main(void)
             // Queue processes.
             task_add(task2);
             task_add(task1);
-
-            // TEST.
-            //task1->next = task1;
-            asm volatile ("hlt \n");
-            //printf("We're back!\n");
-            while (1)
-            {
-                printf("%d\n", A);
-                asm volatile ("hlt \n");
-            }
+        }
+        if (strcmp(s, "show") == 0)
+        {
+            printf("%d\n", A);
         }
     }
     // The kernel is not intended to return; halt.

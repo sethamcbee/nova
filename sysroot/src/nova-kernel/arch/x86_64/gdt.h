@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define RING3 0b11
+
 // GDT entry indices and constants.
 #define GDT_NULL            0x0
 #define GDT_KERNEL_CODE     0x08
@@ -19,6 +21,7 @@
 #define GDT_ENTRY_COUNT     6
 // Replace 0x?0 with 0x?3 for ring 3.
 // Replace 0x?8 with 0x?B for ring 3.
+// Alternatively, just OR with RING3.
 
 // GDT entry structure.
 typedef struct __attribute__((packed))

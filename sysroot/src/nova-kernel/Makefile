@@ -14,7 +14,7 @@ SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
 ARCH=x86_64
-OPTIMIZE=-Og -mno-sse
+OPTIMIZE=-Os -mno-sse
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -237,7 +237,7 @@ QEMU_FLAGS=\
 	-smp $(QEMU_SMP) \
 	-vga std \
 	-soundhw pcspk,sb16 \
-#	-enable-kvm
+	-enable-kvm
 
 # Bochs application settings.
 #BOCHS=$(HOME)/opt/bochs/bin/bochs
@@ -311,16 +311,16 @@ $(OBJ_DIR)/%.cpp.o: %.cpp
 	$(CPP) $(CPPFLAGS) -c $< -o $@
 
 # copy assembly files, generic
-$(ASM_DIR)/%.s.s: %.s
+$(ASM_DIR)/%.s.s: $(OBJ_DIR)/%.s.o
 	mkdir -p $(@D)
-	cp $< $@
+	objdump -drwS $< > $@
 
 # assemble C files, generic
-$(ASM_DIR)/%.c.s: %.c
+$(ASM_DIR)/%.c.s: $(OBJ_DIR)/%.c.o
 	mkdir -p $(@D)
-	$(CC) $(CCFLAGS) -fno-asynchronous-unwind-tables -fverbose-asm -S $< -o $@
+	objdump -drwS $< > $@
 
 # assemble C++ files, generic
-$(ASM_DIR)/%.cpp.s: %.cpp
+$(ASM_DIR)/%.cpp.s: $(OBJ_DIR)/%.cpp.o
 	mkdir -p $(@D)
 	$(CPP) $(CPPFLAGS) -fno-asynchronous-unwind-tables -fverbose-asm -S $< -o $@

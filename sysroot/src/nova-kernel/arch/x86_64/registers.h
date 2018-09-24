@@ -4,31 +4,38 @@
 
 #pragma once
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
 
 typedef struct
 {
     // General purpose.
     uint64_t reg_rax;
-    uint64_t reg_rbx;
-    uint64_t reg_rcx;
-    uint64_t reg_rdx;
-    uint64_t reg_rbp;
-    uint64_t reg_rsp;
-    uint64_t reg_rsi;
-    uint64_t reg_rdi;
-    uint64_t reg_r8;
-    uint64_t reg_r9;
-    uint64_t reg_r10;
-    uint64_t reg_r11;
-    uint64_t reg_r12;
-    uint64_t reg_r13;
-    uint64_t reg_r14;
-    uint64_t reg_r15;
+    uint64_t reg_rbx;       // 8
+    uint64_t reg_rcx;       // 16
+    uint64_t reg_rdx;       // 24
+    uint64_t reg_rbp;       // 32
+    uint64_t reg_rsp;       // 40
+    uint64_t reg_rsi;       // 48
+    uint64_t reg_rdi;       // 56
+    uint64_t reg_r8;        // 64
+    uint64_t reg_r9;        // 72
+    uint64_t reg_r10;       // 80
+    uint64_t reg_r11;       // 88
+    uint64_t reg_r12;       // 96
+    uint64_t reg_r13;       // 104
+    uint64_t reg_r14;       // 112
+    uint64_t reg_r15;       // 120
 
     // Special registers.
-    uint64_t reg_rip;
-    uint64_t reg_flags;
+    uint64_t reg_rip;       // 128
+    uint64_t reg_flags;     // 136
+    uint64_t reg_ss;        // 144
+    uint64_t reg_cs;        // 152
 } Registers;
+
+static_assert(offsetof(Registers, reg_rsp) == 40, "");
+static_assert(offsetof(Registers, reg_rip) == 128, "");

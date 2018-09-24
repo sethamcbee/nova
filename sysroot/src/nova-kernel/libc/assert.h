@@ -2,6 +2,8 @@
 // Created: 2018-9-5
 // Description: Compile-time and run-time assertions.
 
+#pragma once
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,7 +13,7 @@
 #define static_assert _Static_assert
 
 __attribute((noreturn))
-void kassert(const char* file, const char* func, long line, const char* exp)
+static void kassert(const char* file, const char* func, long line, const char* exp)
 {
     char msg[500];
     char line_str[10];

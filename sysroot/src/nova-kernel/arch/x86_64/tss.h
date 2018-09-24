@@ -57,4 +57,7 @@ volatile Tss tss;
 // Must be called to set up the TSS.
 void tss_init(void);
 
+// Loads new state into TR, setting ring# to mask.
+void tss_load(uint16_t mask);
+
 #endif // TSS_H

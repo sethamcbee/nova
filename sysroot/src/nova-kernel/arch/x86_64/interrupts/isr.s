@@ -155,7 +155,14 @@ isr_0:
 
 .global isr_1
 isr_1:
+	# Get IP.
+	popq %r12
+
 	isr_push
+
+	# Handle exception.
+	movq %r12, %rdi
+	call isr_1_ext
 
 	movq $panic_1, %rdi
 	call kernel_panic
@@ -276,7 +283,7 @@ isr_12:
 .global isr_13
 isr_13:
 	# Get error code.
-	movq (%rsp), %r12
+	popq %r12
 
 	isr_push
 
@@ -502,7 +509,6 @@ isr_32:
 
 switch:
 	# Store registers for task switch.
-
 	call task_get_reg
 	# rax contains ptr.
 	movq %rax, task_switch_tmp1 # Store ptr.
@@ -530,20 +536,22 @@ switch:
 	# Fetch and store FLAGS, SP and IP.
 	popq %rbx    # RIP
 	movq %rbx, 128(%rax)
-	popq %rbx    # Eat CS
+	popq %rbx    # CS
+	movq %rbx, 152(%rax)
 	popq %rbx    # FLAGS
 	movq %rbx, 136(%rax)
 	popq %rbx    # RSP
 	movq %rbx, 40(%rax)
-	#popq %rbx    # Eat SS
+	popq %rbx    # SS
+	movq %rbx, 144(%rax)
 
 	# Store rax.
 	movq task_switch_tmp2, %rbx
 	movq %rbx, (%rax)
 
-	#isr_push
+	isr_push
 	call task_next
-	#isr_pop
+	isr_pop
 	iretq
 
 no_switch:
