@@ -73,10 +73,10 @@ TERMINAL=xfce4-terminal
 
 # directory containing gcc
 ifeq ($(ARCH), x86_64)
-	GCC_DIR=/home/sethamcbee/opt/gcc-7.3.0-x86_64-elf/bin
+	GCC_DIR=~/opt/gcc-7.3.0-x86_64-elf/bin
 endif
 ifeq ($(ARCH), x86)
-	GCC_DIR=/home/sethamcbee/opt/gcc-7.3.0-i686-elf/bin
+	GCC_DIR=~/opt/gcc-7.3.0-i686-elf/bin
 endif
 
 # config defines
