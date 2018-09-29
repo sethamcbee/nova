@@ -84,9 +84,6 @@ void kernel_main(void)
     {
         printf("%s%s$ ", user, dir);
         fflush(stdout);
-        
-        char* FCK = malloc(0x1000);
-        free(FCK);
 
         // Get user input.
         scanf("%s", s);
@@ -135,6 +132,11 @@ void kernel_main(void)
         if (strcmp(s, "show") == 0)
         {
             printf("%d\n", A);
+        }
+        if (strcmp(s, "malloc") == 0)
+        {
+            char* waste = malloc(0x100000);
+            *waste = 'w';
         }
     }
     // The kernel is not intended to return; halt.

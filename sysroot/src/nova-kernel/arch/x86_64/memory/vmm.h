@@ -78,6 +78,9 @@ void* vmm_pages_alloc_kernel(size_t n);
 // well as marking it as free in the PMM.
 void vmm_page_free_kernel(void* virt);
 
+// Frees consecutive kernel pages.
+void vmm_pages_free_kernel(void* virt, size_t n);
+
 // Inserts a node and returns a pointer to the new root node.
 Vmm_Node* vmm_tree_insert(Vmm_Node* root, Vmm_Region mem);
 

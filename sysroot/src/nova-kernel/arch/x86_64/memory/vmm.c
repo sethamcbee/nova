@@ -288,6 +288,11 @@ void vmm_init(void)
     // Now we can allocate the new node on the heap.
     vmm_tree_kernel_free = malloc(sizeof(Vmm_Node*));
     *vmm_tree_kernel_free = _vmm_tree_kernel_free;
+    
+    void* a = vmm_page_alloc_kernel();
+    void* b = vmm_page_alloc_kernel();
+    vmm_page_free_kernel(a);
+    vmm_page_free_kernel(b);
 }
 
 void* vmm_phys_addr(void* virt)
@@ -536,9 +541,9 @@ void* vmm_pages_alloc_kernel(size_t n)
         }
         else
         {
-            // Deallocate the memory.
+            // Delete the memory region from the tree.
             virt_base = mem.base;
-            vmm_tree_delete(vmm_tree_kernel_free, mem);
+            vmm_tree_kernel_free = vmm_tree_delete(vmm_tree_kernel_free, mem);
         }
             
         // Map the region.
@@ -563,14 +568,24 @@ void* vmm_pages_alloc_kernel(size_t n)
 
 void vmm_page_free_kernel(void* virt)
 {
-    void* phys = vmm_phys_addr(virt);
+	vmm_pages_free_kernel(virt, 1);
+}
 
-    // Check that the virtual address exists.
-    if (phys != NULL)
-    {
-        vmm_page_unmap(virt);
-        pmm_frame_free(phys);
-    }
+void vmm_pages_free_kernel(void* virt, size_t n)
+{
+	// Modify trees.
+	Vmm_Region region;
+	region.base = virt;
+	region.pages = n;
+	vmm_tree_kernel_free = vmm_tree_insert(vmm_tree_kernel_free, region);
+	
+	// Modify paging tables.
+	for (size_t i = 0; i < n; i++)
+	{
+		vmm_page_unmap(virt);
+		pmm_frame_free(vmm_phys_addr(virt));
+		virt = (void*)(size_t)virt + PAGE_SIZE;
+	}
 }
 
 int vmm_tree_height(Vmm_Node* node)
@@ -672,7 +687,7 @@ Vmm_Node* vmm_tree_insert(Vmm_Node* root, Vmm_Region mem)
         root->l = vmm_tree_insert(root->l, mem);
     }
     else if (mem.base > root->mem.base)
-    {
+    {   
         root->r = vmm_tree_insert(root->r, mem);
     }
     else
@@ -680,8 +695,22 @@ Vmm_Node* vmm_tree_insert(Vmm_Node* root, Vmm_Region mem)
         kernel_panic("VMM tree insert failed.");
     }
     
-    vmm_tree_update_height(root);
+    // TODO: Figure out how to merge with left node correctly.
+	
+	// Check if we should merge with the right node.
+	if (root->r)
+	{
+		void* end = (void*)(size_t)mem.base + mem.pages * PAGE_SIZE;
+		if (end == root->r->mem.base)
+		{
+			mem.base = root->r->mem.base;
+			mem.pages += root->r->mem.pages;
+			root->r = vmm_tree_delete(root->r, root->r->mem);
+			vmm_tree_resize(root, mem);
+		}
+	}
     
+    vmm_tree_update_height(root);
     root = vmm_tree_balance(root);
     
     return (root);
@@ -759,6 +788,7 @@ Vmm_Node* vmm_tree_delete(Vmm_Node* root, Vmm_Region mem)
 Vmm_Region vmm_tree_find_pages(Vmm_Node* root, size_t pages)
 {
     Vmm_Region ret;
+    ret.base = NULL;
     
     if (root == NULL)
     {
