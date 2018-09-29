@@ -84,6 +84,9 @@ void kernel_main(void)
     {
         printf("%s%s$ ", user, dir);
         fflush(stdout);
+        
+        char* FCK = malloc(0x1000);
+        free(FCK);
 
         // Get user input.
         scanf("%s", s);

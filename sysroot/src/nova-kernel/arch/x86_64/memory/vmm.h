@@ -27,6 +27,30 @@ extern void *kernel_ro_end;
 #define PT_INDEX(addr)    ((((size_t)(addr)) >> 12) & 511UL)
 #define PT_OFFSET(addr)    ((size_t)(addr) & 0xFFFUL)
 
+typedef struct Vmm_Region Vmm_Region;
+struct Vmm_Region
+{
+	void* base;
+	size_t pages;
+};
+
+// Stores a region of virtual memory.
+// Implemented as an AVL tree.
+typedef struct Vmm_Node Vmm_Node;
+struct Vmm_Node
+{
+	Vmm_Region mem;
+	int height;
+	Vmm_Node* l;
+	Vmm_Node* r;
+};
+
+// Virtual memory trees.
+Vmm_Node* vmm_tree_kernel_free;
+Vmm_Node* vmm_tree_kernel_used;
+Vmm_Node* vmm_tree_user_free;
+Vmm_Node* vmm_tree_user_used;
+
 // Convert virtual address to physical address.
 void* vmm_phys_addr(void* virt);
 
@@ -53,3 +77,16 @@ void* vmm_pages_alloc_kernel(size_t n);
 // Frees a page that was used by the kernel. This unmaps the page, as
 // well as marking it as free in the PMM.
 void vmm_page_free_kernel(void* virt);
+
+// Inserts a node and returns a pointer to the new root node.
+Vmm_Node* vmm_tree_insert(Vmm_Node* root, Vmm_Region mem);
+
+// Deletes a node and returns a pointer to the new root node.
+Vmm_Node* vmm_tree_delete(Vmm_Node* root, Vmm_Region mem);
+
+// Searches a tree for a sufficient amount of pages.
+// return.pages == 0 when no sufficient region was found.
+Vmm_Region vmm_tree_find_pages(Vmm_Node* root, size_t pages);
+
+// Resizes a node by changing its page count (NOT its base).
+Vmm_Node* vmm_tree_resize(Vmm_Node* root, Vmm_Region mem);

@@ -14,7 +14,7 @@ SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
 ARCH=x86_64
-OPTIMIZE=-Os -mno-sse
+OPTIMIZE=-O0 -mno-sse
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -237,7 +237,7 @@ QEMU_FLAGS=\
 	-smp $(QEMU_SMP) \
 	-vga std \
 	-soundhw pcspk,sb16 \
-	-enable-kvm
+#	-enable-kvm
 
 # Bochs application settings.
 #BOCHS=$(HOME)/opt/bochs/bin/bochs
