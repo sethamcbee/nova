@@ -423,7 +423,7 @@ int vfprintf(FILE *stream, const char *format, va_list arg)
             {
                 if (length != LENGTH_WIDE)
                 {
-                    char c = (char) va_arg(arg, int);
+                    char c = va_arg(arg, int);
                     fputc(c, stream);
                     written++;
                 }
@@ -435,10 +435,10 @@ int vfprintf(FILE *stream, const char *format, va_list arg)
             {
                 // Get precision from va_arg if specified.
                 if (precision == PRECISION_ARG)
-                    precision = (int) va_arg(arg, int);
+                    precision = va_arg(arg, int);
 
                 // Get pointer to string.
-                const char *s = (const char*) va_arg(arg, const char *);
+                const char *s = va_arg(arg, const char *);
 
                 if (precision > 0)
                 {
@@ -701,7 +701,7 @@ int vfscanf(FILE *stream, const char *format, va_list arg)
                     precision = (int) va_arg(arg, int);
 
                 // Get pointer to string.
-                char *s = (char*) va_arg(arg, char*);
+                char *s = va_arg(arg, char*);
 
                 if (precision > 0)
                 {

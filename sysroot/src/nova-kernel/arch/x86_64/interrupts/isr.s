@@ -549,9 +549,9 @@ switch:
 	movq task_switch_tmp2, %rbx
 	movq %rbx, (%rax)
 
-	isr_push
+	#isr_push
 	call task_next
-	isr_pop
+	#isr_pop
 	iretq
 
 no_switch:

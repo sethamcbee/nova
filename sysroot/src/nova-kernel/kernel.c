@@ -46,6 +46,13 @@ void fun1(void)
 
 void fun2(void)
 {
+    char s[100];
+    while (1)
+    {
+        printf("user:/$ ");
+        scanf("%s", s);
+    }
+    
     while (1)
     {
         A--;
@@ -101,12 +108,14 @@ void kernel_main(void)
 
             // Create process 1.
             Process* proc1 = malloc(sizeof(Process));
-            proc1->reg.reg_rip = (uint64_t)&fun1;
-            proc1->reg.reg_rsp = (uint64_t)&ustk1 + 0x1000;
+            proc1->reg.reg_rip = (uint64_t)fun1;
+            proc1->reg.reg_rsp = (uint64_t)ustk1 + 0x1000;
             proc1->reg.reg_flags = cpu_get_flags();
-            proc1->reg.reg_ss = GDT_USER_DATA | RING3;
-            proc1->reg.reg_cs = GDT_USER_CODE | RING3;
-            proc1->rsp0 = (uint64_t)&kstk1 + 0x1000;
+            //proc1->reg.reg_ss = GDT_USER_DATA | RING3;
+            proc1->reg.reg_ss = GDT_KERNEL_DATA;
+            //proc1->reg.reg_cs = GDT_USER_CODE | RING3;
+            proc1->reg.reg_cs = GDT_KERNEL_CODE;
+            proc1->rsp0 = (uint64_t)kstk1 + 0x1000;
             proc1->priv = 3;
             Task* task1 = malloc(sizeof(Task));
             task1->proc = proc1;
@@ -114,12 +123,14 @@ void kernel_main(void)
 
             // Create process 2.
             Process* proc2 = malloc(sizeof(Process));
-            proc2->reg.reg_rip = (uint64_t)&fun2;
-            proc2->reg.reg_rsp = (uint64_t)&ustk2 + 0x1000;
+            proc2->reg.reg_rip = (uint64_t)fun2;
+            proc2->reg.reg_rsp = (uint64_t)ustk2 + 0x1000;
             proc2->reg.reg_flags = cpu_get_flags();
-            proc2->reg.reg_ss = GDT_USER_DATA | RING3;
-            proc2->reg.reg_cs = GDT_USER_CODE | RING3;
-            proc2->rsp0 = (uint64_t)&kstk2 + 0x1000;
+            //proc2->reg.reg_ss = GDT_USER_DATA | RING3;
+            proc2->reg.reg_ss = GDT_KERNEL_DATA;
+            //proc2->reg.reg_cs = GDT_USER_CODE | RING3;
+            proc2->reg.reg_cs = GDT_KERNEL_CODE;
+            proc2->rsp0 = (uint64_t)kstk2 + 0x1000;
             proc2->priv = 3;
             Task* task2 = malloc(sizeof(Task));
             task2->proc = proc2;
@@ -128,15 +139,16 @@ void kernel_main(void)
             // Queue processes.
             task_add(task2);
             task_add(task1);
+            
+            // Freeze this thread.
+            while (1)
+            {
+                asm volatile ("nop \n" : : : "memory");
+            }
         }
         if (strcmp(s, "show") == 0)
         {
             printf("%d\n", A);
-        }
-        if (strcmp(s, "malloc") == 0)
-        {
-            char* waste = malloc(0x100000);
-            *waste = 'w';
         }
     }
     // The kernel is not intended to return; halt.

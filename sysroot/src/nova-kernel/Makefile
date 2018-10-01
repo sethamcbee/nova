@@ -139,7 +139,7 @@ ifeq ($(ARCH), x86_64)
 		-ffreestanding \
 		-nostdlib \
 		-static \
-		-lgcc
+		-mno-red-zone
 endif
 ifeq ($(ARCH), x86)
 	GCC_PREFIX=i686-elf-
@@ -264,7 +264,7 @@ obj: $(OBJ)
 $(BIN): $(OBJ)
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(DEBUG_DIR)
-	$(LD) -T $(LD_SCRIPT) -o $(BIN) $(LDFLAGS) $(OBJ)
+	$(LD) -T $(LD_SCRIPT) -o $(BIN) $(LDFLAGS) $(OBJ) -lgcc
 
 # target to build output binary
 .PHONY: bin
