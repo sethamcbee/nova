@@ -274,6 +274,11 @@ bin: $(BIN)
 .PHONY: iso
 iso: $(ISO)
 
+# Run CPPCheck on entire codebase.
+.PHONY: cppcheck
+cppcheck: $(SRC)
+	cppcheck -q .
+
 # build output iso
 $(ISO): $(BIN)
 	mkdir -p $(GRUB_DIR)/boot/grub

@@ -47,7 +47,7 @@ void fun2(void)
     {
         printf("user:/$ ");
         scanf("%s", s);
-        if (strcmp("show", s) == 0)
+        if (strcmp(s, "show") == 0)
         {
             printf("%d\n", A);
         }
@@ -123,8 +123,10 @@ void kernel_main(void)
             proc2->reg.rip = (uint64_t)fun2;
             proc2->reg.rsp = (uint64_t)ustk2 + 0x1000;
             proc2->reg.flags = cpu_get_flags();
-            proc2->reg.ss = GDT_USER_DATA | RING3;
-            proc2->reg.cs = GDT_USER_CODE | RING3;
+            //proc2->reg.ss = GDT_USER_DATA | RING3;
+            proc2->reg.ss = GDT_KERNEL_DATA;
+            //proc2->reg.cs = GDT_USER_CODE | RING3;
+            proc2->reg.cs = GDT_KERNEL_CODE;
             proc2->rsp0 = (uint64_t)kstk2 + 0x1000;
             proc2->priv = 3;
             Task* task2 = malloc(sizeof(Task));
