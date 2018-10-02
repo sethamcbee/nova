@@ -31,4 +31,7 @@ int kernel_log(const char *s);
 __attribute__((noreturn))
 void kernel_halt(void);
 
+// Loaded kernel module, from bootloader.
+void* kernel_module;
+
 #endif // KERNEL_H

@@ -78,9 +78,6 @@ void kernel_main(void)
     kernel_task.ticks = DEFAULT_TICKS;
     kernel_task.next = &kernel_task;
     cur_task = &kernel_task;
-    
-    // TEST
-    
 
     // Kernel loop.
     while (1)
@@ -90,6 +87,12 @@ void kernel_main(void)
 
         // Get user input.
         scanf("%s", s);
+        if (strcmp(s, "module") == 0)
+        {
+            char* contents = vmm_page_alloc_kernel();
+            vmm_page_map(kernel_module, contents, PG_PR | PG_RW | PG_U);
+            printf("%s\n", contents);
+        }
         if (strcmp(s, "test") == 0)
         {
             char* kstk1 = vmm_page_alloc_kernel();
