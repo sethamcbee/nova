@@ -24,15 +24,15 @@
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/memory/vmm.h>
 
-volatile int A;
+volatile int a;
 
 void fun1(void)
 {
-    A = 100;
+    a = 100;
 
     while (1)
     {
-        A++;
+        a++;
         for (size_t i = 0; i < 0x100000; i++)
             asm volatile ("nop \n" : : : "memory");
     }
@@ -49,7 +49,7 @@ void fun2(void)
         scanf("%s", s);
         if (strcmp(s, "show") == 0)
         {
-            printf("%d\n", A);
+            printf("%d\n", a);
         }
     }
 
@@ -140,7 +140,7 @@ void kernel_main(void)
             // TEST.
             while (1)
             {
-                A--;
+                a--;
                 for (size_t i = 0; i < 0x100000; i++)
                     asm volatile ("nop \n" : : : "memory");
             }
