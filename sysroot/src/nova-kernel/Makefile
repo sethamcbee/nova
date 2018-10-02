@@ -27,6 +27,7 @@ GRUB_DIR=$(BUILD_DIR)/grub
 ISO_DIR=$(BUILD_DIR)/iso
 RELEASE_DIR=$(BUILD_DIR)/release
 DEBUG_DIR=$(BUILD_DIR)/debug
+DOC_DIR=$(BUILD_DIR)/doc
 QEMU_DIR=$(BUILD_DIR)/qemu
 
 # find all source files except architecture-specific files
@@ -278,6 +279,13 @@ iso: $(ISO)
 .PHONY: cppcheck
 cppcheck: $(SRC)
 	cppcheck -q .
+
+# Generate documentation.
+.PHONY: doc
+doc: $(DOC_DIR)/html/index.html
+
+$(DOC_DIR)/html/index.html: $(SRC) doxygen.cfg
+	doxygen doxygen.cfg
 
 # build output iso
 $(ISO): $(BIN)
