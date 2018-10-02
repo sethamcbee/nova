@@ -535,6 +535,7 @@ int printf(const char *format, ...)
     va_list arg;
     va_start(arg, format);
     ret = vfprintf(stdout, format, arg);
+    va_end(arg);
     return (ret);
 }
 
@@ -566,6 +567,7 @@ int sprintf(char *s, const char *format, ...)
     va_list arg;
     va_start(arg, format);
     ret = vsprintf(s, format, arg);
+    va_end(arg);
     return (ret);
 }
 
