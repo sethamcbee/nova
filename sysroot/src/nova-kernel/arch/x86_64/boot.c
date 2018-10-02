@@ -22,6 +22,8 @@
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 
+void* kernel_module;
+
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
 
@@ -66,9 +68,10 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
 void multiboot2_parse(struct multiboot_tag *mb_tag)
 {
     char s[20];
-    struct multiboot_tag *mb_end;
-    struct multiboot_tag_string *mb_tag_string;
-    struct multiboot_tag_mmap *mb_mmap = NULL;
+    struct multiboot_tag* mb_end;
+    struct multiboot_tag_string* mb_tag_string;
+    struct multiboot_tag_module* mb_tag_module;
+    struct multiboot_tag_mmap* mb_mmap = NULL;
     bool memory_map_found = false;
 
     mb_end = (struct multiboot_tag*) (((uint8_t*)mb_tag) + mb_tag->type);
@@ -103,6 +106,12 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
             memory_map_found = true;
             mb_mmap = (struct multiboot_tag_mmap*)mb_tag;
             break;
+            
+        // Module.
+        case MULTIBOOT_TAG_TYPE_MODULE:
+			mb_tag_module = (struct multiboot_tag_module*)mb_tag;
+			kernel_module = (void*)mb_tag_module->mod_start;
+			break;
 
         // Treat unsupported tag as basic tag.
         default:

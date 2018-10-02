@@ -125,7 +125,7 @@ static inline uint64_t cpu_rdtsc(void)
     return (ret);
 }
 
-// Returns the contents of the FLAGS register.
+// Returns the contents of the RFLAGS register.
 static inline uint64_t cpu_get_flags(void)
 {
     uint64_t ret;
@@ -140,15 +140,30 @@ static inline uint64_t cpu_get_flags(void)
     return (ret);
 }
 
-void cpu_proc_asm(Process* proc);
+// Sets the contents of the RFLAGS register.
+static inline void cpu_set_flags(uint64_t flags)
+{
+	asm volatile
+	(
+		"pushq %0 \n"
+		"popfq \n"
+		:
+		: "A" (flags)
+		:
+	);
+}
 
+// Handles the actual task switching.
+void cpu_proc_asm(Registers* proc);
+
+// Switches context to a given process.
 static inline void cpu_proc(Process* proc)
 {
     // Set up the TSS.
     tss.rsp0 = proc->rsp0;
 
     // Jump to code.
-    cpu_proc_asm(proc);
+    cpu_proc_asm(&proc->reg);
 }
 
 #endif // CPU_H

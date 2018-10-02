@@ -26,7 +26,6 @@ static ssize_t (*ext_write)(const void *, size_t n);
 // Writes data.
 static ssize_t tty_write(const void *s, size_t n)
 {
-    ssize_t ret = 0;
     return ( ext_write(s, n) );
 }
 

@@ -278,7 +278,8 @@ iso: $(ISO)
 $(ISO): $(BIN)
 	mkdir -p $(GRUB_DIR)/boot/grub
 	mkdir -p $(ISO_DIR)
-	cp $(SRC_DIR)/grub.cfg $(GRUB_DIR)/boot/grub/
+	cp $(SRC_DIR)/grub/grub.cfg $(GRUB_DIR)/boot/grub/
+	cp $(SRC_DIR)/grub/manifest.txt $(GRUB_DIR)/boot/
 	cp $(BIN) $(GRUB_DIR)/boot/$(VERSION).bin
 	$(GRUB) $(GRUB_FLAGS) -o $(ISO) $(GRUB_DIR)
 

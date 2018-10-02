@@ -28,15 +28,11 @@ volatile int A;
 
 void fun1(void)
 {
-    //char* a = malloc(0x1000);
-    char a[512] = "0";
-
     A = 100;
 
     while (1)
     {
         A++;
-        //printf("%d\n", A);
         for (size_t i = 0; i < 0x100000; i++)
             asm volatile ("nop \n" : : : "memory");
     }
@@ -51,13 +47,10 @@ void fun2(void)
     {
         printf("user:/$ ");
         scanf("%s", s);
-    }
-    
-    while (1)
-    {
-        A--;
-        for (size_t i = 0; i < 0x100000; i++)
-            asm volatile ("nop \n" : : : "memory");
+        if (strcmp("show", s) == 0)
+        {
+            printf("%d\n", A);
+        }
     }
 
     asm volatile ("int $0x10 \n");
@@ -85,6 +78,9 @@ void kernel_main(void)
     kernel_task.ticks = DEFAULT_TICKS;
     kernel_task.next = &kernel_task;
     cur_task = &kernel_task;
+    
+    // TEST
+    
 
     // Kernel loop.
     while (1)
@@ -108,13 +104,11 @@ void kernel_main(void)
 
             // Create process 1.
             Process* proc1 = malloc(sizeof(Process));
-            proc1->reg.reg_rip = (uint64_t)fun1;
-            proc1->reg.reg_rsp = (uint64_t)ustk1 + 0x1000;
-            proc1->reg.reg_flags = cpu_get_flags();
-            //proc1->reg.reg_ss = GDT_USER_DATA | RING3;
-            proc1->reg.reg_ss = GDT_KERNEL_DATA;
-            //proc1->reg.reg_cs = GDT_USER_CODE | RING3;
-            proc1->reg.reg_cs = GDT_KERNEL_CODE;
+            proc1->reg.rip = (uint64_t)fun1;
+            proc1->reg.rsp = (uint64_t)ustk1 + 0x1000;
+            proc1->reg.flags = cpu_get_flags();
+            proc1->reg.ss = GDT_USER_DATA | RING3;
+            proc1->reg.cs = GDT_USER_CODE | RING3;
             proc1->rsp0 = (uint64_t)kstk1 + 0x1000;
             proc1->priv = 3;
             Task* task1 = malloc(sizeof(Task));
@@ -123,13 +117,11 @@ void kernel_main(void)
 
             // Create process 2.
             Process* proc2 = malloc(sizeof(Process));
-            proc2->reg.reg_rip = (uint64_t)fun2;
-            proc2->reg.reg_rsp = (uint64_t)ustk2 + 0x1000;
-            proc2->reg.reg_flags = cpu_get_flags();
-            //proc2->reg.reg_ss = GDT_USER_DATA | RING3;
-            proc2->reg.reg_ss = GDT_KERNEL_DATA;
-            //proc2->reg.reg_cs = GDT_USER_CODE | RING3;
-            proc2->reg.reg_cs = GDT_KERNEL_CODE;
+            proc2->reg.rip = (uint64_t)fun2;
+            proc2->reg.rsp = (uint64_t)ustk2 + 0x1000;
+            proc2->reg.flags = cpu_get_flags();
+            proc2->reg.ss = GDT_USER_DATA | RING3;
+            proc2->reg.cs = GDT_USER_CODE | RING3;
             proc2->rsp0 = (uint64_t)kstk2 + 0x1000;
             proc2->priv = 3;
             Task* task2 = malloc(sizeof(Task));
@@ -140,15 +132,13 @@ void kernel_main(void)
             task_add(task2);
             task_add(task1);
             
-            // Freeze this thread.
+            // TEST.
             while (1)
             {
-                asm volatile ("nop \n" : : : "memory");
+                A--;
+                for (size_t i = 0; i < 0x100000; i++)
+                    asm volatile ("nop \n" : : : "memory");
             }
-        }
-        if (strcmp(s, "show") == 0)
-        {
-            printf("%d\n", A);
         }
     }
     // The kernel is not intended to return; halt.

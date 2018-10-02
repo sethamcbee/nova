@@ -4,7 +4,7 @@
 
 .text
 
-# Proc struct* stored in rdi
+# Register struct* stored in rdi
 .global cpu_proc_asm
 cpu_proc_asm:
     # Load registers with stored values.
