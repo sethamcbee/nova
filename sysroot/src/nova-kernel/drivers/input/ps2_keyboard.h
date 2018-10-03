@@ -1,13 +1,13 @@
-// Authors: Seth McBee
-// Created: 2018-4-12
-// Description: Generic PS/2 keyboard driver.
+/**
+ * @file ps2_keyboard.h
+ * @author Seth McBee
+ * @date 2018-4-12
+ * @brief Generic PS/2 keyboard driver.
+ */
 
-#ifndef PS2_KEYBOARD_H
-#define PS2_KEYBOARD_H
+#pragma once
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <stdio.h>
 
@@ -60,6 +60,4 @@ uint8_t ps2_keyboard_queue_count;
 char ps2_keyboard_table[256];
 
 // stdio input device.
-FILE *ps2_keyboard_stream;
-
-#endif // PS2_KEYBOARD_H
+FILE* ps2_keyboard_stream;

@@ -5,10 +5,6 @@
 #ifndef VGA_TEXT_H
 #define VGA_TEXT_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-
 #include <globals.h>
 
 #define VGA_TEXT_BUFFER 0xB8000

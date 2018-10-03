@@ -1,15 +1,15 @@
-// Authors: Seth McBee
-// Created: 2018-4-12
-// Description: Generic PS/2 keyboard driver.
+/**
+ * @file ps2_keyboard.c
+ * @author Seth McBee
+ * @date 2018-4-12
+ * @brief Generic PS/2 keyboard driver.
+ */
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#include <globals.h>
 #include <kernel.h>
 #include <hal/keyboard.h>
 #include <drivers/input/ps2_keyboard.h>
@@ -630,6 +630,7 @@ void ps2_keyboard_handle(uint8_t code)
     code_last = code;
 }
 
+/// Eat garbage data from the device's internal buffer.
 static void ps2_kb_flush(void)
 {
     bool ret = false;

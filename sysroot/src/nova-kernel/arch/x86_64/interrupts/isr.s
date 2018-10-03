@@ -562,9 +562,6 @@ no_switch:
 isr_33:
 	isr_push
 
-	#movq $panic_33, %rdi
-	#call kernel_log
-
 	call isr_33_ext
 
 	isr_pop
