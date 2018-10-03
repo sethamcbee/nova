@@ -287,6 +287,11 @@ iso: $(ISO)
 cppcheck: $(SRC)
 	cppcheck -q .
 
+# Print LOC stats.
+.PHONY: cloc
+cloc:
+	cloc . --exclude-dir=build
+
 # Generate documentation.
 .PHONY: doc
 doc: $(DOC_DIR)/
