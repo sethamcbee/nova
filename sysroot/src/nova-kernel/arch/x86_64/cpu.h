@@ -160,7 +160,7 @@ void cpu_proc_asm(Registers* proc);
 static inline void cpu_proc(Process* proc)
 {
     // Set up the TSS.
-    tss.rsp0 = proc->rsp0;
+    tss.rsp0 = proc->kernel_stack;
 
     // Jump to code.
     cpu_proc_asm(&proc->reg);

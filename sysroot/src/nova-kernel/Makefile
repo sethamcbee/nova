@@ -39,11 +39,13 @@ ifeq ($(ARCH), x86_64)
 	LD_SCRIPT=arch/x86_64/x86_64.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.c")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.s")
+	DOXYGEN_CFG=x86_64.doxygen
 endif
 ifeq ($(ARCH), x86)
 	LD_SCRIPT=arch/x86/x86.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.c")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.s")
+	DOXYGEN_CFG=x86.doxygen
 endif
 
 # objects list made from generic sources list
@@ -246,7 +248,7 @@ BOCHS=bochs
 
 # build objects, binary, and disk image
 .PHONY: default
-default: iso
+default: iso doc
 
 # rebuild objects, binary, and disk image
 .PHONY: remake
@@ -255,7 +257,7 @@ remake: clean iso
 # delete contents of build folder
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BIN_DIR) $(OBJ_DIR) $(ASM_DIR) $(GRUB_DIR) $(ISO_DIR) $(DEBUG_DIR)
 
 # target to build all objects
 .PHONY: obj
@@ -284,9 +286,6 @@ cppcheck: $(SRC)
 .PHONY: doc
 doc: $(DOC_DIR)/html/index.html
 
-$(DOC_DIR)/html/index.html: $(SRC) doxygen.cfg
-	doxygen doxygen.cfg
-
 # build output iso
 $(ISO): $(BIN)
 	mkdir -p $(GRUB_DIR)/boot/grub
@@ -308,6 +307,11 @@ bochs: $(ISO)
 # target to export assembled source files
 .PHONY: asm
 asm: $(ASM)
+
+# Target to generate HTML documentation using doxygen.
+$(DOC_DIR)/html/index.html: $(SRC) $(DOXYGEN_CFG)
+	mkdir -p $(DOC_DIR)
+	doxygen $(DOXYGEN_CFG)
 
 # assemble assembly files, generic
 $(OBJ_DIR)/%.s.o: %.s
@@ -337,4 +341,4 @@ $(ASM_DIR)/%.c.s: $(OBJ_DIR)/%.c.o
 # assemble C++ files, generic
 $(ASM_DIR)/%.cpp.s: $(OBJ_DIR)/%.cpp.o
 	mkdir -p $(@D)
-	$(CPP) $(CPPFLAGS) -fno-asynchronous-unwind-tables -fverbose-asm -S $< -o $@
+	objdump -drwS $< > $@

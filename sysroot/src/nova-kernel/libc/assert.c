@@ -1,12 +1,14 @@
-// Authors: Seth McBee
-// Created: 2018-9-28
-// Description: Implementation of kernel-level assertions.
+/**
+ * @file assert.c
+ * @author Seth McBee
+ * @date 2018-9-28
+ * @brief Implementation of kernel-level assertions.
+ */
 
 #include <assert.h>
 
 #include <kernel.h>
 
-__attribute((noreturn))
 void kassert(const char* file, const char* func, long line, const char* exp)
 {
     char msg[500];

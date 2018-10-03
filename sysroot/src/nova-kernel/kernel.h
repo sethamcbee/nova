@@ -1,37 +1,71 @@
-// Authors: Seth McBee
-// Created: 2017-10-14
-// Description: Main kernel.
+/**
+ * @file kernel.h
+ * @author Seth McBee
+ * @date 2017-10-14
+ * @brief Kernel entry point and miscellaneous kernel functions.
+ */
 
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-
 #include <globals.h>
 
-// Main kernel. Should only be called once.
+/**
+ * @brief Kernel entry point. Should never return.
+ */
 void kernel_main(void);
 
-// Kernel panic. Prints panic message and then halts infinitely.
-__attribute__((noreturn))
+/**
+ * @brief Print string to terminal and halts all operations. Should
+ * never return.
+ * 
+ * @param str Error message to be printed. Must not exceed 10000
+ * bytes in length.
+ */
 void kernel_panic(char *str);
 
-// Function pointer to the environment-specific terminal write().
-ssize_t (*kernel_write)(const void *, size_t);
+/**
+ * @brief Points to the write function for an environment-specific
+ * file or device.
+ * 
+ * @param s Data to be written (likely to be char's, but this is
+ * not necessarily the case). Data must be contiguous in virtual
+ * memory.
+ * @param n Length of the data stream to be written.
+ * 
+ * @return Number of bytes written, or an error code.
+ */
 
-// Finds the length of the string and then calls kernel_write.
+ssize_t (*kernel_write)(const void*, size_t);
+
+/**
+ * @brief Writes a string using kernel_write() without a specified
+ * length.
+ * 
+ * @param s Data to be written. Must be null-terminated.
+ * 
+ * @return Number of bytes written, or an error code.
+ */
 int kernel_print(const char *s);
 
-// Stores the string in the kernel log.
+/**
+ * @brief Writes a string to a file, rather than to stdout or stderr.
+ * 
+ * @param s Data to be written. Must be null-terminated.
+ * 
+ * @return Number of bytes written, or an error code.
+ */
 int kernel_log(const char *s);
 
-// Safely stops all operation.
-__attribute__((noreturn))
+/**
+ * @brief Safely halts all operations. Does not return.
+ */
 void kernel_halt(void);
 
-// Loaded kernel module, from bootloader.
+/**
+ * @brief Kernel module loaded by the bootloader, or NULL if no
+ * module was loaded.
+ */
 void* kernel_module;
 
 #endif // KERNEL_H

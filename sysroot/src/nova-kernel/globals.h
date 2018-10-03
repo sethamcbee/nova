@@ -1,28 +1,20 @@
-/*
- * globals.h
- *
- * Copyright 2014 Seth Nils <altindiefanboy@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+/**
+ * @file globals.h
+ * @author Seth McBee
+ * @date 2014-?-?
+ * @brief Miscellaneous typedefs and macros.
  */
 
-#ifndef GLOBALS_H_INCLUDED
-#define GLOBALS_H_INCLUDED
+#include <assert.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-typedef long long ssize_t;
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+typedef ptrdiff_t ssize_t;
 
 /**
  * @brief Sets a bit, giving it a value of 1.
@@ -86,4 +78,4 @@ typedef long long ssize_t;
  */
 #define UNLIKELY(x) __builtin_expect((x), 0)
 
-#endif /* GLOBALS_H_INCLUDED */
+#endif // GLOBALS_H

@@ -1,23 +1,41 @@
-// Authors: Seth McBee
-// Created: 2018-9-6
-// Description: Kernel and userpace process structs.
+/**
+ * @file process.h
+ * @author Seth McBee
+ * @date 2018-9-6
+ * @brief Kernel and userspace process structs.
+ */
 
 #pragma once
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
+#ifdef ARCH_X86
+#include <arch/x86/registers.h>
+#endif // ARCH_X86
+
+#ifdef ARCH_X86_64
 #include <arch/x86_64/registers.h>
+#endif // ARCH_X86_64
 
+/**
+ * @brief Stores process information.
+ */
 typedef struct
-{
-    // Virtual address of the register storage.
-    Registers reg;
+{	
+	/**
+	 * @brief Top of the kernel stack associated with this process.
+	 */
+    size_t kernel_stack;
 
-    // RSP0 to store in TSS.
-    uint64_t rsp0;
-
-    // Kernel = 0, User = 3;
+	/**
+	 * @brief Privilege level of this process.
+	 * @note Kernel = 0, User = 3
+	 */
     uint8_t priv;
+    
+    /**
+     * @brief Stores architecture-specific register state for this
+     * process.
+     */
+    Registers reg;
 } Process;

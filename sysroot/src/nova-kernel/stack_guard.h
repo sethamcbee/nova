@@ -1,24 +1,33 @@
-// Authors: Seth McBee
-// Created: 2018-4-13
-// Description: GCC stack guard implementation.
-
-#ifdef STACK_GUARD
+/**
+ * @file stack_guard.h
+ * @author Seth McBee
+ * @date 2018-4-13
+ * @brief GCC stack guard support.
+ */
 
 #ifndef STACK_GUARD_H
 #define STACK_GUARD_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+//#ifdef STACK_GUARD
 
-// Some arbitrary value.
+#include <globals.h>
+
+/**
+ * @brief Some arbitrary value for the stack guard implementation to
+ * check for stack clobbering.
+ */
 #define STACK_CHK_GUARD 0x9012
 
+/**
+ * @brief Pointer used by GCC stack guard code.
+ */
 uintptr_t __stack_chk_guard;
 
-__attribute__((noreturn))
+/**
+ * @brief Function called upon detection of stack corruption.
+ */
 void __stack_chk_fail(void);
 
-#endif // STACK_GUARD_H
+//#endif // STACK_GUARD
 
-#endif // STACK_GUARD
+#endif // STACK_GUARD_H

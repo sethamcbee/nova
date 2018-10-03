@@ -1,15 +1,11 @@
-// Authors: Seth McBee
-// Created: 2017-10-14
-// Description: Main kernel.
+/**
+ * @file kernel.c
+ * @author Seth McBee
+ * @date 2017-10-14
+ * @brief Kernel entry point.
+ */
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <globals.h>
 
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
@@ -72,7 +68,7 @@ void kernel_main(void)
     // Set up scheduler.
     Process kernel_proc;
     kernel_proc.priv = 0;
-    kernel_proc.rsp0 = 0;
+    kernel_proc.kernel_stack = 0;
     Task kernel_task;
     kernel_task.proc = &kernel_proc;
     kernel_task.ticks = DEFAULT_TICKS;
@@ -112,7 +108,7 @@ void kernel_main(void)
             proc1->reg.flags = cpu_get_flags();
             proc1->reg.ss = GDT_USER_DATA | RING3;
             proc1->reg.cs = GDT_USER_CODE | RING3;
-            proc1->rsp0 = (uint64_t)kstk1 + 0x1000;
+            proc1->kernel_stack = (uint64_t)kstk1 + 0x1000;
             proc1->priv = 3;
             Task* task1 = malloc(sizeof(Task));
             task1->proc = proc1;
@@ -127,7 +123,7 @@ void kernel_main(void)
             proc2->reg.ss = GDT_KERNEL_DATA;
             //proc2->reg.cs = GDT_USER_CODE | RING3;
             proc2->reg.cs = GDT_KERNEL_CODE;
-            proc2->rsp0 = (uint64_t)kstk2 + 0x1000;
+            proc2->kernel_stack = (uint64_t)kstk2 + 0x1000;
             proc2->priv = 3;
             Task* task2 = malloc(sizeof(Task));
             task2->proc = proc2;
@@ -151,7 +147,6 @@ void kernel_main(void)
     kernel_halt();
 }
 
-__attribute__((noreturn))
 void kernel_panic(char* str)
 {
     // Just pass the string to print for now.
@@ -194,7 +189,6 @@ int kernel_log(const char *s)
     return (ret);
 }
 
-__attribute__((noreturn))
 void kernel_halt(void)
 {
 #if defined(ARCH_X86_64) || defined(ARCH_X86)

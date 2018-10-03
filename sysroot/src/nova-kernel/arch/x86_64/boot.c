@@ -22,7 +22,7 @@
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 
-void* kernel_module;
+void* kernel_module = NULL;
 
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
@@ -110,7 +110,7 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
         // Module.
         case MULTIBOOT_TAG_TYPE_MODULE:
 			mb_tag_module = (struct multiboot_tag_module*)mb_tag;
-			kernel_module = (void*)mb_tag_module->mod_start;
+			kernel_module = (void*)(uint64_t)mb_tag_module->mod_start;
 			break;
 
         // Treat unsupported tag as basic tag.

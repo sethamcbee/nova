@@ -1,41 +1,75 @@
-// Authors: Seth McBee
-// Created: 2018-9-6
-// Description: Scheduler for process switching.
+/**
+ * @file scheduler.h
+ * @author Seth McBee
+ * @date 2018-9-6
+ * @brief Scheduler for process switching.
+ */
 
-#pragma once
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <proc/process.h>
 
-#define DEFAULT_TICKS 1
+/**
+ * @brief Number of ticks before a task switch.
+ */
+#define DEFAULT_TICKS 5
 
-// Stub. "next" just points to the next task, or itself if it is
-// the last remaining process.
 typedef struct Task Task;
-struct Task
+
+/**
+ * @brief Stores information pertaining to a task.
+ * @note This should be replaced with a proper implementation.
+ */
+typedef struct Task
 {
+	/**
+	 * @brief Info for the process belonging to this task.
+	 */
     Process* proc;
 
-    // Number of clock ticks remaining until this task loses context.
+	/**
+	 * @brief Number of ticks remaining before a forced task switch.
+	 */
     size_t ticks;
 
+	/**
+	 * @brief Points to the next task to switch to.
+	 */
     Task* next;
-};
+} Task;
 
-// Points to the current task.
+/**
+ * @brief Points to the current task.
+ */
 Task* cur_task;
 
-// Decrements task and returns whether the task should change.
+/**
+ * @brief Decrement the tick count for the current task and return
+ * whether a task switch should occur.
+ * 
+ * @return Whether a task switch should occur.
+ */
 bool task_tick(void);
 
-// Switches context to the next task.
+/**
+ * @brief Switch context to the next task.
+ */
 void task_next(void);
 
-// Adds a task after the current one.
+/**
+ * @brief Add a task to the list, immediately after the current
+ * task.
+ * 
+ * @param new_task New task to be added to the list.
+ */
 void task_add(Task* new_task);
 
-// Gets pointer to the register storage of the current process.
+/**
+ * @brief Get a pointer to the current task's stored CPU state.
+ */
 Registers* task_get_reg(void);
+
+#endif // SCHEDULER_H

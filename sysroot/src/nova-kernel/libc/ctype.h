@@ -1,12 +1,12 @@
 /**
  * @file ctype.h
- *
- * @author Seth Nils
- * @date 2014/6/5
+ * @author Seth McBee
+ * @date 2014-6-5
+ * @brief C standard library ctype header.
  */
 
-#ifndef _CTYPE_H_INCLUDED
-#define _CTYPE_H_INCLUDED
+#ifndef CTYPE_H
+#define CTYPE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -139,4 +139,4 @@ int toupper(int c);
 }
 #endif
 
-#endif /* _CTYPE_H_INCLUDED */
+#endif /* CTYPE_H */

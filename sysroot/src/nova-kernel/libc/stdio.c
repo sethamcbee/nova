@@ -1,12 +1,13 @@
-// Authors: Seth McBee
-// Created: 2018-4-27
-// Description: STDIO.
+/**
+ * @file stdio.c
+ * @author Seth McBee
+ * @date 2018-4-27
+ * @brief C standard library stdio implementation.
+ */
+
+#include <globals.h>
 
 #include <limits.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -223,7 +224,7 @@ int fputc(int c, FILE *stream)
         fflush(stream);
     }
 
-    return (0);
+    return (c);
 }
 
 int putc(int c, FILE *stream)

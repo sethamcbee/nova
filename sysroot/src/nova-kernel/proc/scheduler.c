@@ -1,16 +1,19 @@
-// Authors: Seth McBee
-// Created: 2018-9-6
-// Description: Scheduler for process switching.
+/**
+ * @file scheduler.c
+ * @author Seth McBee
+ * @date 2018-9-6
+ * @brief Scheduler for process switching.
+ */
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <proc/process.h>
 #include <proc/scheduler.h>
 
+#ifdef ARCH_X86_64
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/registers.h>
+#endif // ARCH_X86_64
 
 bool task_tick(void)
 {
