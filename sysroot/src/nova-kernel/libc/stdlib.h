@@ -1,36 +1,16 @@
-/*
- * stdlib.h
- *
- * Copyright 2014 Seth Nils <altindiefanboy@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+/**
+ * @file stdlib.h
+ * @author Seth McBee
+ * @date 2014-?-?
+ * @brief C standard library stdlib header.
  */
 
 #ifndef STDLIB_H
 #define STDLIB_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <liballoc/liballoc.h>
-
-// Allocates a block of memory and returns a pointer to the start
-// of the block, or NULL if the block could not be allocated.
-void* malloc(size_t size);
 
 /**
  * @brief Converts string to double.
@@ -247,6 +227,16 @@ ldiv_t ldiv(long num, long denom);
  *
  * @param val Value to convert.
  * @param str String to store converted value in.
+ *
+ * @return Null-terminated string containing value converted to a string.
+ */
+char* itoa(int val, char* str);
+
+/**
+ * @brief Converts value to string according to specified base.
+ *
+ * @param val Value to convert.
+ * @param str String to store converted value in.
  * @param base Base the number is represented in.
  *
  * @return Null-terminated string containing value converted to a string.
@@ -262,7 +252,6 @@ ldiv_t ldiv(long num, long denom);
  * @note Base should be between 2 and 36, where 10 means decimal base, 16
  * means hexadecimal base, 8 means octal base, and 2 means binary base.
  */
-char* itoa(int val, char* str);
 char* _itoa(int val, char* str, int base);
 
 /**
@@ -270,26 +259,13 @@ char* _itoa(int val, char* str, int base);
  *
  * @param val Value to convert.
  * @param str String to store converted value in.
- * @param base Base the number is represented in.
  *
  * @return Null-terminated string containing value converted to a string.
- *
- * @note If base is 10 and value is negative, the resulting string will
- * be preceded by a negative sign ('-'). With any other base, value is
- * always considered to be unsigned.
- *
- * @note String should be an array long enough to contain any possible value.
- * (ex. at least ((sizeof(int) * 8 + 1) or 33 bytes on 32-bit
- * platforms)
- *
- * @note Base should be between 2 and 36, where 10 means decimal base, 16
- * means hexadecimal base, 8 means octal base, and 2 means binary base.
  */
 char* litoa(long val, char* str);
-char* _litoa(long val, char* str, int base);
 
 /**
- * @brief Converts value to string.
+ * @brief Converts value to string according to specified base.
  *
  * @param val Value to convert.
  * @param str String to store converted value in.
@@ -308,7 +284,38 @@ char* _litoa(long val, char* str, int base);
  * @note Base should be between 2 and 36, where 10 means decimal base, 16
  * means hexadecimal base, 8 means octal base, and 2 means binary base.
  */
+char* _litoa(long val, char* str, int base);
+
+/**
+ * @brief Converts value to string.
+ *
+ * @param val Value to convert.
+ * @param str String to store converted value in.
+ *
+ * @return Null-terminated string containing value converted to a string.
+ */
 char* sitoa(size_t val, char* str);
+
+/**
+ * @brief Converts value to string according to specified base.
+ *
+ * @param val Value to convert.
+ * @param str String to store converted value in.
+ * @param base Base the number is represented in.
+ *
+ * @return Null-terminated string containing value converted to a string.
+ *
+ * @note If base is 10 and value is negative, the resulting string will
+ * be preceded by a negative sign ('-'). With any other base, value is
+ * always considered to be unsigned.
+ *
+ * @note String should be an array long enough to contain any possible value.
+ * (ex. at least ((sizeof(int) * 8 + 1) or 33 bytes on 32-bit
+ * platforms)
+ *
+ * @note Base should be between 2 and 36, where 10 means decimal base, 16
+ * means hexadecimal base, 8 means octal base, and 2 means binary base.
+ */
 char* _sitoa(size_t val, char* str, int base);
 
 /**

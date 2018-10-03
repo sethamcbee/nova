@@ -1,12 +1,14 @@
-// Authors: Seth McBee
-// Created: 2018-5-10
-// Description: Paging structure management.
+/**
+ * @file paging.h
+ * @author Seth McBee
+ * @date 2018-5-10
+ * @brief Paging structure management.
+ */
 
-#pragma once
+#ifndef PAGING_H
+#define PAGING_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #define PAGE_SIZE   (0x1000) // 4 KiB pages.
 #define PAGE_COUNT  512      // Entries per table.
@@ -117,3 +119,5 @@ Pdpte pdpt0[512] __attribute__((aligned(PAGE_SIZE)));
 Pde pd0[512] __attribute__((aligned(PAGE_SIZE)));
 Pte pt0[512] __attribute__((aligned(PAGE_SIZE)));
 Pte pt1[512] __attribute__((aligned(PAGE_SIZE)));
+
+#endif // PAGING_H
