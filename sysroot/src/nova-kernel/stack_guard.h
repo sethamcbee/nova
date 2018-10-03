@@ -5,10 +5,9 @@
  * @brief GCC stack guard support.
  */
 
-#ifndef STACK_GUARD_H
-#define STACK_GUARD_H
+#pragma once
 
-//#ifdef STACK_GUARD
+#ifdef STACK_GUARD
 
 #include <globals.h>
 
@@ -28,6 +27,4 @@ uintptr_t __stack_chk_guard;
  */
 void __stack_chk_fail(void);
 
-//#endif // STACK_GUARD
-
-#endif // STACK_GUARD_H
+#endif // STACK_GUARD

@@ -1,13 +1,13 @@
-// Authors: Seth McBee
-// Created: 2018-4-11
-// Description: Basic CPU functions.
+/**
+ * @file cpu.h
+ * @author Seth McBee
+ * @date 2018-4-11
+ * @brief Miscellaneous CPU functions.
+ */
 
-#ifndef CPU_H
-#define CPU_H
+#pragma once
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <liballoc/liballoc.h>
 #include <proc/process.h>
@@ -15,7 +15,7 @@
 
 #include <arch/x86_64/tss.h>
 
-// Writes a byte to an IO port.
+/// Write a byte to an IO port.
 static inline void cpu_outb(uint8_t val, uint16_t port)
 {
     asm volatile
@@ -27,7 +27,7 @@ static inline void cpu_outb(uint8_t val, uint16_t port)
     );
 }
 
-// Writes a word to an IO port.
+/// Write a word to an IO port.
 static inline void cpu_outw(uint16_t val, uint16_t port)
 {
     asm volatile
@@ -39,7 +39,7 @@ static inline void cpu_outw(uint16_t val, uint16_t port)
     );
 }
 
-// Writes a long to an IO port.
+/// Write a long to an IO port.
 static inline void cpu_outl(uint32_t val, uint16_t port)
 {
     asm volatile
@@ -51,7 +51,7 @@ static inline void cpu_outl(uint32_t val, uint16_t port)
     );
 }
 
-// Reads a byte from an IO port.
+/// Read a byte from an IO port.
 static inline uint8_t cpu_inb(uint16_t port)
 {
     uint8_t val;
@@ -67,7 +67,7 @@ static inline uint8_t cpu_inb(uint16_t port)
     return (val);
 }
 
-// Reads a word from an IO port.
+/// Read a word from an IO port.
 static inline uint16_t cpu_inw(uint16_t port)
 {
     uint16_t val;
@@ -83,7 +83,7 @@ static inline uint16_t cpu_inw(uint16_t port)
     return (val);
 }
 
-// Reads a long from an IO port.
+/// Read a long from an IO port.
 static inline uint32_t cpu_inl(uint16_t port)
 {
     uint32_t val;
@@ -99,7 +99,7 @@ static inline uint32_t cpu_inl(uint16_t port)
     return (val);
 }
 
-// Waits for one IO cycle.
+/// Wait for one IO cycle.
 static inline void cpu_io_wait(void)
 {
     asm volatile
@@ -111,7 +111,7 @@ static inline void cpu_io_wait(void)
     );
 }
 
-// Returns the current RDTSC time-stamp.
+/// Get the current RDTSC time-stamp.
 static inline uint64_t cpu_rdtsc(void)
 {
     uint64_t ret;
@@ -125,7 +125,7 @@ static inline uint64_t cpu_rdtsc(void)
     return (ret);
 }
 
-// Returns the contents of the RFLAGS register.
+/// Get the contents of the RFLAGS register.
 static inline uint64_t cpu_get_flags(void)
 {
     uint64_t ret;
@@ -140,7 +140,7 @@ static inline uint64_t cpu_get_flags(void)
     return (ret);
 }
 
-// Sets the contents of the RFLAGS register.
+/// Set the contents of the RFLAGS register.
 static inline void cpu_set_flags(uint64_t flags)
 {
 	asm volatile
@@ -153,10 +153,10 @@ static inline void cpu_set_flags(uint64_t flags)
 	);
 }
 
-// Handles the actual task switching.
+/// Handle the actual task switching.
 void cpu_proc_asm(Registers* proc);
 
-// Switches context to a given process.
+/// Switche context to a given process.
 static inline void cpu_proc(Process* proc)
 {
     // Set up the TSS.
@@ -165,5 +165,3 @@ static inline void cpu_proc(Process* proc)
     // Jump to code.
     cpu_proc_asm(&proc->reg);
 }
-
-#endif // CPU_H

@@ -2,50 +2,62 @@
 # Created: 2017-10-17
 # Description: GDT setup.
 
-#include <arch/x86/gdt.h>
+.global gdt_ptr
+.global gdt_init
+.global gdt_start
 
-.set GDT_SIZE, (Lgdt_end - Lgdt_start - 1) # Size of table minus 1.
+.set GDT_SIZE, (gdt_end - gdt_start - 1) # Size of table minus 1.
 
 # Define GDT pointer.
-.data
-.global gdt_pointer
+.section .init
 .align 16
-gdt_pointer:
+gdt_ptr:
     .word GDT_SIZE
-    .long Lgdt_start # Address of GDT
+    .long gdt_start # Address of GDT
+
+# Initialize GDT.
+gdt_init:
+	movl $gdt_ptr, %eax
+	lgdt (%eax)
+	ret
 
 # Define GDT.
 .align 16
-Lgdt_start:
-Lgdt_null:                  # Null descriptor.
+gdt_start:
+gdt_null:                  # Null descriptor.
     .long 0
     .long 0
-Lgdt_kernel_code:
+gdt_kernel_code:
     .word 0xFFFF            # Lowest 16 bits of limit = 0xFFFFF
     .word 0                 # Offset = 0
     .byte 0                 # Offset = 0
     .byte 0b10011010        # Access byte
     .byte 0b11001111        # Flags and upper 4 bits of limit
     .byte 0                 # Offset = 0
-Lgdt_kernel_data:
+gdt_kernel_data:
     .word 0xFFFF            # Lowest 16 bits of limit = 0xFFFFF
     .word 0                 # Offset = 0
     .byte 0                 # Offset = 0
     .byte 0b10010010        # Access byte
     .byte 0b11001111        # Flags and upper 4 bits of limit
     .byte 0                 # Offset = 0
-Lgdt_user_code:
+gdt_user_code:
     .word 0xFFFF            # Lowest 16 bits of limit = 0xFFFFF
     .word 0                 # Offset = 0
     .byte 0                 # Offset = 0
     .byte 0b11111010        # Access byte
     .byte 0b11001111        # Flags and upper 4 bits of limit
     .byte 0                 # Offset = 0
-Lgdt_user_data:
+gdt_user_data:
     .word 0xFFFF            # Lowest 16 bits of limit = 0xFFFFF
     .word 0                 # Offset = 0
     .byte 0                 # Offset = 0
     .byte 0b11110010        # Access byte
     .byte 0b11001111        # Flags and upper 4 bits of limit
     .byte 0                 # Offset = 0
-Lgdt_end:
+gdt_tss:
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+gdt_end:

@@ -1,16 +1,16 @@
-// Authors: Seth McBee
-// Created: 2018-9-6
-// Description: Register storage for process switching.
+/**
+ * @file registers.h
+ * @author Seth McBee
+ * @date 2018-9-6
+ * @brief Register storage for process switching.
+ */
 
 #pragma once
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
-
-typedef struct
+/// Storage for registers.
+typedef struct Registers
 {
     // General purpose.
     uint64_t rax;

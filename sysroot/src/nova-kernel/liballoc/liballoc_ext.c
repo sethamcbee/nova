@@ -1,11 +1,21 @@
-// Authors: Seth McBee
-// Created: 2018-5-11
-// Description: Liballoc dependencies.
+/**
+ * @file liballoc_ext.c
+ * @author Seth McBee
+ * @date 2018-5-11
+ * @brief liballoc dependencies.
+ */
 
 #include <liballoc/liballoc.h>
 
+#ifdef ARCH_X86_64
 #include <arch/x86_64/memory/paging.h>
 #include <arch/x86_64/memory/vmm.h>
+#endif // ARCH_X86_64
+
+#ifdef ARCH_X86
+#include <arch/x86/memory/paging.h>
+#include <arch/x86/memory/vmm.h>
+#endif // ARCH_X86
 
 // STUB.
 // Security risk.
@@ -35,10 +45,12 @@ void* liballoc_alloc(int pages)
 
 int liballoc_free(void* page,int pages)
 {
+	uint8_t* p = page;
+	
     while (pages > 0)
     {
-        vmm_page_free_kernel(page);
-        page += PAGE_SIZE;
+        vmm_page_free_kernel(p);
+        p += PAGE_SIZE;
         pages--;
     }
 

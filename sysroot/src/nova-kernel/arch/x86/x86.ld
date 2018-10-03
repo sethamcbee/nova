@@ -1,43 +1,53 @@
 /* Declare output format and architecture. */
 OUTPUT_FORMAT(elf32-i386)
-/* OUTPUT_FORMAT(elf32-i386) */
-OUTPUT_ARCH(i386)
 
 /* Declare entry function. */
-ENTRY(_start)
+ENTRY(start)
+
+BOOT_OFFSET = 0x100000;
+KERNEL_OFFSET = 0xC0000000;
 
 SECTIONS
 {
-	/* Start loading sections at 1MiB. */
-	. = 1M;
-	_sections_start = .;
+	. = BOOT_OFFSET;
+	phys_start = .;
 
-	/* Multiboot header must be first so it can be found by the
-	 * bootloader. */
-	_section_text_start = .;
-	.text BLOCK(4K) : ALIGN(4K)
+	init_start = .;
+	. = ALIGN(0x1000);
+	.init :
 	{
-		*(.multiboot)
+		KEEP(*(.init))
+	}
+	init_end = .;
+
+	. += KERNEL_OFFSET;
+
+	kernel_start = .;
+	kernel_ro_start = . - KERNEL_OFFSET;
+	.text : AT(ADDR(.text) - KERNEL_OFFSET)
+	{
 		*(.text)
 	}
 
-	.rodata BLOCK(4K) : ALIGN(4K)
+	.rodata : AT(ADDR(.rodata) - KERNEL_OFFSET)
 	{
 		*(.rodata)
 	}
+	. = ALIGN(0x1000);
+	kernel_ro_end = . - KERNEL_OFFSET;
 
-	.data BLOCK(4K) : ALIGN(4K)
+	.data : AT(ADDR(.data) - KERNEL_OFFSET)
 	{
+		. = ALIGN(0x1000);
 		*(.data)
 	}
-	_section_data_end = .;
 
-	.bss BLOCK(4K) : ALIGN(4K)
+	.bss : AT(ADDR(.bss) - KERNEL_OFFSET)
 	{
 		*(COMMON)
 		*(.bss)
 	}
-	_section_bss_end = .;
-
-	_sections_end = .;
+	. = ALIGN(0x1000);
+	kernel_end = .;
+	phys_end = . - KERNEL_OFFSET;
 }

@@ -15,6 +15,11 @@
 #include <arch/x86_64/registers.h>
 #endif // ARCH_X86_64
 
+#ifdef ARCH_X86
+#include <arch/x86/cpu.h>
+#include <arch/x86/registers.h>
+#endif // ARCH_X86
+
 bool task_tick(void)
 {
     // Disable scheduler.

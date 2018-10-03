@@ -15,10 +15,17 @@
 #include <proc/process.h>
 #include <proc/scheduler.h>
 
+#ifdef ARCH_X86_64
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/gdt.h>
-#include <arch/x86_64/tss.h>
 #include <arch/x86_64/memory/vmm.h>
+#endif // ARCH_X86_64
+
+#ifdef ARCH_X86
+#include <arch/x86/cpu.h>
+#include <arch/x86/gdt.h>
+#include <arch/x86/memory/vmm.h>
+#endif // ARCH_X86
 
 volatile int a;
 
@@ -103,12 +110,10 @@ void kernel_main(void)
 
             // Create process 1.
             Process* proc1 = malloc(sizeof(Process));
-            proc1->reg.rip = (uint64_t)fun1;
-            proc1->reg.rsp = (uint64_t)ustk1 + 0x1000;
             proc1->reg.flags = cpu_get_flags();
             proc1->reg.ss = GDT_USER_DATA | RING3;
             proc1->reg.cs = GDT_USER_CODE | RING3;
-            proc1->kernel_stack = (uint64_t)kstk1 + 0x1000;
+            proc1->kernel_stack = (size_t)kstk1 + 0x1000;
             proc1->priv = 3;
             Task* task1 = malloc(sizeof(Task));
             task1->proc = proc1;
@@ -116,18 +121,27 @@ void kernel_main(void)
 
             // Create process 2.
             Process* proc2 = malloc(sizeof(Process));
-            proc2->reg.rip = (uint64_t)fun2;
-            proc2->reg.rsp = (uint64_t)ustk2 + 0x1000;
             proc2->reg.flags = cpu_get_flags();
-            //proc2->reg.ss = GDT_USER_DATA | RING3;
-            proc2->reg.ss = GDT_KERNEL_DATA;
-            //proc2->reg.cs = GDT_USER_CODE | RING3;
-            proc2->reg.cs = GDT_KERNEL_CODE;
-            proc2->kernel_stack = (uint64_t)kstk2 + 0x1000;
+            proc2->reg.ss = GDT_USER_DATA | RING3;
+            proc2->reg.cs = GDT_USER_CODE | RING3;
+            proc2->kernel_stack = (size_t)kstk2 + 0x1000;
             proc2->priv = 3;
             Task* task2 = malloc(sizeof(Task));
             task2->proc = proc2;
             task2->ticks = DEFAULT_TICKS;
+            
+            #ifdef ARCH_X86_64
+            proc1->reg.rip = (size_t)fun1;
+            proc1->reg.rsp = (size_t)ustk1 + 0x1000;
+            proc2->reg.rip = (size_t)fun2;
+            proc2->reg.rsp = (size_t)ustk2 + 0x1000;
+            #endif // ARCH_X86_64
+            #ifdef ARCH_X86
+            proc1->reg.eip = (size_t)fun1;
+            proc1->reg.esp = (size_t)ustk1 + 0x1000;
+            proc2->reg.eip = (size_t)fun2;
+            proc2->reg.esp = (size_t)ustk2 + 0x1000;
+            #endif // ARCH_X86
 
             // Queue processes.
             task_add(task2);

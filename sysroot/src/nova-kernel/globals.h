@@ -11,8 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#pragma once
 
 typedef ptrdiff_t ssize_t;
 
@@ -77,5 +76,3 @@ typedef ptrdiff_t ssize_t;
  * @param x Expression to evaluate.
  */
 #define UNLIKELY(x) __builtin_expect((x), 0)
-
-#endif // GLOBALS_H

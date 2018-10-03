@@ -1,6 +1,5 @@
 /* Declare output format and architecture. */
 OUTPUT_FORMAT(elf64-x86-64)
-/*OUTPUT_ARCH(i386:x86-64)*/
 
 /* Declare entry function. */
 ENTRY(start)

@@ -2,14 +2,10 @@
 # Created: 2017-10-17
 # Description: x86-64 GDT setup.
 
-#include <arch/x86_64/gdt.h>
-
-.global gdt_entry
-.global gdt_start
 .global gdt_ptr
 .global gdt_init
-
-.extern tss
+.global gdt_start
+.global gdt_entry
 
 .set GDT_SIZE, (gdt_end - gdt_start - 1) # Size of table minus 1.
 
@@ -20,13 +16,11 @@ gdt_ptr:
     .word GDT_SIZE
     .quad gdt_start         # Address of GDT
 
-# Initializes GDT.
+# Initialize GDT.
 .text
 gdt_init:
-    push %rax
     movq $gdt_ptr, %rax
     lgdt (%rax)
-    pop %rax
     ret
 
 # Define GDT.

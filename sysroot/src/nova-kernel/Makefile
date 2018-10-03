@@ -14,7 +14,7 @@ SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
 ARCH=x86_64
-OPTIMIZE=-O2 -mno-sse
+OPTIMIZE=-O3 -mno-sse
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -32,18 +32,21 @@ QEMU_DIR=$(BUILD_DIR)/qemu
 
 # find all source files except architecture-specific files
 SRC=$(shell find $(SRC_DIR) -type f -name "*.c" -not -path "./arch/*" -not -path "./build/*")
+SRC+=$(shell find $(SRC_DIR) -type f -name "*.cc" -not -path "./arch/*" -not -path "./build/*")
 SRC+=$(shell find $(SRC_DIR) -type f -name "*.s" -not -path "./arch/*" -not -path "./build/*")
 
 # add appropriate architecture-specific files
 ifeq ($(ARCH), x86_64)
 	LD_SCRIPT=arch/x86_64/x86_64.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.c")
+	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.cc")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86_64 -type f -name "*.s")
 	DOXYGEN_CFG=x86_64.doxygen
 endif
 ifeq ($(ARCH), x86)
 	LD_SCRIPT=arch/x86/x86.ld
 	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.c")
+	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.cc")
 	SRC+=$(shell find $(SRC_DIR)/arch/x86 -type f -name "*.s")
 	DOXYGEN_CFG=x86.doxygen
 endif
@@ -175,13 +178,15 @@ ifeq ($(ARCH), x86)
 		$(DEFINES) \
 		-z max-page-size=4096 \
 		-ffreestanding \
-		-nostdlib \
-		-lgcc
+		-nostdlib
 endif
 
 # GDB settings.
-GDB=~/opt/gdb-8.1/bin/gdb
-#GDB=gdb
+ifeq ($(ARCH), x86_64)
+	GDB=~/opt/gdb-8.1/bin/gdb
+else
+	GDB=~/opt/gdb-8.1/bin/gdb -ex "set architecture i386"
+endif
 
 # Adds additional compiler flags if debugging.
 ifeq ($(DEBUG),true)
@@ -324,7 +329,7 @@ $(OBJ_DIR)/%.c.o: %.c
 	$(CC) $(CCFLAGS) -c $< -o $@
 
 # compile C++ files, generic
-$(OBJ_DIR)/%.cpp.o: %.cpp
+$(OBJ_DIR)/%.cc.o: %.cc
 	mkdir -p $(@D)
 	$(CPP) $(CPPFLAGS) -c $< -o $@
 
@@ -339,6 +344,6 @@ $(ASM_DIR)/%.c.s: $(OBJ_DIR)/%.c.o
 	objdump -drwS $< > $@
 
 # assemble C++ files, generic
-$(ASM_DIR)/%.cpp.s: $(OBJ_DIR)/%.cpp.o
+$(ASM_DIR)/%.cc.s: $(OBJ_DIR)/%.cpp.o
 	mkdir -p $(@D)
 	objdump -drwS $< > $@

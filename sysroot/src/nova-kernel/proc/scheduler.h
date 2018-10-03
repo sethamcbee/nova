@@ -15,7 +15,7 @@
 /**
  * @brief Number of ticks before a task switch.
  */
-#define DEFAULT_TICKS 5
+#define DEFAULT_TICKS 1
 
 typedef struct Task Task;
 

@@ -1,13 +1,13 @@
-// Authors: Seth McBee
-// Created: 2017-10-17
-// Description: GDT constants and declarations.
+/**
+ * @file gdt.h
+ * @author Seth McBee
+ * @date 2017-10-17
+ * @brief GDT constants and declarations.
+ */
 
-#ifndef GDT_H
-#define GDT_H
+#pragma once
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #define RING3 0b11
 
@@ -23,8 +23,8 @@
 // Replace 0x?8 with 0x?B for ring 3.
 // Alternatively, just OR with RING3.
 
-// GDT entry structure.
-typedef struct __attribute__((packed))
+/// GDT entry structure.
+typedef struct Gdt_Entry
 {
     uint16_t limit_0;
     uint16_t base_0;
@@ -42,22 +42,20 @@ typedef struct __attribute__((packed))
     uint8_t size : 1;
     uint8_t granularity : 1;
     uint8_t base_2;
-} Gdt_Entry;
+} __attribute__((packed)) Gdt_Entry;
 
-// GDT pointer structure.
-typedef struct __attribute__((packed))
+/// GDT pointer structure.
+typedef struct Gdt_Ptr
 {
     uint16_t size;
-    uint64_t base;
-} Gdt_Ptr;
+    size_t base;
+} __attribute__((packed)) Gdt_Ptr;
 
-// Initializes GDT.
+/// Initialize GDT.
 void gdt_init(void);
 
-// GDT structure, declared in assembly file.
+/// GDT structure, declared in assembly file.
 Gdt_Entry gdt_entry[GDT_ENTRY_COUNT] __attribute__((aligned(16)));
 
-// Pointer to GDT, loaded by LGDT.
+/// Pointer to GDT, loaded by LGDT.
 Gdt_Ptr gdt_ptr;
-
-#endif // GDT_H
