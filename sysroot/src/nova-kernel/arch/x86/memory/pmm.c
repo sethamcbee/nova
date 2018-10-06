@@ -22,7 +22,8 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
     // Number of memory map entries.
     size_t mmap_entry_count = mb_mmap->size / mb_mmap->entry_size;
 
-    // Point frame bitmap to end of kernel memory, aligned to next page.
+    // Point frame bitmap to end of kernel memory (or end of a kernel
+    // module if one was loaded), aligned to next page.
     pmm_bitmap = (uint8_t*)&phys_end;
     if ((size_t)&pmm_bitmap % PAGE_SIZE != 0)
     {
@@ -84,18 +85,32 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
         }
     }
 
-    // Align bitmap length to page boundary..
+    // Align bitmap length to page boundary.
     pmm_bitmap_len = pmm_frames_available / 8;
     if (pmm_bitmap_len % 8 != 0)
     {
         pmm_bitmap_len += 1 - (pmm_bitmap_len % 8);
     }
+    
+    // Check if we have room to store the bitmap before the
+    // kernel module appears.
+    if (pmm_bitmap + pmm_bitmap_len >= (uint8_t*)kernel_module)
+    {
+		uintptr_t mod_end = (uintptr_t)kernel_module->mod_end;
+		pmm_bitmap = (uint8_t*)mod_end;
+		
+		// Align to page boundary.
+		if ((size_t)&pmm_bitmap % PAGE_SIZE != 0)
+		{
+			pmm_bitmap += PAGE_SIZE - ((size_t)&pmm_bitmap % PAGE_SIZE);
+		}
+	}
 
     // Set all bitmap entries to used.
     memset(pmm_bitmap, 0xFF, pmm_bitmap_len);
 
     // Minimum base address to consider a frame to be free.
-    uint32_t base_min = (uint32_t)pmm_bitmap + pmm_bitmap_len;
+    size_t base_min = (size_t)pmm_bitmap + pmm_bitmap_len;
 
     // Verify that bitmap fits below our initial paged memory.
     if (base_min >= (size_t)&phys_end + 0x200000)
@@ -139,6 +154,33 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
             }
         }
     }
+    
+    // Mark frames used by the loaded kernel module, if any.
+    if (kernel_module != NULL)
+    {
+		size_t offset = kernel_module->mod_start;
+		size_t len = kernel_module->size;
+		
+		// Align base address to page boundary, downwards.
+		if (offset % PAGE_SIZE != 0)
+		{
+			offset -= PAGE_SIZE - (offset % PAGE_SIZE);
+		}
+		
+		// Align length to page boundary, upwards.
+		if (len % PAGE_SIZE != 0)
+		{
+			len += PAGE_SIZE - (len % PAGE_SIZE);
+		}
+		
+		// Mark frames.
+		while (len > 0)
+		{
+			pmm_frame_free((void*)offset);
+			offset += PAGE_SIZE;
+			len -= PAGE_SIZE;
+		}
+	}
 
     // TODO: Allocate structures to manage special unavailable memory
     // (like ACPI).

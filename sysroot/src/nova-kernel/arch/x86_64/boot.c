@@ -1,10 +1,11 @@
-// Authors: Seth McBee
-// Created: 2017-10-14
-// Description: x86_64 initial C boot environment.
+/**
+ * @file boot.c
+ * @author Seth McBee
+ * @date 2017-10-14
+ * @brief x86-64 initial C boot environment.
+ */
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <globals.h>
 
 #include <stdlib.h>
 
@@ -22,7 +23,7 @@
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 
-void* kernel_module = NULL;
+struct multiboot_tag_module* kernel_module = NULL;
 
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
@@ -138,4 +139,3 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
     // Initialize physical memory manager.
     pmm_init(mb_mmap);
 }
-

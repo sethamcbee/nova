@@ -5,10 +5,11 @@
  * @brief Kernel entry point and miscellaneous kernel functions.
  */
 
-#ifndef KERNEL_H
-#define KERNEL_H
+#pragma once
 
 #include <globals.h>
+
+#include <arch/x86_64/multiboot2.h>
 
 /**
  * @brief Kernel entry point. Should never return.
@@ -66,6 +67,4 @@ void kernel_halt(void);
  * @brief Kernel module loaded by the bootloader, or NULL if no
  * module was loaded.
  */
-void* kernel_module;
-
-#endif // KERNEL_H
+struct multiboot_tag_module* kernel_module;
