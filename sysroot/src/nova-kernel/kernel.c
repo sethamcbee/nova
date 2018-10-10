@@ -14,6 +14,7 @@
 #include <liballoc/liballoc.h>
 #include <proc/process.h>
 #include <proc/scheduler.h>
+#include <fs/vfs.h>
 
 #ifdef ARCH_X86_64
 #include <arch/x86_64/cpu.h>
@@ -28,7 +29,10 @@
 #endif // ARCH_X86
 
 void kernel_main(void)
-{
+{	
+	// Initialize VFS.
+	vfs_init();
+	
     // Initialize STDIO.
     stdio_init();
     tty_init();

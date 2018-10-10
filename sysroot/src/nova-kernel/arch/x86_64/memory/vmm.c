@@ -654,7 +654,7 @@ Vmm_Node* vmm_tree_balance(Vmm_Node* node)
     if (balance < -1)
     {
         // Right-right.
-        if (node->mem.base < node->r->mem.base)
+        if (node->mem.base > node->r->mem.base)
         {
             return (vmm_tree_rotate_left(node));
         }
@@ -747,12 +747,13 @@ Vmm_Node* vmm_tree_delete(Vmm_Node* root, Vmm_Region mem)
             root->mem = least->mem;
             
             // Delete this node.
-            vmm_tree_delete(root->r, least->mem);
+            root->r = vmm_tree_delete(root->r, least->mem);
         }
         // If node has no children.
         else if (!root->l && !root->r)
         {
-            free (root);
+            free(root);
+            return (NULL);
         }
         // Node has one child.
         else

@@ -163,6 +163,39 @@ int strcmp(const char* cs, const char* ct)
     return (0);
 }
 
+int strncmp(const char* cs, const char* ct, size_t n)
+{
+	for (size_t i = 0; (cs[i] != '\0') && (ct[i] != '\0'); ++i)
+    {
+		if (i == n)
+		{
+			return (0);
+		}
+		
+        if (((unsigned char) cs[i]) > ((unsigned char) ct[i]))
+        {
+            return (1);
+        }
+
+        if (((unsigned char) cs[i]) < ((unsigned char) ct[i]))
+        {
+            return (-1);
+        }
+    }
+
+    if (strlen(cs) > strlen(ct))
+    {
+        return (1);
+    }
+
+    if (strlen(cs) < strlen(ct))
+    {
+        return (-1);
+    }
+
+    return (0);
+}
+
 char* strcpy(char* s, const char* ct)
 {
     size_t ct_length = strlen(ct);
