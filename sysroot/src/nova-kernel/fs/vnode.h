@@ -33,4 +33,14 @@ struct Vnode
 	
 	/// Type of file node.
 	Vnode_Type type;
+	
+	/// Parent directory.
+	Dnode* parent;
+	
+	/// Height of node in AVL tree.
+	int height;
+	
+	/// AVL tree children.
+	Vnode* left;
+	Vnode* right;
 };

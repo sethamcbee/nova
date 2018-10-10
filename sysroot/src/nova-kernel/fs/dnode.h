@@ -8,6 +8,7 @@
 #pragma once
 
 typedef struct Dnode Dnode;
+typedef struct FS_Driver FS_Driver;
 typedef struct Vnode Vnode;
 
 /// Type of directory.
@@ -34,9 +35,28 @@ struct Dnode
 	/// Directory type.
 	Dnode_Type type;
 	
+	/// Parent directory.
+	Dnode* parent;
+	
 	/// AVL tree of subdirectories.
 	Dnode* dir;
 	
 	/// AVL tree of files.
 	Vnode* files;
+	
+	/// Height of node in AVL tree.
+	int height;
+	
+	/// AVL tree children.
+	Dnode* left;
+	Dnode* right;
 };
+
+/// Insert a subdirectory.
+Dnode* dnode_tree_insert(Dnode* root, const char* name);
+
+/// Delete a subdirectory.
+Dnode* dnode_tree_remove(Dnode* root, const char* name);
+
+/// Find a subdirectory.
+Dnode* dnode_tree_find(Dnode* root, const char* name);
