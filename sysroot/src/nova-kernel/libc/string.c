@@ -244,15 +244,12 @@ char* strncat(char* s, const char* ct, size_t n)
     size_t s_length = strlen(s);
     size_t ct_length = strlen(ct);
 
-    for (size_t i = 0; (i < ct_length) && (i < n); ++i)
+	size_t i;
+    for (i = 0; (i < ct_length) && (i < n); ++i)
     {
         s[s_length + i] = ct[i];
     }
-
-    for (size_t i = ct_length; i < n; ++i)
-    {
-        s[s_length + i] = '\0';
-    }
+    s[i] = '\0';
 
     return (s);
 }

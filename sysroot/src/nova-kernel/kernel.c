@@ -33,6 +33,14 @@ void kernel_main(void)
 	// Initialize VFS.
 	vfs_init();
 	
+	// TEST.
+	vfs_create_dnode("/bin", DNODE_DIR);
+	vfs_find_dnode("/bin");
+	vfs_create_dnode("/lib", DNODE_DIR);
+	vfs_create_dnode("/var", DNODE_DIR);
+	vfs_create_dnode("/usr", DNODE_DIR);
+	vfs_create_dnode("/usr/bin", DNODE_DIR);
+	
     // Initialize STDIO.
     stdio_init();
     tty_init();

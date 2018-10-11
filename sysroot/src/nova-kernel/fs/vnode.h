@@ -14,7 +14,7 @@ typedef struct Vnode Vnode;
 typedef enum Vnode_Type
 {
 	VNODE_FILE,
-	VNODE_SOFTLINK,
+	VNODE_SYMLINK,
 	VNODE_FIFO,
 	VNODE_SPECIAL
 } Vnode_Type;

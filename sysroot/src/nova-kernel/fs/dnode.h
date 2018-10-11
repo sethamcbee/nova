@@ -16,7 +16,7 @@ typedef enum Dnode_Type
 {
 	DNODE_DIR,
 	DNODE_MOUNT,
-	DNODE_SOFTLINK,
+	DNODE_SYMLINK,
 	DNODE_SPECIAL
 } Dnode_Type;
 

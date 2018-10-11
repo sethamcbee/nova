@@ -9,11 +9,8 @@
 
 #include <globals.h>
 
-typedef enum Dnode_Type Dnode_Type;
-typedef enum Vnode_Type Vnode_Type;
-typedef struct Dnode Dnode;
-typedef struct FS_Driver FS_Driver;
-typedef struct Vnode Vnode;
+#include <fs/dnode.h>
+#include <fs/vnode.h>
 
 /// Root directory.
 Dnode* vfs_root;

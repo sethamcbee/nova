@@ -285,7 +285,7 @@ iso: $(ISO)
 # Run CPPCheck on entire codebase.
 .PHONY: cppcheck
 cppcheck: $(SRC)
-	cppcheck -q .
+	cppcheck -q --enable=all .
 
 # Print LOC stats.
 .PHONY: cloc
