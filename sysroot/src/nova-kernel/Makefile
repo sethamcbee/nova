@@ -183,9 +183,11 @@ endif
 
 # GDB settings.
 ifeq ($(ARCH), x86_64)
-	GDB=~/opt/gdb-8.1/bin/gdb
+	#GDB=~/opt/gdb-8.1/bin/gdb
+	GDB=gdb
 else
-	GDB=~/opt/gdb-8.1/bin/gdb -ex "set architecture i386"
+	#GDB=~/opt/gdb-8.1/bin/gdb -ex "set architecture i386"
+	GDB=gdb
 endif
 
 # Adds additional compiler flags if debugging.
