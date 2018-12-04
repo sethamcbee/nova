@@ -13,34 +13,34 @@ typedef struct Vnode Vnode;
 /// Type of file.
 typedef enum Vnode_Type
 {
-	VNODE_FILE,
-	VNODE_SYMLINK,
-	VNODE_FIFO,
-	VNODE_SPECIAL
+    VNODE_FILE,
+    VNODE_SYMLINK,
+    VNODE_FIFO,
+    VNODE_SPECIAL
 } Vnode_Type;
 
 /// VFS file node.
 struct Vnode
 {
-	/// File system driver.
-	FS_Driver* fs;
-	
-	/// File system driver data.
-	void* fs_data;
-	
-	/// File name.
-	char* name;
-	
-	/// Type of file node.
-	Vnode_Type type;
-	
-	/// Parent directory.
-	Dnode* parent;
-	
-	/// Height of node in AVL tree.
-	int height;
-	
-	/// AVL tree children.
-	Vnode* left;
-	Vnode* right;
+    /// File system driver.
+    FS_Driver* fs;
+
+    /// File system driver data.
+    void* fs_data;
+
+    /// File name.
+    char* name;
+
+    /// Type of file node.
+    Vnode_Type type;
+
+    /// Parent directory.
+    Dnode* parent;
+
+    /// Height of node in AVL tree.
+    int height;
+
+    /// AVL tree children.
+    Vnode* left;
+    Vnode* right;
 };

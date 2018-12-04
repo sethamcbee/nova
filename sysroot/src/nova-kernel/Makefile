@@ -259,7 +259,9 @@ default: iso doc
 
 # rebuild objects, binary, and disk image
 .PHONY: remake
-remake: clean iso
+remake:
+	make clean
+	make
 
 # delete contents of build folder
 .PHONY: clean
@@ -296,7 +298,7 @@ cloc:
 
 # Generate documentation.
 .PHONY: doc
-doc: $(DOC_DIR)/
+doc: $(DOC_DIR)/html/index.html
 
 # build output iso
 $(ISO): $(BIN)
@@ -321,7 +323,7 @@ bochs: $(ISO)
 asm: $(ASM)
 
 # Target to generate HTML documentation using doxygen.
-$(DOC_DIR)/: $(SRC) $(DOXYGEN_CFG)
+$(DOC_DIR)/html/index.html: $(SRC) $(DOXYGEN_CFG)
 	mkdir -p $(DOC_DIR)
 	doxygen $(DOXYGEN_CFG)
 

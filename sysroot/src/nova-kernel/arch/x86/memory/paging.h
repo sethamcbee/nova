@@ -46,7 +46,8 @@ typedef struct __attribute__((packed))
     uint8_t ignored : 1;
     uint8_t available : 3;
     uint32_t table_addr : 20;
-} Pde;
+}
+Pde;
 
 /// Page table entry.
 typedef struct __attribute__((packed))
@@ -62,7 +63,8 @@ typedef struct __attribute__((packed))
     uint8_t global : 1;
     uint8_t available : 3;
     uint32_t page_addr : 20;
-} Pte;
+}
+Pte;
 
 // Initial kernel paging structures.
 Pde pd0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));

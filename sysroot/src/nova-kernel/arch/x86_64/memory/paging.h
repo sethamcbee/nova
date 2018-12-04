@@ -51,7 +51,8 @@ typedef struct __attribute__((packed))
     uint32_t dir_ptr_addr_high : 20;
     uint16_t available_high : 11;
     uint8_t sign_extend : 1;
-} Pml4e;
+}
+Pml4e;
 
 // Page directory pointer entry.
 typedef struct __attribute__((packed))
@@ -71,7 +72,8 @@ typedef struct __attribute__((packed))
     uint32_t dir_addr_high : 20;
     uint16_t available_high : 11;
     uint8_t sign_extend : 1;
-} Pdpte;
+}
+Pdpte;
 
 // Page directory entry.
 typedef struct __attribute__((packed))
@@ -91,7 +93,8 @@ typedef struct __attribute__((packed))
     uint32_t table_addr_high : 20;
     uint16_t available_high : 11;
     uint8_t sign_extend : 1;
-} Pde;
+}
+Pde;
 
 // Page table entry.
 typedef struct

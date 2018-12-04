@@ -15,16 +15,16 @@ extern "C" {
  */
 struct	boundary_tag
 {
-	unsigned int magic;			//< It's a kind of ...
-	unsigned int size; 			//< Requested size.
-	unsigned int real_size;		//< Actual size.
-	int index;					//< Location in the page table.
+    unsigned int magic;			//< It's a kind of ...
+    unsigned int size; 			//< Requested size.
+    unsigned int real_size;		//< Actual size.
+    int index;					//< Location in the page table.
 
-	struct boundary_tag *split_left;	//< Linked-list info for broken pages.
-	struct boundary_tag *split_right;	//< The same.
+    struct boundary_tag *split_left;	//< Linked-list info for broken pages.
+    struct boundary_tag *split_right;	//< The same.
 
-	struct boundary_tag *next;	//< Linked list info.
-	struct boundary_tag *prev;	//< Linked list info.
+    struct boundary_tag *next;	//< Linked list info.
+    struct boundary_tag *prev;	//< Linked list info.
 };
 
 

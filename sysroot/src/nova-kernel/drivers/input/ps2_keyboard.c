@@ -15,13 +15,13 @@
 #include <drivers/input/ps2_keyboard.h>
 
 #ifdef ARCH_X86_64
-    #include <arch/x86_64/cpu.h>
-    #include <arch/x86_64/devices/ps2.h>
+#include <arch/x86_64/cpu.h>
+#include <arch/x86_64/devices/ps2.h>
 #endif
 
 #ifdef ARCH_X86
-    #include <arch/x86/cpu.h>
-    #include <arch/x86/devices/ps2.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/devices/ps2.h>
 #endif
 
 // Flushes the keyboard buffer.
@@ -37,44 +37,44 @@ static uint8_t code_last;
 
 void ps2_keyboard_init(void)
 {
-    #if defined(ARCH_X86_64) || defined(ARCH_X86)
-        ps2_keyboard_queue_count = 0;
-        volatile uint8_t response = 0;
+#if defined(ARCH_X86_64) || defined(ARCH_X86)
+    ps2_keyboard_queue_count = 0;
+    volatile uint8_t response = 0;
 
-        // Disable 2nd PS/2 channel.
-        ps2_send(0xA7, PS2_CMD);
+    // Disable 2nd PS/2 channel.
+    ps2_send(0xA7, PS2_CMD);
 
-        // Flush output buffer.
-        ps2_kb_flush();
+    // Flush output buffer.
+    ps2_kb_flush();
 
-        // Disable port translation.
-        do
-        {
-            ps2_send(PS2_CFG_R, PS2_CMD);
-            response = ps2_receive(PS2_DATA);
-        }
-        while (response == PS2_KB_REDO);
-        response = BIT_CLEAR(response, 6);
-        ps2_send(PS2_CFG_W, PS2_CMD);
-        ps2_send(response, PS2_DATA);
+    // Disable port translation.
+    do
+    {
+        ps2_send(PS2_CFG_R, PS2_CMD);
+        response = ps2_receive(PS2_DATA);
+    }
+    while (response == PS2_KB_REDO);
+    response = BIT_CLEAR(response, 6);
+    ps2_send(PS2_CFG_W, PS2_CMD);
+    ps2_send(response, PS2_DATA);
 
-        // Set scan mode 2.
-        do
-        {
-            ps2_send(PS2_KB_SCAN, PS2_DATA);
-            response = ps2_receive(PS2_DATA);
-        }
-        while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
-        do
-        {
-            ps2_send(PS2_KB_SCAN2, PS2_DATA);
-            response = ps2_receive(PS2_DATA);
-        }
-        while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
+    // Set scan mode 2.
+    do
+    {
+        ps2_send(PS2_KB_SCAN, PS2_DATA);
+        response = ps2_receive(PS2_DATA);
+    }
+    while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
+    do
+    {
+        ps2_send(PS2_KB_SCAN2, PS2_DATA);
+        response = ps2_receive(PS2_DATA);
+    }
+    while ((response != PS2_KB_ACK) && (response != PS2_KB_REDO));
 
-        // Flush again.
-        ps2_kb_flush();
-    #endif
+    // Flush again.
+    ps2_kb_flush();
+#endif
 
     shift = false;
     control = false;

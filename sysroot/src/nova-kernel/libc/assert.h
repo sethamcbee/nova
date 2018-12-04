@@ -22,7 +22,7 @@
 
 /**
  * @brief Handle kernel run-time assertion.
- * 
+ *
  * @param file Name of the file in which the assertion failed.
  * @param func Name of the function in which the assertion failed.
  * @param line Line number at which the assertion failed.

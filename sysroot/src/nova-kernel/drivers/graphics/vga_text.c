@@ -12,11 +12,11 @@
 #include <drivers/graphics/vga_text.h>
 
 #ifdef ARCH_X86_64
-    #include <arch/x86_64/cpu.h>
+#include <arch/x86_64/cpu.h>
 #endif
 
 #ifdef ARCH_X86
-    #include <arch/x86/cpu.h>
+#include <arch/x86/cpu.h>
 #endif
 
 static volatile uint16_t *vga_buffer;
@@ -112,10 +112,10 @@ void vga_text_initialize(void)
     }
 
     // Disable the cursor.
-    #if defined(ARCH_X86_64) || defined(ARCH_X86)
-        cpu_outb(0x0A, 0x3D4); //Magic.
-        cpu_outb(0x20, 0x3D5);
-    #endif
+#if defined(ARCH_X86_64) || defined(ARCH_X86)
+    cpu_outb(0x0A, 0x3D4); //Magic.
+    cpu_outb(0x20, 0x3D5);
+#endif
 }
 
 uint8_t vga_text_make_color(Vga_Text_Color fg, Vga_Text_Color bg)

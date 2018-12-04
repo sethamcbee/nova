@@ -21,18 +21,18 @@
  * @brief Stores process information.
  */
 typedef struct
-{	
-	/**
-	 * @brief Top of the kernel stack associated with this process.
-	 */
+{
+    /**
+     * @brief Top of the kernel stack associated with this process.
+     */
     size_t kernel_stack;
 
-	/**
-	 * @brief Privilege level of this process.
-	 * @note Kernel = 0, User = 3
-	 */
+    /**
+     * @brief Privilege level of this process.
+     * @note Kernel = 0, User = 3
+     */
     uint8_t priv;
-    
+
     /**
      * @brief Stores architecture-specific register state for this
      * process.

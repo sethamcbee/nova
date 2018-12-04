@@ -165,13 +165,13 @@ int strcmp(const char* cs, const char* ct)
 
 int strncmp(const char* cs, const char* ct, size_t n)
 {
-	for (size_t i = 0; (cs[i] != '\0') && (ct[i] != '\0'); ++i)
+    for (size_t i = 0; (cs[i] != '\0') && (ct[i] != '\0'); ++i)
     {
-		if (i == n)
-		{
-			return (0);
-		}
-		
+        if (i == n)
+        {
+            return (0);
+        }
+
         if (((unsigned char) cs[i]) > ((unsigned char) ct[i]))
         {
             return (1);
@@ -244,7 +244,7 @@ char* strncat(char* s, const char* ct, size_t n)
     size_t s_length = strlen(s);
     size_t ct_length = strlen(ct);
 
-	size_t i;
+    size_t i;
     for (i = 0; (i < ct_length) && (i < n); ++i)
     {
         s[s_length + i] = ct[i];
@@ -343,23 +343,23 @@ size_t strspn(const char* cs, const char* ct)
 
 const char* strstr(const char* cs, const char* ct)
 {
-	const char* ret;
+    const char* ret;
 
-	ret = strchr(cs, ct[0]);
-	while (ret != NULL)
-	{
-		for (size_t i = 0; (ret[i] == ct[i]) || (ct[i] == '\0'); ++i)
-		{
-			if (ct[i] == '\0')
-			{
-				return (ret);
-			}
-		}
+    ret = strchr(cs, ct[0]);
+    while (ret != NULL)
+    {
+        for (size_t i = 0; (ret[i] == ct[i]) || (ct[i] == '\0'); ++i)
+        {
+            if (ct[i] == '\0')
+            {
+                return (ret);
+            }
+        }
 
-		ret = strchr(ret, ct[0]);
-	}
+        ret = strchr(ret, ct[0]);
+    }
 
-	return (ret);
+    return (ret);
 }
 
 /* Parse S into tokens separated by characters in DELIM.
@@ -374,31 +374,31 @@ const char* strstr(const char* cs, const char* ct)
 static char *olds;
 char * strtok (char *s, const char *delim)
 {
-  char *token;
+    char *token;
 
-  if (s == NULL)
-    s = olds;
+    if (s == NULL)
+        s = olds;
 
-  /* Scan leading delimiters.  */
-  s += strspn (s, delim);
-  if (*s == '\0')
+    /* Scan leading delimiters.  */
+    s += strspn (s, delim);
+    if (*s == '\0')
     {
-      olds = s;
-      return NULL;
+        olds = s;
+        return NULL;
     }
 
-  /* Find the end of the token.  */
-  token = s;
-  s = strpbrk (token, delim);
-  size_t len = strlen(s);
-  if (s == NULL)
-    /* This token finishes the string.  */
-    olds = memchr (token, '\0', len);
-  else
+    /* Find the end of the token.  */
+    token = s;
+    s = strpbrk (token, delim);
+    size_t len = strlen(s);
+    if (s == NULL)
+        /* This token finishes the string.  */
+        olds = memchr (token, '\0', len);
+    else
     {
-      /* Terminate the token and make OLDS point past it.  */
-      *s = '\0';
-      olds = s + 1;
+        /* Terminate the token and make OLDS point past it.  */
+        *s = '\0';
+        olds = s + 1;
     }
-  return token;
+    return token;
 }

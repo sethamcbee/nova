@@ -39,12 +39,12 @@ struct Vmm_Node_Stack
 Vmm_Node_Stack* vmm_node_stack_ctor(void)
 {
     static const size_t DEFAULT_MAX = 5;
-    
+
     Vmm_Node_Stack* stk = malloc(sizeof(Vmm_Node_Stack));
     stk->base = malloc(sizeof(Vmm_Node*) * DEFAULT_MAX);
     stk->count = 0;
     stk->max = DEFAULT_MAX;
-    
+
     return (stk);
 }
 
@@ -57,7 +57,7 @@ void vmm_node_stack_push(Vmm_Node_Stack* stk, Vmm_Node* node)
         size_t new_size = sizeof(Vmm_Node*) * (stk->max);
         stk->base = (Vmm_Node**) realloc((void*)stk->base, new_size);
     }
-    
+
     // Add to the stack and increment count.
     stk->base[stk->count] = node;
     stk->count++;
@@ -70,10 +70,10 @@ Vmm_Node* vmm_node_stack_pop(Vmm_Node_Stack* stk)
     {
         return (NULL);
     }
-    
+
     // Retrieve the next node and remove it from the stack.
     stk->count--;
-    
+
     return (stk->base[stk->count]);
 }
 
@@ -81,7 +81,7 @@ void vmm_node_stack_dtor(Vmm_Node_Stack* stk)
 {
     // Free the actual stack.
     free((void*)stk->base);
-    
+
     // Free this object.
     free((void*)stk);
 }
@@ -150,14 +150,14 @@ void* vmm_pages_alloc_kernel(size_t n)
     {
         return (NULL);
     }
-    
+
     Vmm_Region mem = vmm_tree_find_pages(vmm_tree_kernel_free, n);
-    
+
     // Check if a region was actually found.
     if (mem.pages > 0)
     {
         void* virt_base;
-        
+
         // Return any memory to the pool that we aren't using.
         if (mem.pages > n)
         {
@@ -171,7 +171,7 @@ void* vmm_pages_alloc_kernel(size_t n)
             virt_base = mem.base;
             vmm_tree_kernel_free = vmm_tree_delete(vmm_tree_kernel_free, mem);
         }
-            
+
         // Map the region.
         void* phys;
         size_t virt = (size_t) virt_base;
@@ -179,7 +179,7 @@ void* vmm_pages_alloc_kernel(size_t n)
         {
             phys = pmm_frame_alloc();
             //vmm_page_map(phys, (void*)virt, PG_PR | PG_RW);
-            
+
             // TEST:
             // USER FLAG SAFETY RISK.
             vmm_page_map(phys, (void*)virt, PG_PR | PG_RW | PG_U);
@@ -187,31 +187,31 @@ void* vmm_pages_alloc_kernel(size_t n)
         }
         return (virt_base);
     }
-    
+
     // Else.
     return (NULL);
 }
 
 void vmm_page_free_kernel(void* virt)
 {
-	vmm_pages_free_kernel(virt, 1);
+    vmm_pages_free_kernel(virt, 1);
 }
 
 void vmm_pages_free_kernel(void* virt, size_t n)
 {
-	// Modify trees.
-	Vmm_Region region;
-	region.base = virt;
-	region.pages = n;
-	vmm_tree_kernel_free = vmm_tree_insert(vmm_tree_kernel_free, region);
-	
-	// Modify paging tables.
-	for (size_t i = 0; i < n; i++)
-	{
-		vmm_page_unmap(virt);
-		pmm_frame_free(vmm_phys_addr(virt));
-		virt = (void*)(size_t)virt + PAGE_SIZE;
-	}
+    // Modify trees.
+    Vmm_Region region;
+    region.base = virt;
+    region.pages = n;
+    vmm_tree_kernel_free = vmm_tree_insert(vmm_tree_kernel_free, region);
+
+    // Modify paging tables.
+    for (size_t i = 0; i < n; i++)
+    {
+        vmm_page_unmap(virt);
+        pmm_frame_free(vmm_phys_addr(virt));
+        virt = (void*)(size_t)virt + PAGE_SIZE;
+    }
 }
 
 int vmm_tree_height(Vmm_Node* node)
@@ -234,28 +234,28 @@ void vmm_tree_update_height(Vmm_Node* node)
 Vmm_Node* vmm_tree_rotate_left(Vmm_Node* root)
 {
     Vmm_Node* new_root = root->r;
-    
+
     // Rotate.
     root->r = new_root->l;
     new_root->l = root;
-    
+
     vmm_tree_update_height(root);
     vmm_tree_update_height(new_root);
-    
+
     return (new_root);
 }
 
 Vmm_Node* vmm_tree_rotate_right(Vmm_Node* root)
 {
     Vmm_Node* new_root = root->l;
-    
+
     // Rotate.
     root->l = new_root->r;
     new_root->r = root;
-    
+
     vmm_tree_update_height(root);
     vmm_tree_update_height(new_root);
-    
+
     return (new_root);
 }
 
@@ -263,7 +263,7 @@ Vmm_Node* vmm_tree_balance(Vmm_Node* node)
 {
     int balance = vmm_tree_height(node->l);
     balance -= vmm_tree_height(node->r);
-    
+
     if (balance > 1)
     {
         // Left-left.
@@ -271,12 +271,12 @@ Vmm_Node* vmm_tree_balance(Vmm_Node* node)
         {
             return (vmm_tree_rotate_right(node));
         }
-        
+
         // Else, left-right.
         node->l = vmm_tree_rotate_left(node->l);
         return (vmm_tree_rotate_right(node));
     }
-    
+
     if (balance < -1)
     {
         // Right-right.
@@ -284,12 +284,12 @@ Vmm_Node* vmm_tree_balance(Vmm_Node* node)
         {
             return (vmm_tree_rotate_left(node));
         }
-        
+
         // Else, right-left.
         node->r = vmm_tree_rotate_right(node->r);
         return (vmm_tree_rotate_left(node));
     }
-    
+
     // Else.
     return (node);
 }
@@ -299,46 +299,46 @@ Vmm_Node* vmm_tree_insert(Vmm_Node* root, Vmm_Region mem)
     if (root == NULL)
     {
         Vmm_Node* new_node = (Vmm_Node*) malloc(sizeof(Vmm_Node));
-        
+
         new_node->mem = mem;
         new_node->height = 1;
         new_node->l = NULL;
         new_node->r = NULL;
-        
+
         return (new_node);
     }
-    
+
     if (mem.base < root->mem.base)
     {
         root->l = vmm_tree_insert(root->l, mem);
     }
     else if (mem.base > root->mem.base)
-    {   
+    {
         root->r = vmm_tree_insert(root->r, mem);
     }
     else
     {
         kernel_panic("VMM tree insert failed.");
     }
-    
+
     // TODO: Figure out how to merge with left node correctly.
-	
-	// Check if we should merge with the right node.
-	if (root->r)
-	{
-		void* end = (void*)(size_t)mem.base + mem.pages * PAGE_SIZE;
-		if (end == root->r->mem.base)
-		{
-			mem.base = root->r->mem.base;
-			mem.pages += root->r->mem.pages;
-			root->r = vmm_tree_delete(root->r, root->r->mem);
-			vmm_tree_resize(root, mem);
-		}
-	}
-    
+
+    // Check if we should merge with the right node.
+    if (root->r)
+    {
+        void* end = (void*)(size_t)mem.base + mem.pages * PAGE_SIZE;
+        if (end == root->r->mem.base)
+        {
+            mem.base = root->r->mem.base;
+            mem.pages += root->r->mem.pages;
+            root->r = vmm_tree_delete(root->r, root->r->mem);
+            vmm_tree_resize(root, mem);
+        }
+    }
+
     vmm_tree_update_height(root);
     root = vmm_tree_balance(root);
-    
+
     return (root);
 }
 
@@ -348,7 +348,7 @@ Vmm_Node* vmm_tree_delete(Vmm_Node* root, Vmm_Region mem)
     {
         return (root);
     }
-    
+
     if (mem.base < root->mem.base)
     {
         root->r = vmm_tree_delete(root->r, mem);
@@ -368,10 +368,10 @@ Vmm_Node* vmm_tree_delete(Vmm_Node* root, Vmm_Region mem)
             {
                 least = least->l;
             }
-            
+
             // Copy this node.
             root->mem = least->mem;
-            
+
             // Delete this node.
             vmm_tree_delete(root->r, least->mem);
         }
@@ -396,18 +396,18 @@ Vmm_Node* vmm_tree_delete(Vmm_Node* root, Vmm_Region mem)
             }
         }
     }
-    
+
     if (root == NULL)
     {
         return (NULL);
     }
-    
+
     // Update height.
     vmm_tree_update_height(root);
-    
+
     // Balance node.
     vmm_tree_balance(root);
-    
+
     return (root);
 }
 
@@ -415,34 +415,34 @@ Vmm_Region vmm_tree_find_pages(Vmm_Node* root, size_t pages)
 {
     Vmm_Region ret;
     ret.base = NULL;
-    
+
     if (root == NULL)
     {
         // Not in this branch.
         ret.pages = 0;
         return (ret);
     }
-    
+
     // Found a sufficient region.
     if (root->mem.pages >= pages)
     {
         return (root->mem);
     }
-    
+
     // Else, check left branch.
     ret = vmm_tree_find_pages(root->l, pages);
     if (ret.pages > 0)
     {
         return (ret);
     }
-    
+
     // Else, check right branch.
     ret = vmm_tree_find_pages(root->r, pages);
     if (ret.pages > 0)
     {
         return (ret);
     }
-    
+
     // Else, not in this branch.
     return (ret);
 }
@@ -450,31 +450,31 @@ Vmm_Region vmm_tree_find_pages(Vmm_Node* root, size_t pages)
 Vmm_Node* vmm_tree_resize(Vmm_Node* root, Vmm_Region mem)
 {
     Vmm_Node* ret;
-    
+
     if (root == NULL)
     {
         return (NULL);
     }
-    
+
     // Check if this is the region.
     if (root->mem.base == mem.base)
     {
         root->mem = mem;
         return (root);
     }
-    
+
     // Check left branch.
     if (mem.base < root->mem.base)
     {
-       ret = vmm_tree_resize(root->l, mem);
-       
-       if (ret)
-       {
-           ret->mem = mem;
-           return (ret);
-       }
+        ret = vmm_tree_resize(root->l, mem);
+
+        if (ret)
+        {
+            ret->mem = mem;
+            return (ret);
+        }
     }
-    
+
     // Else, check right branch.
     ret = vmm_tree_resize(root->r, mem);
     if (ret)
@@ -482,7 +482,7 @@ Vmm_Node* vmm_tree_resize(Vmm_Node* root, Vmm_Region mem)
         ret->mem = mem;
         return (ret);
     }
-    
+
     // Else, region not found.
     return (NULL);
 }

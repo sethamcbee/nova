@@ -42,14 +42,16 @@ typedef struct __attribute__((packed))
     uint8_t size : 1;
     uint8_t granularity : 1;
     uint8_t base_2;
-} Gdt_Entry;
+}
+Gdt_Entry;
 
 /// GDT pointer structure.
 typedef struct __attribute__((packed))
 {
     uint16_t size;
     size_t base;
-} Gdt_Ptr;
+}
+Gdt_Ptr;
 
 /// Initialize GDT.
 void gdt_init(void);

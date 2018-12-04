@@ -19,14 +19,14 @@ typedef struct Vnode Vnode;
 /// In-memory representation of file.
 struct Ramfs_Data
 {
-	/// Data stored.
-	void* buf;
-	
-	/// Currently used buffer size.
-	size_t size;
-	
-	/// Currently allocated buffer size.
-	size_t max_size;
+    /// Data stored.
+    void* buf;
+
+    /// Currently used buffer size.
+    size_t size;
+
+    /// Currently allocated buffer size.
+    size_t max_size;
 };
 
 /// Return driver interface for this file system.

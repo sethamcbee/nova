@@ -45,8 +45,8 @@ void* liballoc_alloc(int pages)
 
 int liballoc_free(void* page,int pages)
 {
-	uint8_t* p = page;
-	
+    uint8_t* p = page;
+
     while (pages > 0)
     {
         vmm_page_free_kernel(p);

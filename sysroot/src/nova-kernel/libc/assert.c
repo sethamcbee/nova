@@ -15,7 +15,7 @@ void kassert(const char* file, const char* func, long line, const char* exp)
     char line_str[10];
 
 #if defined(ARCH_X86_64) || defined(ARCH_X86)
-	asm volatile ("cli \n");
+    asm volatile ("cli \n");
 #endif
 
     // Convert line number to a string.

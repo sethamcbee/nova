@@ -144,14 +144,14 @@ static inline uint32_t cpu_get_flags(void)
 /// Set the contents of the RFLAGS register.
 static inline void cpu_set_flags(uint32_t flags)
 {
-	asm volatile
-	(
-		"pushl %0 \n"
-		"popf \n"
-		:
-		: "A" (flags)
-		:
-	);
+    asm volatile
+    (
+        "pushl %0 \n"
+        "popf \n"
+        :
+        : "A" (flags)
+        :
+    );
 }
 
 /// Handle the actual task switching.

@@ -30,8 +30,8 @@ extern void *kernel_ro_end;
 typedef struct Vmm_Region Vmm_Region;
 struct Vmm_Region
 {
-	void* base;
-	size_t pages;
+    void* base;
+    size_t pages;
 };
 
 // Stores a region of virtual memory.
@@ -39,10 +39,10 @@ struct Vmm_Region
 typedef struct Vmm_Node Vmm_Node;
 struct Vmm_Node
 {
-	Vmm_Region mem;
-	int height;
-	Vmm_Node* l;
-	Vmm_Node* r;
+    Vmm_Region mem;
+    int height;
+    Vmm_Node* l;
+    Vmm_Node* r;
 };
 
 // Virtual memory trees.

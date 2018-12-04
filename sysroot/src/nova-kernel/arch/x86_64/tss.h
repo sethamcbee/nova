@@ -29,7 +29,8 @@ typedef struct __attribute__((packed))
     uint8_t base_2;
     uint32_t base_3;
     uint32_t reserved_2;
-} Tss_Descriptor;
+}
+Tss_Descriptor;
 
 typedef struct __attribute__((packed))
 {
@@ -48,7 +49,8 @@ typedef struct __attribute__((packed))
     uint64_t reserved_2;
     uint16_t reserved_3;
     uint16_t iopb_offset;
-} Tss;
+}
+Tss;
 
 // Long mode TSS.
 __attribute__((aligned(16)))

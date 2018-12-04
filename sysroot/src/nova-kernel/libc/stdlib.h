@@ -145,8 +145,8 @@ void* bsearch(
  * greater.
  */
 void qsort
-    (void* base, size_t n, size_t size,
-     int (*cmp)(const void*, const void*));
+(void* base, size_t n, size_t size,
+ int (*cmp)(const void*, const void*));
 
 /**
  * @brief Returns absolute value of an integer.

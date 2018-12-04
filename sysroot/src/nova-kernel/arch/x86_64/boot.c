@@ -107,12 +107,12 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
             memory_map_found = true;
             mb_mmap = (struct multiboot_tag_mmap*)mb_tag;
             break;
-            
+
         // Module.
         case MULTIBOOT_TAG_TYPE_MODULE:
-			mb_tag_module = (struct multiboot_tag_module*)mb_tag;
-			kernel_module = (void*)(uint64_t)mb_tag_module->mod_start;
-			break;
+            mb_tag_module = (struct multiboot_tag_module*)mb_tag;
+            kernel_module = (void*)(uint64_t)mb_tag_module->mod_start;
+            break;
 
         // Treat unsupported tag as basic tag.
         default:

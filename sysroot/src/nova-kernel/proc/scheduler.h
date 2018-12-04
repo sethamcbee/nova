@@ -25,19 +25,19 @@ typedef struct Task Task;
  */
 typedef struct Task
 {
-	/**
-	 * @brief Info for the process belonging to this task.
-	 */
+    /**
+     * @brief Info for the process belonging to this task.
+     */
     Process* proc;
 
-	/**
-	 * @brief Number of ticks remaining before a forced task switch.
-	 */
+    /**
+     * @brief Number of ticks remaining before a forced task switch.
+     */
     size_t ticks;
 
-	/**
-	 * @brief Points to the next task to switch to.
-	 */
+    /**
+     * @brief Points to the next task to switch to.
+     */
     Task* next;
 } Task;
 
@@ -49,7 +49,7 @@ Task* cur_task;
 /**
  * @brief Decrement the tick count for the current task and return
  * whether a task switch should occur.
- * 
+ *
  * @return Whether a task switch should occur.
  */
 bool task_tick(void);
@@ -62,7 +62,7 @@ void task_next(void);
 /**
  * @brief Add a task to the list, immediately after the current
  * task.
- * 
+ *
  * @param new_task New task to be added to the list.
  */
 void task_add(Task* new_task);

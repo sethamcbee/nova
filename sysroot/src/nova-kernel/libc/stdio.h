@@ -40,24 +40,24 @@
 /// Stream/file abstraction.
 typedef struct FILE
 {
-	/// Buffer for stream data.
+    /// Buffer for stream data.
     volatile char* buf;
-    
+
     /// Current position in the stream.
     volatile size_t pos;
-    
+
     /// Current length of the stream data.
     volatile size_t len;
-    
+
     /// Maximum length of the stream data.
     volatile size_t max_len;
-    
+
     /// Buffering mode.
     volatile int buf_mode;
-    
+
     /// IO mode.
     volatile int io_mode;
-    
+
     /// Stream operation function pointers.
     volatile union
     {
@@ -77,29 +77,29 @@ FILE* stderr;
 
 /**
  * @brief Get byte from stream buffer. For internal use.
- * 
+ *
  * @param stream Source stream.
- * 
+ *
  * @return Byte from stream, or error code.
  */
 int rgetc(FILE* stream);
 
 /**
  * @brief Put byte in stream buffer. For internal use.
- * 
+ *
  * @param c Byte to place in buffer.
  * @param stream Destination stream.
- * 
+ *
  * @return Byte that was written to the buffer, or error code.
  */
 int rputc(int c, FILE* stream);
 
 /**
  * @brief Un-get byte from stream buffer. For internal use.
- * 
+ *
  * @param c Byte to replace in buffer.
  * @param stream Destination stream.
- * 
+ *
  * @return Byte that was placed back into the buffer, or error code.
  */
 int rungetc(int c, FILE* stream);
@@ -112,37 +112,37 @@ void stdio_init(void);
 
 /**
  * @brief Flush output buffer.
- * 
+ *
  * @param stream Stream to be flushed.
- * 
+ *
  * @return 0 if successful. Otherwise, return error code.
  */
 int fflush(FILE *stream);
 
 /**
  * @brief Clear error status on stream.
- * 
+ *
  * @param stream Stream to be cleared.
  */
 void clearerr(FILE *stream);
 
 /**
  * @brief Write a given number of characters to a stream.
- * 
+ *
  * @param s Data to be written.
  * @param n Number of bytes to write.
  * @param stream Destination stream.
- * 
+ *
  * @return Number of bytes successfully written, or error code.
  */
 int fputn(const char *s, size_t n, FILE *stream);
 
 /**
  * @brief Write a single character to a stream.
- * 
+ *
  * @param c Character to be written.
  * @param stream Destination stream.
- * 
+ *
  * @return The character written, or EOF if an error occurred.
  * If an error occurred, ferror will be set accordingly.
  */
@@ -154,30 +154,30 @@ int putc(int c, FILE *stream);
 
 /**
  * @brief Write a single character to stdout.
- * 
+ *
  * @see fputc()
  */
 int putchar(int c);
 
 /**
  * @brief Write a null-terminated string to a stream.
- * 
+ *
  * @param s String to be written.
  * @param stream Destination stream.
- * 
+ *
  * @return Number of bytes successfully written, or an error code.
- * 
+ *
  * @see fputn()
  */
 int fputs(const char *s, FILE *stream);
 
 /**
  * @brief Write a null-terminated string to stdout.
- * 
+ *
  * @param s String to be written.
- * 
+ *
  * @return Number of bytes successfully written, or an error code.
- * 
+ *
  * @see fputs()
  * @see fputn()
  */
@@ -185,42 +185,42 @@ int puts(const char *s);
 
 /**
  * @brief Get a single character from a stream.
- * 
+ *
  * @param stream Source stream.
- * 
+ *
  * @return Character retrieved, or an error code.
  */
 int fgetc(FILE *stream);
 
 /**
  * @brief Get a single character from a stream.
- * 
+ *
  * @see fgetc()
  */
 int getc(FILE *stream);
 
 /**
  * @brief Un-get a single character from a stream.
- * 
+ *
  * @param c Character to place back.
  * @param stream Destination stream.
- * 
+ *
  * @return Character put back, or EOF if an error occurred.
  */
 int ungetc(int c, FILE *stream);
 
 /**
  * @brief Get a single character from stdin.
- * 
+ *
  * @see fgetc()
  */
 int getchar(void);
 
 /**
  * @brief Get a string from stdin, not including the trailing newline.
- * 
+ *
  * @param s Destination in which to place the data.
- * 
+ *
  * @return Pointer to destination, or EOF if an error occurred while
  * copying data.
  */
