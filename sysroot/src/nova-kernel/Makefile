@@ -235,11 +235,7 @@ endif
 #QEMU flags
 QEMU_FLAGS=\
 	-cdrom $(ISO) \
-	-s \
-	-S \
 	-boot d \
-	-display sdl \
-	-monitor stdio \
 	-no-reboot \
 	-no-shutdown \
 	-m $(QEMU_MEMORY) \
@@ -247,7 +243,7 @@ QEMU_FLAGS=\
 	-smp $(QEMU_SMP) \
 	-vga std \
 	-soundhw pcspk,sb16 \
-#	-enable-kvm
+	-enable-kvm
 
 # Bochs application settings.
 #BOCHS=$(HOME)/opt/bochs/bin/bochs
@@ -311,8 +307,12 @@ $(ISO): $(BIN)
 
 .PHONY: qemu
 qemu: $(ISO)
-	$(TERMINAL) -e "$(QEMU) $(QEMU_FLAGS)" &
+	$(TERMINAL) -e "$(QEMU) -s -S -display sdl -monitor stdio $(QEMU_FLAGS)" &
 	$(GDB) -tui --quiet $(BIN) -ex "set confirm off" -ex "target remote localhost:1234"
+
+.PHONY: curses-qemu
+curses-qemu: $(ISO)
+	$(QEMU) -curses $(QEMU_FLAGS)
 
 .PHONY: bochs
 bochs: $(ISO)
