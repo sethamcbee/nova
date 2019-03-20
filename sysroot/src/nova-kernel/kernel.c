@@ -82,7 +82,7 @@ void kernel_main(void)
     kernel_halt();
 }
 
-void kernel_panic(char* str)
+void kernel_panic(const char* str)
 {
     // Just pass the string to print for now.
     kernel_print("\n\nKERNEL PANIC:\n\n");

@@ -12,7 +12,7 @@
 #include <kernel.h>
 #include <stack_guard.h>
 
-uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
+//uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
 
 void __stack_chk_fail(void)
 {

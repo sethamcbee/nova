@@ -58,7 +58,7 @@ OBJ=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SRC)))
 ASM=$(addprefix $(ASM_DIR)/, $(addsuffix .s, $(SRC)))
 
 # Headers to be included into all other (C) files.
-HEADERS=stack_guard.h
+#HEADERS=stack_guard.h
 
 # Script for adding headers.
 HEADERS_SCRIPT=$(addprefix -include , $(HEADERS))
@@ -130,7 +130,7 @@ ifeq ($(ARCH), x86_64)
 		$(HEADERS_SCRIPT) \
 		$(OPTIMIZE) \
 		$(DEFINES) \
-		-std=gnu++11 \
+		-std=gnu++17 \
 		-ffreestanding \
 		-Wall \
 		-fno-exceptions \
@@ -167,7 +167,7 @@ ifeq ($(ARCH), x86)
 		$(HEADERS_SCRIPT) \
 		$(OPTIMIZE) \
 		$(DEFINES) \
-		-std=gnu++11 \
+		-std=gnu++17 \
 		-ffreestanding \
 		-Wall \
 		-fno-exceptions \

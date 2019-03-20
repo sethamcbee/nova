@@ -23,7 +23,7 @@ void kernel_main(void);
  * @param str Error message to be printed. Must not exceed 10000
  * bytes in length.
  */
-void kernel_panic(char *str);
+void kernel_panic(const char *str);
 
 /**
  * @brief Points to the write function for an environment-specific
