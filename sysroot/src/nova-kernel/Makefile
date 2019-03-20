@@ -66,7 +66,8 @@ HEADERS_SCRIPT=$(addprefix -include , $(HEADERS))
 # additional include paths
 INCLUDE_PATH=\
 $(SRC_DIR) \
-$(SRC_DIR)/libc
+$(SRC_DIR)/libc \
+$(SRC_DIR)/libcpp
 
 # script for adding specified include paths
 INCLUDE_SCRIPT=$(addprefix -I, $(INCLUDE_PATH))
