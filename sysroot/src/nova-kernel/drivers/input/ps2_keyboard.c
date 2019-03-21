@@ -24,6 +24,11 @@
 #include <arch/x86/devices/ps2.h>
 #endif
 
+uint8_t ps2_keyboard_queue[PS2_KB_QUEUE_MAX];
+uint8_t ps2_keyboard_queue_count;
+char ps2_keyboard_table[256];
+FILE* ps2_keyboard_stream;
+
 // Flushes the keyboard buffer.
 static void ps2_kb_flush(void);
 

@@ -7,6 +7,10 @@
 
 #include <globals.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define VGA_TEXT_BUFFER 0xB8000
 #define VGA_TEXT_WIDTH 80
 #define VGA_TEXT_HEIGHT 25
@@ -46,5 +50,9 @@ void vga_text_put_char(uint8_t c, uint8_t x, uint8_t y, uint8_t color);
 
 // Formats a color scheme.
 uint8_t vga_text_make_color(Vga_Text_Color fg, Vga_Text_Color bg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // VGA_TEXT_H

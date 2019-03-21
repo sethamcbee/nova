@@ -10,6 +10,10 @@
 
 #include <globals.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Stream error codes. */
 
 /// EOF error code.
@@ -67,13 +71,13 @@ typedef struct FILE
 } FILE;
 
 /// Standard input stream.
-FILE* stdin;
+extern FILE* stdin;
 
 /// Standard output stream.
-FILE* stdout;
+extern FILE* stdout;
 
 /// Standard error stream.
-FILE* stderr;
+extern FILE* stderr;
 
 /**
  * @brief Get byte from stream buffer. For internal use.
@@ -270,5 +274,9 @@ ssize_t write_null(const void *s, size_t n);
 
 /// Null read interface.
 ssize_t read_null(void *s, size_t n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // STDIO_H

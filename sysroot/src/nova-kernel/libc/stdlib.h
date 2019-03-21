@@ -12,6 +12,10 @@
 
 #include <liballoc/liballoc.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Converts string to double.
  *
@@ -332,5 +336,9 @@ char* _sitoa(size_t val, char* str, int base);
  * or 9 characters if bits is greater than 8.
  */
 char* btoa(uint8_t val, char* str, size_t bits);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* STDLIB_H */

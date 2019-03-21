@@ -11,6 +11,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PS/2 keyboard responses.
 #define PS2_KB_ACK        0xFA
 #define PS2_KB_ECHO       0xEE
@@ -53,11 +57,15 @@ void ps2_keyboard_handle(uint8_t code);
 
 // Keyboard handler queue.
 #define PS2_KB_QUEUE_MAX 32
-uint8_t ps2_keyboard_queue[PS2_KB_QUEUE_MAX];
-uint8_t ps2_keyboard_queue_count;
+extern uint8_t ps2_keyboard_queue[PS2_KB_QUEUE_MAX];
+extern uint8_t ps2_keyboard_queue_count;
 
 // Stores keyboard mapping.
-char ps2_keyboard_table[256];
+extern char ps2_keyboard_table[256];
 
-// stdio input device.
-FILE* ps2_keyboard_stream;
+// Stdio input device.
+extern FILE* ps2_keyboard_stream;
+
+#ifdef __cplusplus
+}
+#endif

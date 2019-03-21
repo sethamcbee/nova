@@ -25,6 +25,10 @@
 #define LENGTH_WIDE         1
 #define LENGTH_DOUBLE       2
 
+FILE* stdin;
+FILE* stdout;
+FILE* stderr;
+
 // STUB. Eventually these should be implemented using the VFS.
 static char stdin_buf[1000];
 static FILE stdin_file;
