@@ -13,6 +13,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef ptrdiff_t ssize_t;
 
 /**
@@ -76,3 +80,7 @@ typedef ptrdiff_t ssize_t;
  * @param x Expression to evaluate.
  */
 #define UNLIKELY(x) __builtin_expect((x), 0)
+
+#ifdef __cplusplus
+}
+#endif

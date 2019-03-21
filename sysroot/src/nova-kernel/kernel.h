@@ -11,6 +11,10 @@
 
 #include <arch/x86_64/multiboot2.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Kernel entry point. Should never return.
  */
@@ -67,4 +71,8 @@ void kernel_halt(void);
  * @brief Kernel module loaded by the bootloader, or NULL if no
  * module was loaded.
  */
-struct multiboot_tag_module* kernel_module;
+extern struct multiboot_tag_module* kernel_module;
+
+#ifdef __cplusplus
+}
+#endif

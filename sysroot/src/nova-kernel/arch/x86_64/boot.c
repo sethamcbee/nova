@@ -23,8 +23,6 @@
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 
-struct multiboot_tag_module* kernel_module = NULL;
-
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
 
@@ -60,6 +58,9 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
 
     // Initialize scheduler.
     cur_task = NULL;
+
+    // Set kernel module pointer to its new virtual address.
+    //kernel_module += &KERNEL_OFFSET;
 
     asm volatile ("sti \n"); // We can safely enable interrupts now.
 

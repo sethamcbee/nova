@@ -28,6 +28,8 @@
 #include <arch/x86/memory/vmm.h>
 #endif // ARCH_X86
 
+struct multiboot_tag_module* kernel_module = NULL;
+
 void kernel_main(void)
 {
     // Initialize VFS.
@@ -77,6 +79,7 @@ void kernel_main(void)
             printf("%s\n", contents);
         }
     }
+
     // The kernel is not intended to return; halt.
     fputs("\nEnd of kernel code. Halt.", stderr);
     kernel_halt();

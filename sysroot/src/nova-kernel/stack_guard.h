@@ -9,7 +9,11 @@
 
 #ifdef STACK_GUARD
 
-#include <globals.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Some arbitrary value for the stack guard implementation to
@@ -20,11 +24,15 @@
 /**
  * @brief Pointer used by GCC stack guard code.
  */
-uintptr_t __stack_chk_guard;
+extern uintptr_t __stack_chk_guard;
 
 /**
  * @brief Function called upon detection of stack corruption.
  */
 void __stack_chk_fail(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // STACK_GUARD

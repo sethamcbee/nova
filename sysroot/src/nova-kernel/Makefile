@@ -58,7 +58,7 @@ OBJ=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SRC)))
 ASM=$(addprefix $(ASM_DIR)/, $(addsuffix .s, $(SRC)))
 
 # Headers to be included into all other (C) files.
-#HEADERS=stack_guard.h
+HEADERS=stack_guard.h
 
 # Script for adding headers.
 HEADERS_SCRIPT=$(addprefix -include , $(HEADERS))
@@ -192,7 +192,7 @@ else
 endif
 
 # Adds additional compiler flags if debugging.
-ifeq ($(DEBUG),true)
+ifeq ($(DEBUG), true)
 	ASFLAGS+= -gdwarf-2
 	CCFLAGS+= -gdwarf-2
 	CPPFLAGS+= -gdwarf-2

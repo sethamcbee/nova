@@ -15,6 +15,10 @@
 
 #include <kernel.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Compiler built-in static assertion.
  */
@@ -36,7 +40,11 @@ void kassert(const char* file, const char* func, long line, const char* exp);
  */
 #define assert(x) ((x) ? 0 : kassert(__FILE__, __func__, __LINE__, #x))
 #else
-#define assert(ignore) ((void)0)
+#define assert(ignore) (0)
 #endif // DEBUG
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ASSERT_H
