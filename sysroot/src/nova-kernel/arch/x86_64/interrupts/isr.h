@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Selector error codes.
 #define ISR_ERROR_EXTERNAL_BIT      0
 #define ISR_ERROR_EXTERNAL_MASK     1
@@ -86,5 +90,9 @@ void isr_14_ext(uint32_t error_code, uint64_t addr);
 void isr_32_ext(void);
 void isr_33_ext(void);
 void isr_39_ext(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ISR_H

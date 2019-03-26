@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct Dnode Dnode;
 typedef struct FS_Driver FS_Driver;
 typedef struct Vnode Vnode;
@@ -60,3 +64,7 @@ Dnode* dnode_tree_remove(Dnode* root, const char* name);
 
 /// Find a subdirectory.
 Dnode* dnode_tree_find(Dnode* root, const char* name);
+
+#ifdef __cplusplus
+}
+#endif

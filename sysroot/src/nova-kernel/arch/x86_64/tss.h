@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __attribute__((packed))
 {
     uint16_t limit_0;
@@ -61,5 +65,9 @@ void tss_init(void);
 
 // Loads new state into TR, setting ring# to mask.
 void tss_load(uint16_t mask);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // TSS_H

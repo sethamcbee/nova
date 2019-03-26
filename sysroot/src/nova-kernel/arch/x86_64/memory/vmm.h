@@ -10,6 +10,10 @@
 
 #include <arch/x86_64/memory/paging.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Virtual address space constants.
 static const size_t BOOT_OFFSET = 0x100000UL;
 static const size_t KERNEL_OFFSET = 0xFFFFFFFF80000000UL;
@@ -93,3 +97,7 @@ Vmm_Region vmm_tree_find_pages(Vmm_Node* root, size_t pages);
 
 // Resizes a node by changing its page count (NOT its base).
 Vmm_Node* vmm_tree_resize(Vmm_Node* root, Vmm_Region mem);
+
+#ifdef __cplusplus
+}
+#endif

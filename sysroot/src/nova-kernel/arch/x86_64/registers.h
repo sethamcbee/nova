@@ -9,6 +9,10 @@
 
 #include <globals.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Storage for registers.
 typedef struct Registers
 {
@@ -39,3 +43,7 @@ typedef struct Registers
 
 static_assert(offsetof(Registers, rsp) == 40, "");
 static_assert(offsetof(Registers, rip) == 128, "");
+
+#ifdef __cplusplus
+}
+#endif

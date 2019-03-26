@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct FS_Driver FS_Driver;
 typedef struct Vnode Vnode;
 
@@ -44,3 +48,7 @@ struct Vnode
     Vnode* left;
     Vnode* right;
 };
+
+#ifdef __cplusplus
+}
+#endif

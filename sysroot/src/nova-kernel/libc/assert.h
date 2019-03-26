@@ -19,10 +19,12 @@
 extern "C" {
 #endif
 
+#ifndef __cplusplus
 /**
  * @brief Compiler built-in static assertion.
  */
 #define static_assert _Static_assert
+#endif // __cplusplus
 
 /**
  * @brief Handle kernel run-time assertion.

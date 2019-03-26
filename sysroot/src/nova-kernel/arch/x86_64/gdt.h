@@ -9,6 +9,10 @@
 
 #include <globals.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RING3 0b11
 
 // GDT entry indices and constants.
@@ -55,7 +59,11 @@ typedef struct Gdt_Ptr
 void gdt_init(void);
 
 /// GDT structure, declared in assembly file.
-Gdt_Entry gdt_entry[GDT_ENTRY_COUNT] __attribute__((aligned(16)));
+extern Gdt_Entry gdt_entry[GDT_ENTRY_COUNT] __attribute__((aligned(16)));
 
 /// Pointer to GDT, loaded by LGDT.
-Gdt_Ptr gdt_ptr;
+extern Gdt_Ptr gdt_ptr;
+
+#ifdef __cplusplus
+}
+#endif

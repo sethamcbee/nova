@@ -10,6 +10,10 @@
 
 #include <globals.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PAGE_SIZE   (0x1000) // 4 KiB pages.
 #define PAGE_COUNT  512      // Entries per table.
 
@@ -122,5 +126,9 @@ Pdpte pdpt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
 Pde pd0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
 Pte pt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
 Pte pt1[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PAGING_H

@@ -7,6 +7,8 @@
 
 #include <globals.h>
 
+#include <memory>
+
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
@@ -74,8 +76,8 @@ void kernel_main(void)
         scanf("%s", s);
         if (strcmp(s, "module") == 0)
         {
-            char* contents = vmm_page_alloc_kernel();
-            vmm_page_map(kernel_module, contents, PG_PR | PG_RW | PG_U);
+            char* contents = (char*)vmm_page_alloc_kernel();
+            vmm_page_map((void*)kernel_module, contents, PG_PR | PG_RW | PG_U);
             printf("%s\n", contents);
         }
     }

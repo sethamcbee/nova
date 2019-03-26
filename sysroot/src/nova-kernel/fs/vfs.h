@@ -12,6 +12,10 @@
 #include <fs/dnode.h>
 #include <fs/vnode.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Root directory.
 Dnode* vfs_root;
 
@@ -41,3 +45,7 @@ Vnode* vfs_find_vnode(const char* path);
 
 /// Find directory if it exists.
 Dnode* vfs_find_dnode(const char* path);
+
+#ifdef __cplusplus
+}
+#endif

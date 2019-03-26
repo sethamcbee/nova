@@ -14,6 +14,9 @@
 #include <drivers/input/ps2_keyboard.h>
 #include <hal/tty.h>
 
+FILE* tty_ins;
+FILE* tty_outs;
+
 static FILE tty_out_file;
 static char tty_out_buf[10000];
 static FILE tty_in_file;

@@ -17,6 +17,10 @@
 #include <arch/x86_64/registers.h>
 #endif // ARCH_X86_64
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Stores process information.
  */
@@ -39,3 +43,7 @@ typedef struct
      */
     Registers reg;
 } Process;
+
+#ifdef __cplusplus
+}
+#endif

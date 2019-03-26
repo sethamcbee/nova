@@ -10,6 +10,10 @@
 
 #include <arch/x86_64/multiboot2.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Initializes physical memory manager using Multiboot2 memory map.
 void pmm_init(struct multiboot_tag_mmap *mb_mmap);
 
@@ -34,3 +38,7 @@ size_t pmm_frames_available;
 
 // Number of unavailable page frames.
 size_t pmm_frames_unavailable;
+
+#ifdef __cplusplus
+}
+#endif

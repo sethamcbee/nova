@@ -12,6 +12,10 @@
 
 #include <proc/process.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Number of ticks before a task switch.
  */
@@ -71,5 +75,9 @@ void task_add(Task* new_task);
  * @brief Get a pointer to the current task's stored CPU state.
  */
 Registers* task_get_reg(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SCHEDULER_H

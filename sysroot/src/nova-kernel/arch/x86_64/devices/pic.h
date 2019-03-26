@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PIC IO addresses.
 #define PIC1            0x20
 #define PIC2            0xA0
@@ -67,5 +71,9 @@ uint16_t pic_irr_get(void);
 
 // Retrieves the ISR.
 uint16_t pic_isr_get(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PIC_H

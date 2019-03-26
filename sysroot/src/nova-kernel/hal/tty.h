@@ -12,8 +12,16 @@
 
 #include <kernel.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void tty_init(void);
 
 // stdio interface.
-FILE *tty_outs;
-FILE *tty_ins;
+extern FILE* tty_outs;
+extern FILE* tty_ins;
+
+#ifdef __cplusplus
+}
+#endif

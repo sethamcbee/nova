@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PS/2 controller ports.
 #define PS2_CMD     0x64
 #define PS2_DATA    0x60
@@ -23,5 +27,9 @@
 
 void ps2_send(uint8_t val, uint16_t port);
 uint8_t ps2_receive(uint16_t port);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PS2_H

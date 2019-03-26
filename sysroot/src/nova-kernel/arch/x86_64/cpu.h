@@ -15,6 +15,10 @@
 
 #include <arch/x86_64/tss.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Write a byte to an IO port.
 static inline void cpu_outb(uint8_t val, uint16_t port)
 {
@@ -165,3 +169,7 @@ static inline void cpu_proc(Process* proc)
     // Jump to code.
     cpu_proc_asm(&proc->reg);
 }
+
+#ifdef __cplusplus
+}
+#endif

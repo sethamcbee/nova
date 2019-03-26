@@ -9,6 +9,10 @@
 
 #include <globals.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum Dnode_Type Dnode_Type;
 typedef enum Vnode_Type Vnode_Type;
 typedef struct Dnode Dnode;
@@ -26,3 +30,7 @@ struct FS_Driver
     ssize_t (*read)(Vnode* file, void* buf, size_t n, size_t pos);
     ssize_t (*write)(Vnode* file, const void* buf, size_t n, size_t pos);
 };
+
+#ifdef __cplusplus
+}
+#endif

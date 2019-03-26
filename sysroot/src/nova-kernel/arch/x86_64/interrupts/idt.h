@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Gate types.
 #define IDT_INTERRUPT_GATE  0b1110
 #define IDT_TASK_GATE       0b0101
@@ -34,5 +38,9 @@ void idt_initialize(void);
 
 // Loads the idt.
 void idt_load(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // IDT_H
