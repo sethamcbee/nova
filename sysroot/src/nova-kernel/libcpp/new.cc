@@ -6,8 +6,7 @@
 
 #include <stddef.h>
 
-extern "C" void* malloc(size_t size);
-extern "C" void free(void* p);
+#include <stdlib.h>
 
 void* operator new(size_t size)
 {

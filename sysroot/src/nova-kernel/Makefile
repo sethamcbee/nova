@@ -244,11 +244,11 @@ QEMU_FLAGS=\
 	-smp $(QEMU_SMP) \
 	-vga std \
 	-soundhw pcspk,sb16 \
-	-enable-kvm
+#	-enable-kvm
 
 # Bochs application settings.
-#BOCHS=$(HOME)/opt/bochs/bin/bochs
-BOCHS=bochs
+BOCHS=$(HOME)/opt/bochs/bin/bochs
+#BOCHS=bochs
 
 # build objects, binary, and disk image
 .PHONY: default
@@ -354,6 +354,6 @@ $(ASM_DIR)/%.c.s: $(OBJ_DIR)/%.c.o
 	objdump -drwS $< > $@
 
 # assemble C++ files, generic
-$(ASM_DIR)/%.cc.s: $(OBJ_DIR)/%.cpp.o
+$(ASM_DIR)/%.cc.s: $(OBJ_DIR)/%.cc.o
 	mkdir -p $(@D)
 	objdump -drwS $< > $@

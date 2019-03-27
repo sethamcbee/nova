@@ -41,7 +41,7 @@ void kernel_panic(const char *str);
  * @return Number of bytes written, or an error code.
  */
 
-ssize_t (*kernel_write)(const void*, size_t);
+extern ssize_t (*kernel_write)(const void*, size_t);
 
 /**
  * @brief Writes a string using kernel_write() without a specified

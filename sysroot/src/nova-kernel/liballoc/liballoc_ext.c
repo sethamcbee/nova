@@ -43,13 +43,14 @@ void* liballoc_alloc(int pages)
     return ( ret );
 }
 
+// NOTE: Is not currently freeing pages.
 int liballoc_free(void* page,int pages)
 {
     uint8_t* p = page;
 
     while (pages > 0)
     {
-        vmm_page_free_kernel(p);
+        //vmm_page_free_kernel(p);
         p += PAGE_SIZE;
         pages--;
     }

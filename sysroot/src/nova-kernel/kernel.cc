@@ -30,6 +30,7 @@
 #include <arch/x86/memory/vmm.h>
 #endif // ARCH_X86
 
+ssize_t (*kernel_write)(const void*, size_t) = NULL;
 struct multiboot_tag_module* kernel_module = NULL;
 
 void kernel_main(void)
