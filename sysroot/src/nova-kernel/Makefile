@@ -14,7 +14,7 @@ SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
 ARCH=x86_64
-OPTIMIZE=-O0 -mno-sse
+OPTIMIZE=-Og -mno-sse
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -193,9 +193,9 @@ endif
 
 # Adds additional compiler flags if debugging.
 ifeq ($(DEBUG), true)
-	ASFLAGS+= -gdwarf-2
-	CCFLAGS+= -gdwarf-2
-	CPPFLAGS+= -gdwarf-2
+	ASFLAGS+= -ggdb
+	CCFLAGS+= -ggdb
+	CPPFLAGS+= -ggdb
 endif
 
 # Add additional flags if the stack_chk_guard is desired.

@@ -1,5 +1,5 @@
 /**
- * @file utilities.h
+ * @file utility.h
  * @author Seth McBee
  * @date 2019-3-21
  */

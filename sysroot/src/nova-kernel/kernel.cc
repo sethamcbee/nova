@@ -7,6 +7,7 @@
 
 #include <globals.h>
 
+#include <list>
 #include <memory>
 
 #include <kernel.h>
@@ -33,7 +34,11 @@
 ssize_t (*kernel_write)(const void*, size_t) = NULL;
 struct multiboot_tag_module* kernel_module = NULL;
 
-void kernel_main(void)
+void kernel_test()
+{
+}
+
+void kernel_main()
 {
     // Initialize VFS.
     vfs_init();
@@ -66,6 +71,8 @@ void kernel_main(void)
     kernel_task.ticks = DEFAULT_TICKS;
     kernel_task.next = &kernel_task;
     cur_task = &kernel_task;
+
+    kernel_test();
 
     // Kernel loop.
     while (1)
