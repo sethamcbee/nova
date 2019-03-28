@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 #ifdef ARCH_X86_64
+#include <arch/x86_64/cpu.h>
 #include <arch/x86_64/memory/pmm.h>
 #endif
 
@@ -432,12 +433,33 @@ char* _sitoa(size_t val, char* str, int base)
     return (str);
 }
 
-static unsigned long int rand_seed = 1;
+static unsigned long int rand_seed;
 int rand_max(unsigned int max) // RAND_MAX assumed to be 32767
 {
+    static bool seeded = false;
+    if (!seeded)
+    {
+        volatile unsigned long int start = cpu_rdtsc();
+        volatile unsigned long int skip = start;
+        while (skip /= 10)
+        {
+            cpu_io_wait();
+            skip += (cpu_rdtsc() - start) % 10;
+        }
+        skip = cpu_rdtsc() - start;
+        rand_seed = cpu_rdtsc() - start;
+        seeded = true;
+    }
+
     rand_seed = rand_seed * 1103515245 + 12345;
     return (unsigned int)(rand_seed / 65536) % (max + 1);
 }
+
+int rand()
+{
+    return rand_max(32767);
+}
+
 void srand( unsigned int seed )
 {
     rand_seed = seed;
