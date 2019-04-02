@@ -429,7 +429,10 @@ int vfprintf(FILE *stream, const char *format, va_list arg)
                 if (length != LENGTH_WIDE)
                 {
                     char c = va_arg(arg, int);
-                    fputc(c, stream);
+                    if (c != NULL)
+                    {
+                        fputc(c, stream);
+                    }
                     written++;
                 }
                 continue;

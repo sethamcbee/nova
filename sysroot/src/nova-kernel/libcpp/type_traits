@@ -1,1 +1,3 @@
-internal/type_traits.h
+#pragma once
+
+#include <internal/type_traits.h>

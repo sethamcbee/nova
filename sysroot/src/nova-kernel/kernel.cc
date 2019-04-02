@@ -7,8 +7,12 @@
 
 #include <globals.h>
 
+#include <array>
+#include <initializer_list>
 #include <list>
 #include <memory>
+#include <type_traits>
+#include <vector>
 
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>

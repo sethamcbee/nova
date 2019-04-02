@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <initializer_list>
+#include <iterator>
+
 #include <kernel.h>
 
 namespace std
@@ -15,6 +18,18 @@ template <class T, size_t N>
 struct array
 {
 public:
+
+    using value_type = T;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using iterator = pointer;
+    using const_iterator = const_pointer;
+    using reverse_iterator = typename std::reverse_iterator<iterator>;
+    using const_reverse_iterator = typename std::reverse_iterator<const_iterator>;
+    using size_type = size_t;
+    using difference_type = ptrdiff_t;
 
     /** Accessors. **/
 
@@ -81,6 +96,62 @@ public:
     {
         return N;
     }
+    
+    /** Iterators. **/
+    
+    constexpr iterator begin()
+    {
+        return contents;
+    }
+    
+    constexpr const_iterator begin() const
+    {
+        return contents;
+    }
+    
+    constexpr iterator end()
+    {
+        return contents + N;
+    }
+    
+    constexpr const_iterator end() const
+    {
+        return contents + N;
+    }
+    
+    constexpr const_iterator cbegin() const
+    {
+        return contents;
+    }
+    
+    constexpr const_iterator cend() const
+    {
+        return contents + N;
+    }
+    
+    constexpr reverse_iterator rbegin()
+    {
+        auto it = contents + N - 1;
+        return reverse_iterator(it);
+    }
+    
+    constexpr const_reverse_iterator rbegin() const
+    {
+        auto it = contents + N - 1;
+        return const_reverse_iterator(it);
+    }
+    
+    constexpr reverse_iterator rend()
+    {
+        auto it = contents - 1;
+        return reverse_iterator(it);
+    }
+    
+    constexpr const_reverse_iterator rend() const
+    {
+        auto it = contents - 1;
+        return const_reverse_iterator(it);
+    } 
 
     T contents[N];
 };

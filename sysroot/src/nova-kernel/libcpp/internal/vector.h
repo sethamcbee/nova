@@ -7,6 +7,7 @@
 #pragma once
 
 #include <algorithm>
+#include <initializer_list>
 #include <memory>
 #include <utility>
 #include <stdint.h>
@@ -22,6 +23,15 @@ template <class T, class Alloc = allocator<T>>
 class vector
 {
 public:
+
+    using value_type = T;
+    using allocator_type = Alloc;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = T*; /// TODO: implement allocator_traits.
+    using const_pointer = const T*;
+    using iterator = pointer;
+    using const_iterator = const_pointer;
 
     /** Constructors. **/
     
@@ -91,6 +101,15 @@ public:
         other.max_count = 0;
         data = other.data;
         other.data = nullptr;
+    }
+    
+    vector(initializer_list<value_type> il, const Alloc& alloc = Alloc())
+        : vector_alloc(alloc)
+    {
+        for (const auto& n : il)
+        {
+            push_back(n);
+        }
     }
     
     /** Destructor. **/
@@ -261,6 +280,26 @@ public:
     void pop_back()
     {
         --count;
+    }
+    
+    iterator begin() noexcept
+    {
+        return iterator(data);
+    }
+    
+    const_iterator begin() const noexcept
+    {
+        return const_iterator(data);
+    }
+    
+    iterator end() noexcept
+    {
+        return iterator(data + count);
+    }
+    
+    const_iterator end() const noexcept
+    {
+        return const_iterator(data + count);
     }
     
 private:
