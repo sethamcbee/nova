@@ -34,7 +34,7 @@ extern "C" {
  * @param line Line number at which the assertion failed.
  * @param exp Expression that failed evaluation.
  */
-void kassert(const char* file, const char* func, long line, const char* exp);
+bool kassert(const char* file, const char* func, long line, const char* exp);
 
 #ifndef NDEBUG
 /**

@@ -506,6 +506,22 @@ int vfprintf(FILE *stream, const char *format, va_list arg)
                 written += strlen(tmp);
                 continue;
             }
+            
+            if (spec == 'f')
+            {
+                char tmp[100];
+                float f;
+                
+                // Get float.
+                f = (float) va_arg(arg, double);
+                
+                // Format string.
+                ftoa(f, tmp);
+                
+                // Output string.
+                fputs(tmp, stream);
+                written += strlen(tmp);
+            }
 
             // Reset tags.
             left_justify = false;
@@ -769,6 +785,28 @@ int vfscanf(FILE *stream, const char *format, va_list arg)
                     *n = atoi(tmp);
                 }
                 args_read++;
+                continue;
+            }
+            
+            if (spec == 'f')
+            {
+                // Get string.
+                char tmp[100];
+                size_t len = 0;
+                char c = fgetc(stream);
+                while (isdigit(c) || c == '-' || c == '.')
+                {
+                    tmp[len] = c;
+                    ++len;
+                    c = fgetc(stream);
+                }
+                tmp[len] = '\0';
+                
+                // Convert to float.
+                float* target = (float*)va_arg(arg, float*);
+                *target = (float)atof(tmp);
+                
+                ++args_read;
                 continue;
             }
             format++;

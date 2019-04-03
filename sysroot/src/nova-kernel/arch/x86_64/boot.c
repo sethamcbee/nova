@@ -18,7 +18,10 @@
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/multiboot2.h>
 #include <arch/x86_64/tss.h>
+#include <arch/x86_64/devices/cmos.h>
+#include <arch/x86_64/devices/fpu.h>
 #include <arch/x86_64/devices/pic.h>
+#include <arch/x86_64/devices/pit.h>
 #include <arch/x86_64/interrupts/idt.h>
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
@@ -46,6 +49,7 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     idt_initialize();
     vmm_init();
     tss_init();
+    fpu_init();
 
     // Initialize PIC (disables all IRQs).
     pic_initialize();
@@ -54,7 +58,9 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
 
     ps2_keyboard_init();
 
-    // TODO: Set up timer.
+    // Set up timer.
+    cmos_init();
+    pit_init();
 
     // Initialize scheduler.
     cur_task = NULL;

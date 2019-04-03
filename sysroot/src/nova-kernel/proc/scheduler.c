@@ -20,6 +20,8 @@
 #include <arch/x86/registers.h>
 #endif // ARCH_X86
 
+Task* cur_task;
+
 bool task_tick(void)
 {
     // Disable scheduler.

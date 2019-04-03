@@ -30,10 +30,9 @@ int abs(int n)
     }
 }
 
-#if 0
 double atof(const char* s)
 {
-    volatile double val = 0;
+    double val = 0;
     size_t i = 0;
 
     /* Ignores any whitespace at beginning of string. */
@@ -44,7 +43,7 @@ double atof(const char* s)
 
     /* If sign is 1, integer is positive. If sign is -1, integer is
      * negative. Default is positive. */
-    double val_sign = 1;
+    double val_sign = 1.0;
 
     /* Checks for negative sign. */
     if (s[i] == '-')
@@ -64,8 +63,8 @@ double atof(const char* s)
     /* Converts ASCII digits to double. */
     while (isdigit(s[i]) != 0)
     {
-        val *= 10;
-        val += s[i] - '0';
+        val *= 10.0;
+        val += (float)(s[i] - '0');
         ++i;
     }
 
@@ -89,7 +88,6 @@ double atof(const char* s)
 
     return (val_sign * val);
 }
-#endif
 
 int atoi(const char* s)
 {
@@ -429,6 +427,33 @@ char* _sitoa(size_t val, char* str, int base)
         str[str_i] = digit[val%base];
         val /= base;
     }
+
+    return (str);
+}
+
+char* ftoa(float val, char* str)
+{
+    const char digit[] = "0123456789";
+    size_t pos = 0;
+    
+    // Get integer component.
+    litoa((long)val, str);
+    
+    // Get fractional component.
+    pos = strlen(str);
+    str[pos] = '.';
+    ++pos;
+    
+    val -= (long)val;
+    for (size_t i = 0; i < 6; ++i)
+    {
+        val *= 10.0F;
+        str[pos] = digit[(long)val % 10];
+        val -= (long)val;
+        ++pos;
+    }
+    
+    str[pos] = '\0';
 
     return (str);
 }

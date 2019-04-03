@@ -156,4 +156,7 @@ public:
     T contents[N];
 };
 
+template <class T, class... U>
+array(T, U...) -> array<T, 1 + sizeof...(U)>;
+
 }

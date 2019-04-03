@@ -23,7 +23,7 @@ extern "C" {
  *
  * @return String s converted to type double.
  */
-//double atof(const char* s);
+double atof(const char* s);
 
 /**
  * @brief Converts string to int.
@@ -336,6 +336,8 @@ char* _sitoa(size_t val, char* str, int base);
  * or 9 characters if bits is greater than 8.
  */
 char* btoa(uint8_t val, char* str, size_t bits);
+
+char* ftoa(float val, char* str);
 
 #ifdef __cplusplus
 }

@@ -35,11 +35,75 @@
 #include <arch/x86/memory/vmm.h>
 #endif // ARCH_X86
 
+#include <arch/x86_64/devices/pit.h>
+
+size_t ms_to_ticks(size_t ms)
+{
+    return (float)ms * PIT_REAL_FREQ / 1000.0f;
+}
+
+size_t ticks_to_ms(size_t t)
+{
+    return (float)t * 1000.0f / PIT_REAL_FREQ;
+}
+
+void wait_ticks(size_t t)
+{
+    auto start = irq_pit_count;
+    auto volatile* end = &irq_pit_count;
+    while (*end - start < t)
+    {
+        // Busy-wait.
+    }
+}
+
+void wait_ms(size_t ms)
+{
+    auto ticks = ms_to_ticks(ms);
+    wait_ticks(ticks);
+}
+
 ssize_t (*kernel_write)(const void*, size_t) = NULL;
 struct multiboot_tag_module* kernel_module = NULL;
 
 void kernel_test()
 {
+    pit_info();
+    
+    extern uint16_t rtc_sec_init;
+    extern uint16_t rtc_min_init;
+    extern uint16_t rtc_hour_init;
+    extern uint8_t rtc_weekday_init;
+    extern uint8_t rtc_day_init;
+    extern uint8_t rtc_mon_init;
+    extern uint8_t rtc_year_init;
+    
+    uint64_t uptime = ticks_to_ms(irq_pit_count) / 1000;
+    uint64_t sec = rtc_sec_init;
+    uint64_t min = rtc_min_init;
+    uint64_t hour = rtc_hour_init;
+    uint64_t day = rtc_day_init;
+    uint64_t mon = rtc_mon_init;
+    uint64_t year = rtc_year_init;
+    
+    sec += uptime;
+    while (sec > 59)
+    {
+        sec -= 59;
+        ++min;
+    }
+    while (min > 59)
+    {
+        min -= 59;
+        ++hour;
+    }
+    while (hour > 23)
+    {
+        hour -= 23;
+        ++day;
+    }
+    
+    printf("20%d-%d-%d %d:%d:%d\n", year, mon, day, hour, min, sec);
 }
 
 void kernel_main()
@@ -88,9 +152,80 @@ void kernel_main()
         scanf("%s", s);
         if (strcmp(s, "module") == 0)
         {
-            char* contents = (char*)vmm_page_alloc_kernel();
-            vmm_page_map((void*)kernel_module, contents, PG_PR | PG_RW | PG_U);
-            printf("%s\n", contents);
+            char* module_page = (char*)vmm_page_alloc_kernel();
+            vmm_page_map((void*)kernel_module, module_page, PG_PR | PG_RW | PG_U);
+            
+            printf("%s\n", module_page);
+        }
+        if (strcmp(s, "timer") == 0)
+        {
+            auto start = *&irq_pit_count;
+            scanf("%s", s);
+            auto end = *&irq_pit_count;
+            
+            auto ms = ticks_to_ms(end - start);
+            printf("time: %d ms\n", ms);
+        }
+        if (strcmp(s, "ticks") == 0)
+        {
+            auto ticks = irq_pit_count;
+            printf("ticks: %d\n", ticks);
+            printf("uptime: %f sec\n", (double)ticks_to_ms(ticks) / 1000);
+        }
+        if (strcmp(s, "sleep") == 0)
+        {
+            float sec;
+            printf("sec: ");
+            scanf("%f", &sec);
+            size_t i = 1;
+            float whole = sec;
+            while (whole > 1.0001)
+            {
+                wait_ms(1000);
+                printf("%ds...\n", i);
+                ++i;
+                fflush(stdout);
+                --whole;
+            }
+            wait_ms(whole * 1000);
+            printf("%fs.\n", sec);
+        }
+        if (strcmp(s, "date") == 0)
+        {
+            extern uint16_t rtc_sec_init;
+            extern uint16_t rtc_min_init;
+            extern uint16_t rtc_hour_init;
+            extern uint8_t rtc_weekday_init;
+            extern uint8_t rtc_day_init;
+            extern uint8_t rtc_mon_init;
+            extern uint8_t rtc_year_init;
+            
+            uint64_t uptime = ticks_to_ms(irq_pit_count) / 1000;
+            uint64_t sec = rtc_sec_init;
+            uint64_t min = rtc_min_init;
+            uint64_t hour = rtc_hour_init;
+            uint64_t day = rtc_day_init;
+            uint64_t mon = rtc_mon_init;
+            uint64_t year = rtc_year_init;
+            
+            sec += uptime;
+            while (sec > 59)
+            {
+                sec -= 59;
+                ++min;
+            }
+            while (min > 59)
+            {
+                min -= 59;
+                ++hour;
+            }
+            while (hour > 23)
+            {
+                hour -= 23;
+                ++day;
+            }
+            
+            printf("20%d-%d-%d %d:%d:%d\n", year, mon, day, hour, min, sec);
         }
     }
 

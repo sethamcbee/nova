@@ -9,6 +9,9 @@
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/tss.h>
 
+__attribute__((aligned(16)))
+volatile Tss tss;
+
 void tss_init(void)
 {
     Tss_Descriptor *tss_descriptor = (Tss_Descriptor*)&gdt_entry[GDT_TSS / 8];

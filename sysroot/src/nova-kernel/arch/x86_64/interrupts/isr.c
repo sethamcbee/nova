@@ -18,8 +18,8 @@
 #include <arch/x86_64/devices/ps2.h>
 #include <arch/x86_64/interrupts/isr.h>
 
-uint64_t irq_spurious_count = 0;
-uint64_t irq_pit_count = 0;
+volatile uint64_t irq_spurious_count = 0;
+volatile uint64_t irq_pit_count = 0;
 
 void isr_1_ext(uint64_t ip)
 {

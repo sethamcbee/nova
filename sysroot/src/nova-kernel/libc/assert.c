@@ -9,7 +9,7 @@
 
 #include <kernel.h>
 
-void kassert(const char* file, const char* func, long line, const char* exp)
+bool kassert(const char* file, const char* func, long line, const char* exp)
 {
     char msg[500];
     char line_str[10];
@@ -34,4 +34,7 @@ void kassert(const char* file, const char* func, long line, const char* exp)
 
     // Dispatch message.
     kernel_panic(msg);
+    
+    // Dead code.
+    return false;
 }

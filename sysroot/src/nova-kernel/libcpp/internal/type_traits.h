@@ -78,7 +78,7 @@ struct remove_reference<T&&>
 };
 
 template <class T>
-using remove_reference_t = remove_reference<T>;
+using remove_reference_t = typename remove_reference<T>::type;
 
 
 template <class T>
@@ -94,7 +94,7 @@ struct remove_pointer<T*>
 };
 
 template <class T>
-using remove_pointer_t = remove_pointer<T>;
+using remove_pointer_t = typename remove_pointer<T>::type;
 
 
 template <class T>
@@ -110,7 +110,7 @@ struct remove_extent<T[]>
 };
 
 template <class T>
-using remove_extent_t = remove_extent<T>;
+using remove_extent_t = typename remove_extent<T>::type;
 
 
 template <class T>
@@ -126,7 +126,63 @@ struct remove_const<const T>
 };
 
 template <class T>
-using remove_const_t = remove_const<T>;
+using remove_const_t = typename remove_const<T>::type;
+
+
+template <class T>
+struct remove_volatile
+{
+    using type = T;
+};
+
+template <class T>
+struct remove_volatile<volatile T>
+{
+    using type = T;
+};
+
+template <class T>
+using remove_volatile_t = typename remove_volatile<T>::type;
+
+
+template <class T>
+struct remove_cv
+{
+    using type = remove_const_t<remove_volatile_t<T>>;
+};
+
+template <class T>
+using remove_cv_t = typename remove_cv<T>::type;
+
+
+template <class T>
+struct add_const
+{
+    using type = const T;
+};
+
+template <class T>
+using add_const_t = typename add_const<T>::type;
+
+
+template <class T>
+struct add_volatile
+{
+    using type = volatile T;
+};
+
+template <class T>
+using add_volatile_t = typename add_volatile<T>::type;
+
+
+template <class T>
+struct add_cv
+{
+    using type = add_const_t<add_volatile_t<T>>;
+};
+
+template <class T>
+using add_cv_t = typename add_cv<T>::type;
 
 
 template <class T, class U>
@@ -139,20 +195,80 @@ template <class T, class U>
 constexpr auto is_same_v = is_same<T, U>::value;
 
 
+template <class T, class Enable = void>
+struct is_void : public false_type {};
+
+template <class T>
+struct is_void
+<
+    T,
+    enable_if_t
+    <
+        is_same_v
+        <
+            T,
+            void
+        >
+    >
+> : public true_type {};
+
+template <class T>
+constexpr auto is_void_v = is_void<T>::value;
+
+
+template <class T, class Enable = void>
+struct is_null_pointer : public false_type {};
+
+template <class T>
+struct is_null_pointer
+<
+    T,
+    enable_if_t
+    <
+        is_same_v
+        <
+            T,
+            nullptr_t
+        >
+    >
+> : public true_type {};
+
+template <class T>
+constexpr auto is_null_pointer_v = is_null_pointer<T>::value;
+
+
+template <class T>
+struct is_const : public false_type {};
+
+template <class T>
+struct is_const<const T> : public true_type {};
+
+template <class T>
+constexpr auto is_const_v = is_const<T>::value;
+
+
+template <class T>
+struct is_volatile : public false_type {};
+
+template <class T>
+struct is_volatile<volatile T> : public true_type {};
+
+template <class T>
+constexpr auto is_volatile_v = is_volatile<T>::value;
+
+
+template <class T, class Enable = void>
+struct is_abstract : public false_type {};
+
 template <class T>
 struct is_abstract
-{
-    using value_type = bool;
-    
-    static constexpr value_type value = __is_abstract(T);
-    
-    using type = integral_constant<bool, value>;
-    
-    constexpr operator value_type() const noexcept
-    {
-        return value;
-    }
-};
+<
+    T,
+    enable_if_t
+    <
+        __is_abstract(T)
+    >
+> : public true_type {};
 
 template <class T>
 constexpr auto is_abstract_v = is_abstract<T>::value;

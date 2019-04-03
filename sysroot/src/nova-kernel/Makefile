@@ -14,7 +14,7 @@ SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
 ARCH=x86_64
-OPTIMIZE=-O0 -mno-sse
+OPTIMIZE=-O2 -march=core2 -mno-sse4.2 -mno-sse4.1 -mno-sse4 -mno-ssse3 
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true
@@ -343,17 +343,19 @@ $(OBJ_DIR)/%.cc.o: %.cc
 	mkdir -p $(@D)
 	$(CPP) $(CPPFLAGS) -c $< -o $@
 
+OBJDUMP_FLAGS=-CdrSw --no-show-raw-insn
+
 # copy assembly files, generic
 $(ASM_DIR)/%.s.s: $(OBJ_DIR)/%.s.o
 	mkdir -p $(@D)
-	objdump -drwS $< > $@
+	objdump $(OBJDUMP_FLAGS) $< > $@
 
 # assemble C files, generic
 $(ASM_DIR)/%.c.s: $(OBJ_DIR)/%.c.o
 	mkdir -p $(@D)
-	objdump -drwS $< > $@
+	objdump $(OBJDUMP_FLAGS) $< > $@
 
 # assemble C++ files, generic
 $(ASM_DIR)/%.cc.s: $(OBJ_DIR)/%.cc.o
 	mkdir -p $(@D)
-	objdump -drwS $< > $@
+	objdump $(OBJDUMP_FLAGS) $< > $@

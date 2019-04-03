@@ -48,7 +48,7 @@ typedef struct Task
 /**
  * @brief Points to the current task.
  */
-Task* cur_task;
+extern Task* cur_task;
 
 /**
  * @brief Decrement the tick count for the current task and return

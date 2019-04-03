@@ -58,7 +58,7 @@ Tss;
 
 // Long mode TSS.
 __attribute__((aligned(16)))
-volatile Tss tss;
+extern volatile Tss tss;
 
 // Must be called to set up the TSS.
 void tss_init(void);

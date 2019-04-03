@@ -157,6 +157,54 @@ static inline void cpu_set_flags(uint64_t flags)
     );
 }
 
+static inline uint64_t cpu_read_cr0()
+{
+    uint64_t ret;
+    asm volatile
+    (
+        "movq %%cr0, %0 \n"
+        : "=r" (ret)
+        :
+        :
+    );
+    return ret;
+}
+
+static inline void cpu_write_cr0(uint64_t val)
+{
+    asm volatile
+    (
+        "movq %0, %%cr0 \n"
+        : 
+        : "r" (val)
+        :
+    );
+}
+
+static inline uint64_t cpu_read_cr4()
+{
+    uint64_t ret;
+    asm volatile
+    (
+        "movq %%cr4, %0 \n"
+        : "=r" (ret)
+        :
+        :
+    );
+    return ret;
+}
+
+static inline void cpu_write_cr4(uint64_t val)
+{
+    asm volatile
+    (
+        "movq %0, %%cr4 \n"
+        :
+        : "r" (val)
+        :
+    );
+}
+
 /// Handle the actual task switching.
 void cpu_proc_asm(Registers* proc);
 

@@ -444,9 +444,20 @@ public:
         const_iterator it(nullptr);
         return const_reverse_iterator(it);
     }
+    
+    const_reverse_iterator crbegin() const noexcept
+    {
+        const_iterator it(end_node);
+        return const_reverse_iterator(it);
+    }
+    
+    const_reverse_iterator crend() const noexcept
+    {
+        const_iterator it(nullptr);
+        return const_reverse_iterator(it);
+    }
 
     ListNode<T, Allocator>* head = nullptr;
-    //ListNode<T, Allocator>* tail = nullptr;
     ListNode<T, Allocator>* end_node;
     Allocator node_alloc;
     size_t node_count = 0;
