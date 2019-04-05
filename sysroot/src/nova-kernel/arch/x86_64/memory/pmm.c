@@ -68,7 +68,7 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
 
             pmm_frames_available += (len / PAGE_SIZE);
         }
-        else    // Track unavailable memory as well.
+        else // Track unavailable memory as well.
         {
             size_t addr = multiboot2_mmap[i].addr;
             size_t len = multiboot2_mmap[i].len;
@@ -94,9 +94,11 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
 
     // Check if we have room to store the bitmap before the
     // kernel module appears.
-    if (pmm_bitmap + pmm_bitmap_len >= (uint8_t*)kernel_module)
+    if ((void*)(uintptr_t)kernel_module.mod_start != NULL
+        &&
+        pmm_bitmap + pmm_bitmap_len >= (uint8_t*)(uintptr_t)kernel_module.mod_start)
     {
-        uintptr_t mod_end = (uintptr_t)kernel_module->mod_end;
+        uintptr_t mod_end = (uintptr_t)kernel_module.mod_end;
         pmm_bitmap = (uint8_t*)mod_end;
 
         // Align to page boundary.
@@ -156,10 +158,10 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
     }
 
     // Mark frames used by the loaded kernel module, if any.
-    if (kernel_module != NULL)
+    if ((void*)(uintptr_t)kernel_module.mod_start != NULL)
     {
-        size_t offset = kernel_module->mod_start;
-        size_t len = kernel_module->size;
+        size_t offset = kernel_module.mod_start;
+        size_t len = kernel_module.mod_end - kernel_module.mod_start;
 
         // Align base address to page boundary, downwards.
         if (offset % PAGE_SIZE != 0)

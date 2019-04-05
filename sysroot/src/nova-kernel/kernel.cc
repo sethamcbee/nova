@@ -10,9 +10,14 @@
 #include <array>
 #include <initializer_list>
 #include <list>
+#include <map>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <vector>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
@@ -63,13 +68,8 @@ void wait_ms(size_t ms)
     wait_ticks(ticks);
 }
 
-ssize_t (*kernel_write)(const void*, size_t) = NULL;
-struct multiboot_tag_module* kernel_module = NULL;
-
-void kernel_test()
+void print_date()
 {
-    pit_info();
-    
     extern uint16_t rtc_sec_init;
     extern uint16_t rtc_min_init;
     extern uint16_t rtc_hour_init;
@@ -77,7 +77,7 @@ void kernel_test()
     extern uint8_t rtc_day_init;
     extern uint8_t rtc_mon_init;
     extern uint8_t rtc_year_init;
-    
+
     uint64_t uptime = ticks_to_ms(irq_pit_count) / 1000;
     uint64_t sec = rtc_sec_init;
     uint64_t min = rtc_min_init;
@@ -85,7 +85,8 @@ void kernel_test()
     uint64_t day = rtc_day_init;
     uint64_t mon = rtc_mon_init;
     uint64_t year = rtc_year_init;
-    
+
+    // TODO: Optimize this using modulo.
     sec += uptime;
     while (sec > 59)
     {
@@ -102,8 +103,15 @@ void kernel_test()
         hour -= 23;
         ++day;
     }
-    
-    printf("20%d-%d-%d %d:%d:%d\n", year, mon, day, hour, min, sec);
+
+    printf("20%d-%d-%d %d:%d:%d", year, mon, day, hour, min, sec);
+}
+
+ssize_t (*kernel_write)(const void*, size_t) = NULL;
+struct multiboot_tag_module kernel_module;
+
+void kernel_test()
+{
 }
 
 void kernel_main()
@@ -153,16 +161,18 @@ void kernel_main()
         if (strcmp(s, "module") == 0)
         {
             char* module_page = (char*)vmm_page_alloc_kernel();
-            vmm_page_map((void*)kernel_module, module_page, PG_PR | PG_RW | PG_U);
-            
-            printf("%s\n", module_page);
+            vmm_page_map((void*)(uintptr_t)kernel_module.mod_start, module_page, PG_PR | PG_RW | PG_U);
+
+            size_t mod_len = kernel_module.mod_end - kernel_module.mod_start;
+            kernel_write(module_page, mod_len);
+            puts("");
         }
         if (strcmp(s, "timer") == 0)
         {
             auto start = *&irq_pit_count;
             scanf("%s", s);
             auto end = *&irq_pit_count;
-            
+
             auto ms = ticks_to_ms(end - start);
             printf("time: %d ms\n", ms);
         }
@@ -192,40 +202,8 @@ void kernel_main()
         }
         if (strcmp(s, "date") == 0)
         {
-            extern uint16_t rtc_sec_init;
-            extern uint16_t rtc_min_init;
-            extern uint16_t rtc_hour_init;
-            extern uint8_t rtc_weekday_init;
-            extern uint8_t rtc_day_init;
-            extern uint8_t rtc_mon_init;
-            extern uint8_t rtc_year_init;
-            
-            uint64_t uptime = ticks_to_ms(irq_pit_count) / 1000;
-            uint64_t sec = rtc_sec_init;
-            uint64_t min = rtc_min_init;
-            uint64_t hour = rtc_hour_init;
-            uint64_t day = rtc_day_init;
-            uint64_t mon = rtc_mon_init;
-            uint64_t year = rtc_year_init;
-            
-            sec += uptime;
-            while (sec > 59)
-            {
-                sec -= 59;
-                ++min;
-            }
-            while (min > 59)
-            {
-                min -= 59;
-                ++hour;
-            }
-            while (hour > 23)
-            {
-                hour -= 23;
-                ++day;
-            }
-            
-            printf("20%d-%d-%d %d:%d:%d\n", year, mon, day, hour, min, sec);
+            print_date();
+            puts("");
         }
     }
 

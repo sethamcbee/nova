@@ -68,10 +68,9 @@ int kernel_log(const char *s);
 void kernel_halt(void);
 
 /**
- * @brief Kernel module loaded by the bootloader, or NULL if no
- * module was loaded.
+ * @brief Kernel module loaded by the bootloader.
  */
-extern struct multiboot_tag_module* kernel_module;
+extern struct multiboot_tag_module kernel_module;
 
 #ifdef __cplusplus
 }

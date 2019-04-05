@@ -65,9 +65,6 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     // Initialize scheduler.
     cur_task = NULL;
 
-    // Set kernel module pointer to its new virtual address.
-    //kernel_module += &KERNEL_OFFSET;
-
     asm volatile ("sti \n"); // We can safely enable interrupts now.
 
     kernel_main();
@@ -81,6 +78,9 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
     struct multiboot_tag_module* mb_tag_module;
     struct multiboot_tag_mmap* mb_mmap = NULL;
     bool memory_map_found = false;
+    
+    // Initialize kernel module to point to nothing.
+    kernel_module.mod_start = NULL;
 
     mb_end = (struct multiboot_tag*) (((uint8_t*)mb_tag) + mb_tag->type);
     itoa(mb_tag->type, s);
@@ -118,7 +118,7 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
         // Module.
         case MULTIBOOT_TAG_TYPE_MODULE:
             mb_tag_module = (struct multiboot_tag_module*)mb_tag;
-            kernel_module = (void*)(uint64_t)mb_tag_module->mod_start;
+            kernel_module = *mb_tag_module;
             break;
 
         // Treat unsupported tag as basic tag.
