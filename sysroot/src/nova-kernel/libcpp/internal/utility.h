@@ -11,7 +11,6 @@
 namespace std
 {
 
-
 template <class T>
 constexpr add_const_t<T>& as_const(T& t) noexcept
 {
@@ -161,6 +160,5 @@ constexpr T1& get(pair<T1, T2>& p)
         static_assert(I < 2, "Out-of-range std::get(std::pair)");
     }
 }
-
 
 } // namespace std

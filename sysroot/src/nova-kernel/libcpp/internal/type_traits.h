@@ -14,9 +14,9 @@ struct integral_constant
 {
     using type = integral_constant<T, v>;
     using value_type = T;
-    
+
     static constexpr value_type value = v;
-    
+
     constexpr operator value_type() const noexcept
     {
         return v;
@@ -109,6 +109,12 @@ struct remove_extent<T[]>
     using type = T;
 };
 
+template <class T, size_t N>
+struct remove_extent<T[N]>
+{
+    using type = T;
+};
+
 template <class T>
 using remove_extent_t = typename remove_extent<T>::type;
 
@@ -148,11 +154,21 @@ using remove_volatile_t = typename remove_volatile<T>::type;
 template <class T>
 struct remove_cv
 {
-    using type = remove_const_t<remove_volatile_t<T>>;
+    using type = remove_volatile_t<remove_const_t<T>>;
 };
 
 template <class T>
 using remove_cv_t = typename remove_cv<T>::type;
+
+
+template <class T>
+struct remove_cvref
+{
+    using type = remove_cv<remove_reference<T>>;
+};
+
+template <class T>
+using remove_cvref_t = typename remove_cvref<T>::type;
 
 
 template <class T>
@@ -193,6 +209,19 @@ struct is_same<T, T> : public true_type {};
 
 template <class T, class U>
 constexpr auto is_same_v = is_same<T, U>::value;
+
+
+template <class T>
+struct is_array : public false_type {};
+
+template <class T>
+struct is_array<T[]> : public true_type {};
+
+template <class T, size_t N>
+struct is_array<T[N]> : public true_type {};
+
+template <class T>
+constexpr auto is_array_v = is_array<T>::value;
 
 
 template <class T, class Enable = void>
@@ -272,5 +301,28 @@ struct is_abstract
 
 template <class T>
 constexpr auto is_abstract_v = is_abstract<T>::value;
+
+
+template <class T, class Enable = void>
+struct decay
+{
+    using type = remove_cvref_t<T>;
+};
+
+template <class T>
+struct decay
+<
+    T,
+    enable_if_t
+    <
+        is_array_v<T>
+    >
+>
+{
+    using type = remove_extent_t<remove_cvref_t<T>>*;
+};
+
+template <class T>
+using decay_t = typename decay<T>::type;
 
 } // namespace std

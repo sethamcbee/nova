@@ -62,6 +62,13 @@ template <class... Types>
 tuple(Types...) -> tuple<Types...>;
 
 
+template <class... Types>
+constexpr tuple<decay_t<Types>...> make_tuple(Types&&... args)
+{
+    return tuple(std::forward<Types>(args)...);
+}
+
+
 template <size_t I, class T>
 struct tuple_element;
 
