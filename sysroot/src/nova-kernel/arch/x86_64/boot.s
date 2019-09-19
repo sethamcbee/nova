@@ -196,6 +196,20 @@ fill_high_pt2:
     # Set up new stack.
     movq $kernel_stack_top, %rsp
 
+# Enable SSE.
+    movq %cr0, %rax
+    andq $~(1 << 2), %rax # Clear CR0.EM
+    andq $~(1 << 3), %rax # Clear CR0.TS
+    orq $(1 << 5), %rax   # Set CR0.NE
+    orq $(1 << 1), %rax   # Set CR0.MP
+    movq %rax, %cr0
+    movq %cr4, %rax
+    orq $(1 << 9), %rax   # Set CR4.OSFXSR
+    orq $(1 << 10), %rax  # Set CR4.OSXMMEXCPT
+    movq %rax, %cr4
+    fninit
+    fxsave fxsave_region
+
     call boot_main
 
     cli
@@ -203,9 +217,15 @@ fill_high_pt2:
             jmp 1b
 
 .bss
+
 .align 16
 .global kernel_stack_bottom
 kernel_stack_bottom:
     .skip 0x2000 # 8 KiB.
 .global kernel_stack_top
 kernel_stack_top:
+
+# Define FXSAVE region.
+.align 16
+fxsave_region:
+    .skip 512

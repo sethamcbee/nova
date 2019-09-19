@@ -19,7 +19,6 @@
 #include <arch/x86_64/multiboot2.h>
 #include <arch/x86_64/tss.h>
 #include <arch/x86_64/devices/cmos.h>
-#include <arch/x86_64/devices/fpu.h>
 #include <arch/x86_64/devices/pic.h>
 #include <arch/x86_64/devices/pit.h>
 #include <arch/x86_64/interrupts/idt.h>
@@ -49,7 +48,6 @@ void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     idt_initialize();
     vmm_init();
     tss_init();
-    fpu_init();
 
     // Initialize PIC (disables all IRQs).
     pic_initialize();
@@ -78,7 +76,7 @@ void multiboot2_parse(struct multiboot_tag *mb_tag)
     struct multiboot_tag_module* mb_tag_module;
     struct multiboot_tag_mmap* mb_mmap = NULL;
     bool memory_map_found = false;
-    
+
     // Initialize kernel module to point to nothing.
     kernel_module.mod_start = NULL;
 

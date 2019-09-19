@@ -86,23 +86,16 @@ void print_date()
     uint64_t mon = rtc_mon_init;
     uint64_t year = rtc_year_init;
 
-    // TODO: Optimize this using modulo.
     sec += uptime;
-    while (sec > 59)
-    {
-        sec -= 59;
-        ++min;
-    }
-    while (min > 59)
-    {
-        min -= 59;
-        ++hour;
-    }
-    while (hour > 23)
-    {
-        hour -= 23;
-        ++day;
-    }
+
+    min += sec / 60;
+    sec = sec % 60;
+
+    hour += min / 60;
+    min = min % 60;
+
+    day += hour / 24;
+    hour = hour % 24;
 
     printf("20%d-%d-%d %d:%d:%d", year, mon, day, hour, min, sec);
 }
