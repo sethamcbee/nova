@@ -50,10 +50,10 @@ struct Vmm_Node
 };
 
 // Virtual memory trees.
-Vmm_Node* vmm_tree_kernel_free;
-Vmm_Node* vmm_tree_kernel_used;
-Vmm_Node* vmm_tree_user_free;
-Vmm_Node* vmm_tree_user_used;
+extern Vmm_Node* vmm_tree_kernel_free;
+extern Vmm_Node* vmm_tree_kernel_used;
+extern Vmm_Node* vmm_tree_user_free;
+extern Vmm_Node* vmm_tree_user_used;
 
 // Convert virtual address to physical address.
 void* vmm_phys_addr(void* virt);

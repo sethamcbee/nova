@@ -380,7 +380,7 @@ char * strtok (char *s, const char *delim)
         s = olds;
 
     /* Scan leading delimiters.  */
-    s += strspn (s, delim);
+    s += strspn(s, delim);
     if (*s == '\0')
     {
         olds = s;
@@ -389,11 +389,11 @@ char * strtok (char *s, const char *delim)
 
     /* Find the end of the token.  */
     token = s;
-    s = strpbrk (token, delim);
+    s = (char*)strpbrk(token, delim);
     size_t len = strlen(s);
     if (s == NULL)
         /* This token finishes the string.  */
-        olds = memchr (token, '\0', len);
+        olds = (char*)memchr(token, '\0', len);
     else
     {
         /* Terminate the token and make OLDS point past it.  */

@@ -14,6 +14,13 @@
 #include <arch/x86_64/memory/paging.h>
 #include <arch/x86_64/memory/pmm.h>
 
+uint8_t* pmm_bitmap;
+size_t pmm_bitmap_len;
+size_t pmm_frames_free;
+size_t pmm_frames_used;
+size_t pmm_frames_available;
+size_t pmm_frames_unavailable;
+
 // Defined in linker script.
 extern void *phys_end;
 
@@ -84,6 +91,9 @@ void pmm_init(struct multiboot_tag_mmap *mb_mmap)
             pmm_frames_unavailable += (len / PAGE_SIZE);
         }
     }
+
+    // Default all memory to used.
+    pmm_frames_used = pmm_frames_available;
 
     // Align bitmap length to page boundary.
     pmm_bitmap_len = pmm_frames_available / 8;

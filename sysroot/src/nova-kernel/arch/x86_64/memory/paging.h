@@ -121,11 +121,11 @@ typedef struct
 } __attribute__((packed)) Pte;
 
 // Initial kernel paging structures.
-Pml4e pml40[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
-Pdpte pdpt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
-Pde pd0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
-Pte pt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
-Pte pt1[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+extern Pml4e pml40[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+extern Pdpte pdpt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+extern Pde pd0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+extern Pte pt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+extern Pte pt1[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
 
 #ifdef __cplusplus
 }

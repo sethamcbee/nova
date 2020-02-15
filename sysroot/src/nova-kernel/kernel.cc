@@ -8,10 +8,12 @@
 #include <globals.h>
 
 #include <array>
+#include <deque>
 #include <initializer_list>
 #include <list>
 #include <map>
 #include <memory>
+#include <stack>
 #include <tuple>
 #include <type_traits>
 #include <vector>
@@ -26,11 +28,11 @@
 #include <liballoc/liballoc.h>
 #include <proc/process.h>
 #include <proc/scheduler.h>
-#include <fs/vfs.h>
 
 #ifdef ARCH_X86_64
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/gdt.h>
+#include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 #endif // ARCH_X86_64
 
@@ -105,20 +107,31 @@ struct multiboot_tag_module kernel_module;
 
 void kernel_test()
 {
+    std::list<int> l;
+    l.push_back(1);
+    l.push_back(2);
+    l.push_back(3);
+    for (const auto& n : l)
+    {
+        printf("%d\n", n);
+    }
+
+    std::stack<const char*> s;
+
+    s.push("one");
+    s.push("two");
+    s.push("three");
+
+    while (!s.empty())
+    {
+        printf("%s\n", s.top());
+        s.pop();
+    }
 }
 
 void kernel_main()
 {
     // Initialize VFS.
-    vfs_init();
-
-    // TEST.
-    vfs_create_dnode("/bin", DNODE_DIR);
-    vfs_find_dnode("/bin");
-    vfs_create_dnode("/lib", DNODE_DIR);
-    vfs_create_dnode("/var", DNODE_DIR);
-    vfs_create_dnode("/usr", DNODE_DIR);
-    vfs_create_dnode("/usr/bin", DNODE_DIR);
 
     // Initialize STDIO.
     stdio_init();
@@ -133,7 +146,7 @@ void kernel_main()
 
     // Set up scheduler.
     Process kernel_proc;
-    kernel_proc.priv = 0;
+    kernel_proc.priv = 3;
     kernel_proc.kernel_stack = 0;
     Task kernel_task;
     kernel_task.proc = &kernel_proc;
@@ -160,7 +173,46 @@ void kernel_main()
             kernel_write(module_page, mod_len);
             puts("");
         }
-        if (strcmp(s, "timer") == 0)
+        else if (strcmp(s, "mem") == 0)
+        {
+            float conversion = 4096.0 / 1024.0 / 1024.0;
+            float free_memory = ((float)pmm_frames_free) * conversion;
+            float used_memory = ((float)pmm_frames_used) * conversion;
+            float available_memory = ((float)pmm_frames_available) * conversion;
+            float unavailable_memory = ((float)pmm_frames_unavailable) * conversion;
+            printf("Usable memory:   %fMiB\n", available_memory);
+            printf("Reserved memory: %fMiB\n", unavailable_memory);
+            printf("Free memory:     %fMiB\n", free_memory);
+            printf("Used memory:     %fMiB\n", used_memory);
+        }
+        else if (strcmp(s, "vector") == 0)
+        {
+            float n;
+            printf("size: ");
+            scanf("%f", &n);
+            std::vector<uint8_t> v;
+            v.resize((size_t)n);
+            for (auto& a : v)
+                a = 4;
+            printf("done\n");
+        }
+        else if (strcmp(s, "malloc") == 0)
+        {
+            float mb;
+            printf("mb: ");
+            scanf("%f", &mb);
+            size_t bytes = mb * 1024 * 1024;
+            void* discard = malloc(bytes);
+            printf("address: %ld\n", (size_t)discard);
+        }
+        else if (strcmp(s, "free") == 0)
+        {
+            size_t addr;
+            printf("addr: ");
+            scanf("%ld", &addr);
+            free((void*)addr);
+        }
+        else if (strcmp(s, "timer") == 0)
         {
             auto start = *&irq_pit_count;
             scanf("%s", s);
@@ -169,13 +221,13 @@ void kernel_main()
             auto ms = ticks_to_ms(end - start);
             printf("time: %d ms\n", ms);
         }
-        if (strcmp(s, "ticks") == 0)
+        else if (strcmp(s, "ticks") == 0)
         {
             auto ticks = irq_pit_count;
             printf("ticks: %d\n", ticks);
             printf("uptime: %f sec\n", (double)ticks_to_ms(ticks) / 1000);
         }
-        if (strcmp(s, "sleep") == 0)
+        else if (strcmp(s, "sleep") == 0)
         {
             float sec;
             printf("sec: ");
@@ -193,10 +245,14 @@ void kernel_main()
             wait_ms(whole * 1000);
             printf("%fs.\n", sec);
         }
-        if (strcmp(s, "date") == 0)
+        else if (strcmp(s, "date") == 0)
         {
             print_date();
             puts("");
+        }
+        else
+        {
+            printf("Command not recognized.\n");
         }
     }
 

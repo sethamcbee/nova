@@ -7,13 +7,13 @@
 
 #pragma once
 
-#ifdef STACK_GUARD
-
-#include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef STACK_GUARD
+
+#include <stdint.h>
 
 /**
  * @brief Some arbitrary value for the stack guard implementation to

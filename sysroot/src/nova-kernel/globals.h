@@ -14,6 +14,9 @@
 #pragma once
 
 #ifdef __cplusplus
+
+#include <new>
+
 extern "C" {
 #endif
 

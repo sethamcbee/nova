@@ -498,6 +498,7 @@ isr_31:
 .global isr_32
 isr_32:
 	isr_push
+	cld
 
 	# Handle IRQ.
 	call isr_32_ext

@@ -19,6 +19,7 @@
 #include <arch/x86/cpu.h>
 #endif
 
+bool vga_text_initialized;
 static volatile uint16_t *vga_buffer;
 static uint8_t vga_cur_x;
 static uint8_t vga_cur_y;
@@ -33,7 +34,7 @@ ssize_t vga_text_write(const void *str, size_t len)
     }
 
     // Cast str as an char*.
-    const char *p = str;
+    const char *p = (const char*)str;
 
     // Write each character.
     for (size_t i = 0; i < len; i++)

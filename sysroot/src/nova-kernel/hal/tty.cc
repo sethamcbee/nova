@@ -36,7 +36,7 @@ static ssize_t tty_write(const void *s, size_t n)
 static ssize_t tty_read(void *s, size_t n)
 {
     char c;
-    char *str = s;
+    char* str = (char*)s;
     size_t len = 0;
 
     // Flush stdout if the input stream is stdin.

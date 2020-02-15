@@ -73,66 +73,66 @@ public:
     using reference = typename iterator_traits<It>::reference;
 
     reverse_iterator() {}
-    
+
     explicit reverse_iterator(iterator_type other) : it(other) {}
-    
+
     reverse_iterator(const reverse_iterator<It>& other) : it(other.it) {}
-    
+
     iterator_type base() const
     {
         return it;
     }
-    
+
     reference operator*()
     {
         return *it;
     }
-    
+
     pointer operator->()
     {
         return &(*it);
     }
-    
+
     reverse_iterator<It> operator+(difference_type n) const
     {
         return it - n;
     }
-    
+
     reverse_iterator<It>& operator++()
     {
         --it;
         return *this;
     }
-    
+
     reverse_iterator<It>& operator+=(difference_type n)
     {
         it -= n;
         return *this;
     }
-    
+
     reverse_iterator<It> operator-(difference_type n) const
     {
         return it + n;
     }
-    
+
     reverse_iterator<It>& operator--()
     {
         ++it;
         return *this;
     }
-    
+
     reverse_iterator<It>& operator-=(difference_type n)
     {
         it +- n;
         return *this;
     }
-    
-    bool operator==(const reverse_iterator<It>& other)
+
+    bool operator==(const reverse_iterator<It>& other) const
     {
         return it == other.it;
     }
-    
-    bool operator!=(const reverse_iterator<It>& other)
+
+    bool operator!=(const reverse_iterator<It>& other) const
     {
         return it != other.it;
     }

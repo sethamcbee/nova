@@ -40,7 +40,7 @@ void* liballoc_alloc(int pages)
     void* ret = vmm_pages_alloc_kernel(pages);
     vmm_table_flags(ret, PG_PR | PG_RW | PG_U);
 
-    return ( ret );
+    return (ret);
 }
 
 // NOTE: Is not currently freeing pages.

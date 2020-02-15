@@ -15,6 +15,17 @@
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 
+Pml4e pml40[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+Pdpte pdpt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+Pde pd0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+Pte pt0[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+Pte pt1[PAGE_COUNT] __attribute__((aligned(PAGE_SIZE)));
+
+Vmm_Node* vmm_tree_kernel_free;
+Vmm_Node* vmm_tree_kernel_used;
+Vmm_Node* vmm_tree_user_free;
+Vmm_Node* vmm_tree_user_used;
+
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 // Maximum virtual address.
@@ -37,8 +48,8 @@ Vmm_Node_Stack* vmm_node_stack_ctor(void)
 {
     static const size_t DEFAULT_MAX = 5;
 
-    Vmm_Node_Stack* stk = malloc(sizeof(Vmm_Node_Stack));
-    stk->base = malloc(sizeof(Vmm_Node*) * DEFAULT_MAX);
+    auto stk = (Vmm_Node_Stack*)malloc(sizeof(Vmm_Node_Stack));
+    stk->base = (Vmm_Node**)malloc(sizeof(Vmm_Node*) * DEFAULT_MAX);
     stk->count = 0;
     stk->max = DEFAULT_MAX;
 
@@ -286,7 +297,7 @@ void vmm_init(void)
     vmm_tree_kernel_free->l = NULL;
     vmm_tree_kernel_free->r = NULL;
     // Now we can allocate the new node on the heap.
-    vmm_tree_kernel_free = malloc(sizeof(Vmm_Node*));
+    vmm_tree_kernel_free = (Vmm_Node*)malloc(sizeof(Vmm_Node*));
     *vmm_tree_kernel_free = _vmm_tree_kernel_free;
 
     void* a = vmm_page_alloc_kernel();

@@ -11,14 +11,14 @@
 
 #include <arch/x86_64/multiboot2.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @brief Kernel entry point. Should never return.
  */
 void kernel_main(void);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Print string to terminal and halts all operations. Should
@@ -67,11 +67,11 @@ int kernel_log(const char *s);
  */
 void kernel_halt(void);
 
+#ifdef __cplusplus
+}
+#endif
+
 /**
  * @brief Kernel module loaded by the bootloader.
  */
 extern struct multiboot_tag_module kernel_module;
-
-#ifdef __cplusplus
-}
-#endif

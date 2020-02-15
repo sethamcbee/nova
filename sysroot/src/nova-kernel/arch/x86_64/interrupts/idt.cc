@@ -15,7 +15,7 @@ uint64_t idt[256 * 2];
 void idt_encode_entry(void *pos, Idt_Entry entry)
 {
     // Used to iterate through the structure by byte.
-    uint8_t* it = pos;
+    uint8_t* it = (uint8_t*)pos;
 
     *((uint16_t*)it) = (uint16_t) entry.offset;
     it = &it[2];

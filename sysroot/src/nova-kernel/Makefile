@@ -222,15 +222,13 @@ QEMU_DISK=disk.img
 QEMU_DISK_SIZE=30M
 
 #QEMU flags settings
+QEMU_MEMORY=800M
+QEMU_SMP=1
 ifeq ($(ARCH), x86_64)
-	QEMU_MEMORY=800M
 	QEMU_CPU=qemu64
-	QEMU_SMP=1
 endif
 ifeq ($(ARCH), x86)
-	QEMU_MEMORY=800M
 	QEMU_CPU=qemu32
-	QEMU_SMP=1
 endif
 
 #QEMU flags
@@ -308,6 +306,10 @@ $(ISO): $(BIN)
 
 .PHONY: qemu
 qemu: $(ISO)
+	$(QEMU) -display sdl -monitor stdio $(QEMU_FLAGS)
+
+.PHONY: gdb
+gdb: $(ISO)
 	$(TERMINAL) -e "$(QEMU) -s -S -display sdl -monitor stdio $(QEMU_FLAGS)" &
 	$(GDB) -tui --quiet $(BIN) -ex "set confirm off" -ex "target remote localhost:1234"
 

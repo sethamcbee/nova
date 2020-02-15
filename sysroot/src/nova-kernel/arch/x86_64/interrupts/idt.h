@@ -28,7 +28,7 @@ typedef struct Idt_Entry
 } Idt_Entry;
 
 // Stores the IDT.
-uint64_t idt[256 * 2];
+extern uint64_t idt[256 * 2];
 
 // Encodes an IDT entry.
 void idt_encode_entry(void *pos, Idt_Entry entry);

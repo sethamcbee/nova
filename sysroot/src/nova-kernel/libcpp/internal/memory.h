@@ -8,6 +8,8 @@
 
 #include <stddef.h>
 
+#include <utility>
+
 namespace std
 {
 
@@ -15,6 +17,20 @@ template <class T>
 class allocator
 {
 public:
+
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+    using const_pointer = const T*;
+    using const_reference = const T&;
+    using size_type = size_t;
+    using difference_type = ptrdiff_t;
+
+    template <class U>
+    struct rebind
+    {
+        using other = allocator<U>;
+    };
 
     T* allocate(size_t n)
     {
@@ -24,6 +40,18 @@ public:
     void deallocate(T* t, size_t n)
     {
         delete[] t;
+    }
+
+    template <class... Args>
+    void construct(T* t, Args&&... args)
+    {
+        void* p = (void*)t;
+        new (p) T(forward<Args>(args)...);
+    }
+
+    void destroy(T* t)
+    {
+        t->~T();
     }
 };
 
@@ -57,7 +85,7 @@ public:
     using element_type = T;
     using deleter_type = D;
     using pointer = T*;
-    
+
     constexpr unique_ptr() noexcept
     {
         data = nullptr;
@@ -91,7 +119,7 @@ public:
         data = other.data;
         other.data = nullptr;
     }
-    
+
     unique_ptr<T>& operator=(const unique_ptr<T>& other) = delete;
 
     unique_ptr<T>& operator=(unique_ptr<T>&& other) noexcept
@@ -179,7 +207,7 @@ public:
         data = other.data;
         other.data = nullptr;
     }
-    
+
     unique_ptr<T>& operator=(const unique_ptr<T>& other) = delete;
 
     unique_ptr<T>& operator=(unique_ptr<T>&& other) noexcept
@@ -216,7 +244,7 @@ public:
     {
         return data;
     }
-    
+
     T& operator*() = delete;
     T* operator->() = delete;
 

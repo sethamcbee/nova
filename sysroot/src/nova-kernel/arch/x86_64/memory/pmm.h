@@ -24,20 +24,20 @@ void pmm_frame_free(void* addr);
 void* pmm_frame_alloc(void);
 
 // Bitmap representation of the physical memory.
-uint8_t *pmm_bitmap;
-size_t pmm_bitmap_len;
+extern uint8_t* pmm_bitmap;
+extern size_t pmm_bitmap_len;
 
 // Number of page frames that are free to be allocated.
-size_t pmm_frames_free;
+extern size_t pmm_frames_free;
 
 // Number of page frames that have been allocated.
-size_t pmm_frames_used;
+extern size_t pmm_frames_used;
 
 // Number of available page frames.
-size_t pmm_frames_available;
+extern size_t pmm_frames_available;
 
 // Number of unavailable page frames.
-size_t pmm_frames_unavailable;
+extern size_t pmm_frames_unavailable;
 
 #ifdef __cplusplus
 }

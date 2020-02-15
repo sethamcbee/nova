@@ -28,7 +28,7 @@
 void multiboot2_parse(struct multiboot_tag *mb_tag);
 void multiboot2_parse_mmap(struct multiboot_tag_mmap *mb_mmap);
 
-void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
+extern "C" void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
 {
     // Initialize terminal.
     kernel_write = vga_text_write;

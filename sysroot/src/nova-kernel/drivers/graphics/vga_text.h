@@ -37,7 +37,7 @@ typedef enum Vga_Text_Color
 } Vga_Text_Color;
 
 // Indicates whether the terminal has been initialized.
-bool vga_text_initialized;
+extern bool vga_text_initialized;
 
 // Writes a string to the terminal, possibly returning an error code.
 ssize_t vga_text_write(const void *str, size_t len);
