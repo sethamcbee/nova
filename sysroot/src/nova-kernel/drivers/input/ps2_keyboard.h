@@ -9,6 +9,7 @@
 
 #include <globals.h>
 
+#include <array>
 #include <stdio.h>
 
 #ifdef __cplusplus

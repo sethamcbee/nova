@@ -10,14 +10,23 @@
 #include <globals.h>
 
 #include <liballoc/liballoc.h>
-#include <proc/process.h>
-#include <proc/scheduler.h>
 
 #include <arch/x86_64/tss.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static inline void cpu_halt()
+{
+    asm volatile
+    (
+        "hlt \n"
+        :
+        :
+        : "memory"
+    );
+}
 
 /// Write a byte to an IO port.
 static inline void cpu_outb(uint8_t val, uint16_t port)
@@ -175,7 +184,7 @@ static inline void cpu_write_cr0(uint64_t val)
     asm volatile
     (
         "movq %0, %%cr0 \n"
-        : 
+        :
         : "r" (val)
         :
     );
@@ -203,19 +212,6 @@ static inline void cpu_write_cr4(uint64_t val)
         : "r" (val)
         :
     );
-}
-
-/// Handle the actual task switching.
-void cpu_proc_asm(Registers* proc);
-
-/// Switche context to a given process.
-static inline void cpu_proc(Process* proc)
-{
-    // Set up the TSS.
-    tss.rsp0 = proc->kernel_stack;
-
-    // Jump to code.
-    cpu_proc_asm(&proc->reg);
 }
 
 #ifdef __cplusplus

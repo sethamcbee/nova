@@ -12,9 +12,14 @@
 #include <arch/x86_64/multiboot2.h>
 
 /**
- * @brief Kernel entry point. Should never return.
+ * @brief Kernel entry point.
  */
-void kernel_main(void);
+void kernel_start();
+
+/**
+ * @brief Main kernel process.
+ */
+void kernel_main();
 
 #ifdef __cplusplus
 extern "C" {

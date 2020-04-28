@@ -2,48 +2,22 @@
  * @file process.h
  * @author Seth McBee
  * @date 2018-9-6
- * @brief Kernel and userspace process structs.
+ * @brief Kernel and userspace processes.
  */
 
 #pragma once
 
 #include <globals.h>
 
-#ifdef ARCH_X86
-#include <arch/x86/registers.h>
-#endif // ARCH_X86
+#include <vector>
 
-#ifdef ARCH_X86_64
-#include <arch/x86_64/registers.h>
-#endif // ARCH_X86_64
+#include <proc/thread.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @brief Stores process information.
- */
-typedef struct
+struct Process
 {
-    /**
-     * @brief Top of the kernel stack associated with this process.
-     */
-    size_t kernel_stack;
+    std::vector<Thread> threads;
 
-    /**
-     * @brief Privilege level of this process.
-     * @note Kernel = 0, User = 3
-     */
-    uint8_t priv;
+    size_t id;
 
-    /**
-     * @brief Stores architecture-specific register state for this
-     * process.
-     */
-    Registers reg;
-} Process;
-
-#ifdef __cplusplus
-}
-#endif
+    char* name;
+};

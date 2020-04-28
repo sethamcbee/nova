@@ -13,8 +13,8 @@ BUILD_DIR=./build
 SRC_DIR:=.
 
 # Architecture. Options are: x86_64, x86
-ARCH=x86_64
-OPTIMIZE?=-O0 -march=core2 -mno-avx -mno-sse4.2 -mno-sse4.1 -mno-sse4 -mno-ssse3
+ARCH?=x86_64
+OPTIMIZE?=-O0 -march=core2 -mno-avx -mno-sse4.2 -mno-sse4.1 -mno-sse4 -mno-sse3
 
 # Whether to enable the __stack_chk_guard.
 STACK_GUARD=true

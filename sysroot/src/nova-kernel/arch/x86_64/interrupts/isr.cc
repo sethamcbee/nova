@@ -11,7 +11,6 @@
 
 #include <kernel.h>
 #include <drivers/input/ps2_keyboard.h>
-#include <proc/scheduler.h>
 
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/devices/pic.h>

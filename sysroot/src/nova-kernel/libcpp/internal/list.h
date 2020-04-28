@@ -356,6 +356,32 @@ public:
         --count;
     }
 
+    void pop_front()
+    {
+        if (head == nullptr)
+        {
+            return;
+        }
+
+        if (head == tail)
+        {
+            alloc.destroy(&*head);
+            alloc.deallocate(&*head, 1);
+            head = nullptr;
+            tail = nullptr;
+        }
+        else
+        {
+            auto new_head = head->next;
+            alloc.destroy(&*head);
+            alloc.deallocate(&*head, 1);
+            new_head->prev = nullptr;
+            head = new_head;
+        }
+
+        --count;
+    }
+
 private:
 
     ListNode<T>* head = nullptr;

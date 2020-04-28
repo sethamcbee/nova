@@ -152,7 +152,7 @@ public:
         data = nullptr;
     }
 
-    pointer get() noexcept
+    pointer get() const noexcept
     {
         return data;
     }
@@ -240,7 +240,7 @@ public:
         data = nullptr;
     }
 
-    T* get() noexcept
+    T* get() const noexcept
     {
         return data;
     }
@@ -258,5 +258,23 @@ private:
     T* data;;
     D deleter;
 };
+
+template <class T1, class D1, class T2, class D2>
+bool operator==(const unique_ptr<T1, D1>& p1, const unique_ptr<T2, D2>& p2)
+{
+    return p1.get() == p2.get();
+}
+
+template <class T, class D>
+bool operator==(const unique_ptr<T, D>& p, nullptr_t) noexcept
+{
+    return p.get() == nullptr;
+}
+
+template <class T, class D>
+bool operator==(nullptr_t, const unique_ptr<T, D>& p) noexcept
+{
+    return p.get() == nullptr;
+}
 
 } // namespace std

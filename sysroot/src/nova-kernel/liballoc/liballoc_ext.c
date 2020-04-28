@@ -50,7 +50,7 @@ int liballoc_free(void* page,int pages)
 
     while (pages > 0)
     {
-        //vmm_page_free_kernel(p);
+        vmm_page_free_kernel(p);
         p += PAGE_SIZE;
         pages--;
     }

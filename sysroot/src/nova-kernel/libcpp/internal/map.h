@@ -8,31 +8,220 @@
 
 #include <globals.h>
 
+#include <algorithm>
 #include <functional>
 #include <iterator>
+#include <memory>
+#include <stack>
 #include <utility>
+#include <stdint.h>
+#include <stdio.h>
 
 namespace std
 {
 
-template <class Key, class T, class Compare, class Allocator>
+template <class Data>
 struct MapNode
 {
-    MapNode(Allocator& a) : alloc(a) {}
+    MapNode() {}
+    MapNode(const Data& d) : data(d) {}
 
-    MapNode(const T& k, const T& t, Allocator& a) : alloc(a)
+    size_t height = 1;
+    Data data;
+    MapNode<Data>* left;
+    MapNode<Data>* right;
+};
+
+template <class Data, class Compare>
+struct MapTree
+{
+    MapTree() {}
+
+    ~MapTree()
     {
-        data = make_pair(k, t);
+        if (root == nullptr)
+        {
+            return;
+        }
+
+        stack<MapNode<Data>*> stk;
+        stk.push(root);
+        while (!stk.empty())
+        {
+            auto cur = stk.top();
+            stk.pop();
+            if (cur->left != nullptr)
+            {
+                stk.push(cur->left);
+            }
+            if (cur->right != nullptr)
+            {
+                stk.push(cur->right);
+            }
+            delete cur;
+        }
     }
 
-    ~MapNode()
+    int calc_height(const MapNode<Data>* root)
     {
+        if (root == nullptr)
+        {
+            return 0;
+        }
+        else
+        {
+            return root->height;
+        }
     }
 
-    pair<Key, T> data;
-    MapNode<Key, T, Compare, Allocator>* left = nullptr;
-    MapNode<Key, T, Compare, Allocator>* right = nullptr;
-    Allocator& alloc;
+    int calc_balance(const MapNode<Data>* root)
+    {
+        if (root == nullptr)
+        {
+            return 0;
+        }
+        else
+        {
+            int l = calc_height(root->left);
+            int r = calc_height(root->right);
+            return l - r;
+        }
+    }
+
+    void update_height(MapNode<Data>* root)
+    {
+        int l = calc_height(root->left);
+        int r = calc_height(root->right);
+        root->height = 1 + max(l, r);
+    }
+
+    void rotate_left(MapNode<Data>*& root)
+    {
+        auto new_root = root->right;
+        auto new_right = new_root->left;
+
+        // Rotate.
+        new_root->left = root;
+        root->right = new_right;
+
+        // Update heights.
+        update_height(new_root->left->right);
+        update_height(new_root);
+
+        root = new_root;
+    }
+
+    void rotate_right(MapNode<Data>*& root)
+    {
+        auto new_root = root->left;
+        auto new_left = new_root->left;
+
+        // Rotate.
+        new_root->right = root;
+        root->left = new_left;
+
+        update_height(new_root->right->left);
+        update_height(new_root);
+
+        root = new_root;
+    }
+
+    pair<MapNode<Data>*, bool> insert(const Data& d)
+    {
+        // Check for empty tree.
+        if (root == nullptr)
+        {
+            root = new MapNode<Data>(d);
+        }
+        else
+        {
+            MapNode<Data>* cur = root;
+            MapNode<Data>* prev = nullptr;
+            stack<MapNode<Data>*> stk;
+
+            // Build path to new node.
+            while (cur != nullptr)
+            {
+                prev = cur;
+
+                if (compare(d.first, cur->data.first))
+                {
+                    cur = cur->left;
+                }
+                else if (compare(cur->data.first, d.first))
+                {
+                    cur = cur->right;
+                }
+                else
+                {
+                    // Can't add duplicate node.
+                    return {nullptr, false};
+                }
+
+                stk.push(prev);
+            }
+
+            // Add new node.
+            if (compare(d.first, prev->data.first))
+            {
+                delete prev->left;
+                prev->left = new MapNode<Data>(d);
+            }
+            else
+            {
+                delete prev->right;
+                prev->right = new MapNode<Data>(d);
+            }
+
+            // Balance tree
+            while (!stk.empty())
+            {
+                cur = stk.top();
+
+                if (calc_balance(cur) > 1)
+                {
+                    // Check for L-R.
+                    if (calc_balance(cur->left) < 0)
+                    {
+                        rotate_left(cur->left);
+                    }
+
+                    rotate_right(cur);
+                }
+                else if (calc_balance(cur) < -1)
+                {
+                    // Check for R-L.
+                    if (calc_balance(cur->right) > 0)
+                    {
+                        rotate_right(cur->right);
+                    }
+
+                    rotate_left(cur);
+                }
+
+                update_height(cur);
+
+                stk.pop();
+            }
+        }
+    }
+
+    void inorder(const MapNode<Data>* r)
+    {
+        if (r == nullptr)
+        {
+            return;
+        }
+        else
+        {
+            inorder(r->left);
+            printf("[%d, %s], ", r->data.first, r->data.second);
+            inorder(r->right);
+        }
+    }
+
+    MapNode<Data>* root;
+    Compare compare;
 };
 
 template <class Key, class T, class Compare, class Allocator>
@@ -81,18 +270,22 @@ public:
 
     /** Constructors. **/
 
-    explicit map(
-        const key_compare& c = key_compare(),
-        const allocator_type& alloc = allocator_type())
-        : comp(c), node_alloc(alloc) {}
+    /** Modifiers. **/
 
-    explicit map(const allocator_type& alloc)
-        : comp(key_compare()), node_alloc(alloc) {}
+    void insert(const value_type& v)
+    {
+        tree.insert(v);
+    }
+
+    // TEST.
+    void inorder()
+    {
+        tree.inorder(tree.root);
+    }
 
 private:
 
-    MapNode<Key, T, Compare, Allocator>* root = nullptr;
-    key_compare comp;
+    MapTree<value_type, key_compare> tree;
     Allocator node_alloc;
     size_t node_count = 0;
 };

@@ -14,6 +14,7 @@
 #include <map>
 #include <memory>
 #include <stack>
+#include <thread>
 #include <tuple>
 #include <type_traits>
 #include <vector>
@@ -27,11 +28,12 @@
 #include <hal/tty.h>
 #include <liballoc/liballoc.h>
 #include <proc/process.h>
-#include <proc/scheduler.h>
+#include <proc/thread.h>
 
 #ifdef ARCH_X86_64
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/gdt.h>
+#include <arch/x86_64/thread_state.h>
 #include <arch/x86_64/memory/pmm.h>
 #include <arch/x86_64/memory/vmm.h>
 #endif // ARCH_X86_64
@@ -43,6 +45,10 @@
 #endif // ARCH_X86
 
 #include <arch/x86_64/devices/pit.h>
+
+Thread* volatile current_thread;
+Thread* null_thread;
+Thread* kernel_thread;
 
 size_t ms_to_ticks(size_t ms)
 {
@@ -107,29 +113,9 @@ struct multiboot_tag_module kernel_module;
 
 void kernel_test()
 {
-    std::list<int> l;
-    l.push_back(1);
-    l.push_back(2);
-    l.push_back(3);
-    for (const auto& n : l)
-    {
-        printf("%d\n", n);
-    }
-
-    std::stack<const char*> s;
-
-    s.push("one");
-    s.push("two");
-    s.push("three");
-
-    while (!s.empty())
-    {
-        printf("%s\n", s.top());
-        s.pop();
-    }
 }
 
-void kernel_main()
+void kernel_start()
 {
     // Initialize VFS.
 
@@ -140,21 +126,26 @@ void kernel_main()
     stdout = tty_outs;
     stderr = tty_outs;
 
+    // Set up scheduler and run main kernel process.
+    //kernel_main(); // STUB
+    null_thread = thread_spawn((void*)nullptr);
+    current_thread = null_thread;
+    kernel_thread = thread_spawn((void*)kernel_main);
+    thread_switch(kernel_thread);
+
+    // The kernel is not intended to return; halt.
+    fputs("\nEnd of kernel code. Halt.", stdout);
+    fflush(stdout);
+    kernel_halt();
+}
+
+void kernel_main()
+{
+    kernel_test();
+
     char s[10000];
     const char user[] = "kernel@nova:";
     const char dir[] = "/";
-
-    // Set up scheduler.
-    Process kernel_proc;
-    kernel_proc.priv = 3;
-    kernel_proc.kernel_stack = 0;
-    Task kernel_task;
-    kernel_task.proc = &kernel_proc;
-    kernel_task.ticks = DEFAULT_TICKS;
-    kernel_task.next = &kernel_task;
-    cur_task = &kernel_task;
-
-    kernel_test();
 
     // Kernel loop.
     while (1)
@@ -166,10 +157,17 @@ void kernel_main()
         scanf("%s", s);
         if (strcmp(s, "module") == 0)
         {
-            char* module_page = (char*)vmm_page_alloc_kernel();
-            vmm_page_map((void*)(uintptr_t)kernel_module.mod_start, module_page, PG_PR | PG_RW | PG_U);
+            static char* module_page = nullptr;
+
+            // Only map module once.
+            if (module_page == nullptr)
+            {
+                module_page = (char*)vmm_page_alloc_kernel();
+                vmm_page_map((void*)(uintptr_t)kernel_module.mod_start, module_page, PG_PR | PG_RW | PG_U);
+            }
 
             size_t mod_len = kernel_module.mod_end - kernel_module.mod_start;
+            mod_len = std::min(mod_len, (size_t)PAGE_SIZE);
             kernel_write(module_page, mod_len);
             puts("");
         }
@@ -255,10 +253,6 @@ void kernel_main()
             printf("Command not recognized.\n");
         }
     }
-
-    // The kernel is not intended to return; halt.
-    fputs("\nEnd of kernel code. Halt.", stderr);
-    kernel_halt();
 }
 
 void kernel_panic(const char* str)

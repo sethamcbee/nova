@@ -9,10 +9,11 @@
 
 #include <stdlib.h>
 
+#include <list>
+
 #include <kernel.h>
 #include <drivers/graphics/vga_text.h>
 #include <drivers/input/ps2_keyboard.h>
-#include <proc/scheduler.h>
 
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/gdt.h>
@@ -60,12 +61,9 @@ extern "C" void boot_main(struct multiboot_tag *mb_tag, uint32_t magic)
     cmos_init();
     pit_init();
 
-    // Initialize scheduler.
-    cur_task = NULL;
-
     asm volatile ("sti \n"); // We can safely enable interrupts now.
 
-    kernel_main();
+    kernel_start();
 }
 
 void multiboot2_parse(struct multiboot_tag *mb_tag)

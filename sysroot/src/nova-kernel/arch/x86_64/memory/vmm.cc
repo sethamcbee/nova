@@ -547,7 +547,7 @@ void* vmm_pages_alloc_kernel(size_t n)
         if (mem.pages > n)
         {
             mem.pages -= n;
-            virt_base = (void*)(size_t)mem.base + PAGE_SIZE * mem.pages;
+            virt_base = (void*)((size_t)mem.base + PAGE_SIZE * mem.pages);
             vmm_tree_resize(vmm_tree_kernel_free, mem);
         }
         else
@@ -584,6 +584,9 @@ void vmm_page_free_kernel(void* virt)
 
 void vmm_pages_free_kernel(void* virt, size_t n)
 {
+    // STUB. Doesn't actually do anything.
+    return;
+
     // Modify trees.
     Vmm_Region region;
     region.base = virt;
@@ -595,7 +598,7 @@ void vmm_pages_free_kernel(void* virt, size_t n)
     {
         vmm_page_unmap(virt);
         pmm_frame_free(vmm_phys_addr(virt));
-        virt = (void*)(size_t)virt + PAGE_SIZE;
+        virt = (void*)((size_t)virt + PAGE_SIZE);
     }
 }
 
@@ -711,7 +714,7 @@ Vmm_Node* vmm_tree_insert(Vmm_Node* root, Vmm_Region mem)
     // Check if we should merge with the right node.
     if (root->r)
     {
-        void* end = (void*)(size_t)mem.base + mem.pages * PAGE_SIZE;
+        void* end = (void*)((size_t)mem.base + mem.pages * PAGE_SIZE);
         if (end == root->r->mem.base)
         {
             mem.base = root->r->mem.base;
