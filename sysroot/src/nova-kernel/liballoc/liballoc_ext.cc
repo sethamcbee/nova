@@ -5,6 +5,8 @@
  * @brief liballoc dependencies.
  */
 
+#include <mutex>
+
 #include <liballoc/liballoc.h>
 
 #ifdef ARCH_X86_64
@@ -17,22 +19,21 @@
 #include <arch/x86/memory/vmm.h>
 #endif // ARCH_X86
 
-// STUB.
-// Security risk.
+std::mutex liballoc_mtx;
 
-int liballoc_lock(void)
+extern "C" int liballoc_lock(void)
 {
-    //asm volatile ("cli \n");
+    liballoc_mtx.lock();
     return (0);
 }
 
-int liballoc_unlock(void)
+extern "C" int liballoc_unlock(void)
 {
-    //asm volatile ("sti \n");
+    liballoc_mtx.unlock();
     return (0);
 }
 
-void* liballoc_alloc(int pages)
+extern "C" void* liballoc_alloc(int pages)
 {
     if (pages == 0)
         return (NULL);
@@ -44,9 +45,9 @@ void* liballoc_alloc(int pages)
 }
 
 // NOTE: Is not currently freeing pages.
-int liballoc_free(void* page,int pages)
+extern "C" int liballoc_free(void* page,int pages)
 {
-    uint8_t* p = page;
+    uint8_t* p = (uint8_t*)page;
 
     while (pages > 0)
     {

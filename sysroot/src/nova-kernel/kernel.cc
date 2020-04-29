@@ -13,6 +13,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <stack>
 #include <thread>
 #include <tuple>
