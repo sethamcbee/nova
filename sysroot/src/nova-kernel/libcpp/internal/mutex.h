@@ -13,7 +13,7 @@ namespace std
 
 struct mutex_handle
 {
-    volatile int locked = 0;
+    volatile uint32_t locked = 0;
     Thread* owner = nullptr;
 };
 

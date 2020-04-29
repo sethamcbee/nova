@@ -10,9 +10,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <mutex>
+
 #include <kernel.h>
 #include <drivers/input/ps2_keyboard.h>
 #include <hal/tty.h>
+
+// IO mutexes.
+std::mutex tty_ins_mtx;
+std::mutex tty_outs_mtx;
 
 FILE* tty_ins;
 FILE* tty_outs;
@@ -29,12 +35,16 @@ static ssize_t (*ext_write)(const void *, size_t n);
 // Writes data.
 static ssize_t tty_write(const void *s, size_t n)
 {
+    std::lock_guard<std::mutex> mtx(tty_outs_mtx);
+
     return ( ext_write(s, n) );
 }
 
 // Reads data.
 static ssize_t tty_read(void *s, size_t n)
 {
+    std::lock_guard<std::mutex> mtx(tty_ins_mtx);
+
     char c;
     char* str = (char*)s;
     size_t len = 0;
