@@ -7,11 +7,11 @@
 
 #pragma once
 
+#ifdef STACK_GUARD
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifdef STACK_GUARD
 
 #include <stdint.h>
 

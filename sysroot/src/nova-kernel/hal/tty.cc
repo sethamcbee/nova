@@ -18,10 +18,10 @@ FILE* tty_ins;
 FILE* tty_outs;
 
 static FILE tty_out_file;
-static char tty_out_buf[10000];
+static char tty_out_buf[1000];
 static FILE tty_in_file;
-static char tty_in_buf[10000];
-static char tty_in_str[10000 + 1];
+static char tty_in_buf[1000];
+static char tty_in_str[1000 + 1];
 static size_t tty_in_len;
 static ssize_t (*ext_write)(const void *, size_t n);
 //static ssize_t (*ext_read)(void *, size_t n);

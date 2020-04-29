@@ -127,8 +127,7 @@ void kernel_start()
     stderr = tty_outs;
 
     // Set up scheduler and run main kernel process.
-    //kernel_main(); // STUB
-    null_thread = thread_spawn((void*)nullptr);
+    null_thread = new Thread;
     current_thread = null_thread;
     kernel_thread = thread_spawn((void*)kernel_main);
     thread_switch(kernel_thread);
@@ -143,7 +142,7 @@ void kernel_main()
 {
     kernel_test();
 
-    char s[10000];
+    char s[1000];
     const char user[] = "kernel@nova:";
     const char dir[] = "/";
 
