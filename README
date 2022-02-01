@@ -1,0 +1,3 @@
+Nova is a solo-dev hobbyist operating system targeting x86 and x86-64. The project mostly serves to explore ways that C++1X features can be used to
+improve safety of kernel-level code, support modern syntactic sugar and best practices without a necessary performance hit over C-style abstractions, and
+discover cases where move semantics and constexpr can be of use in optimizing or making intent more clear in driver and kernel code.
